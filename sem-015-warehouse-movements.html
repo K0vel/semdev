@@ -3148,6 +3148,18 @@ renderRows();
   }
 })();
 
+/* Re-run column-width sync once fonts + late assets are settled. The
+   initial rAF-scheduled sync (fired from renderRows) measures BEFORE
+   Phosphor font finishes loading on first visit, so glyph widths are
+   smaller than their final rendered size — first user-triggered sort
+   would then resync against larger glyphs and column widths would
+   visibly jump. window.load covers cached/late stylesheets;
+   document.fonts.ready covers the icon font race specifically. */
+window.addEventListener('load', _queueSync);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(_queueSync);
+}
+
 /* Track keyboard-vs-mouse interaction so we can show the focus halo
    only on real Tab navigation, not on click-triggered focus. */
 document.addEventListener('keydown', function(e) {
