@@ -1,0 +1,3149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEM: Warehouse Movements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+
+
+<style>
+/* ─── Design Tokens ──────────────────────────────────────────── */
+/* OKLCH primitives: brand H=50, neutral H=50 C=0.006     */
+:root {
+  /* ── Primitives — Teal (brand, H=151 vivid green) ── */
+  --teal-50:  oklch(0.970 0.025 151.41);
+  --teal-100: oklch(0.940 0.045 151.41);
+  --teal-200: oklch(0.880 0.080 151.41);
+  --teal-300: oklch(0.810 0.115 151.41);
+  --teal-400: oklch(0.7196 0.145 151.41);
+  --teal-500: oklch(0.7196 0.1784 151.41); /* brand base — vivid green */
+  --teal-600: oklch(0.545 0.145 151.41);
+  --teal-700: oklch(0.440 0.120 151.41);
+  --teal-800: oklch(0.340 0.090 151.41);
+  --teal-900: oklch(0.240 0.060 151.41);
+  --teal-950: oklch(0.160 0.040 151.41);
+
+  /* ── Primitives — Neutral (navy-cool, H=240 C=0.014) ─ */
+  --neutral-50:  oklch(0.985 0.008 240);
+  --neutral-100: oklch(0.960 0.010 240);
+  --neutral-200: oklch(0.910 0.012 240);
+  --neutral-300: oklch(0.830 0.014 240);
+  --neutral-400: oklch(0.700 0.014 240);
+  --neutral-500: oklch(0.580 0.014 240);
+  --neutral-600: oklch(0.460 0.014 240);
+  --neutral-700: oklch(0.330 0.020 240);
+  --neutral-750: oklch(0.270 0.022 240);
+  --neutral-800: oklch(0.220 0.025 240);
+  --neutral-850: oklch(0.190 0.025 240);
+  --neutral-900: oklch(0.160 0.025 240);
+  --neutral-950: oklch(0.110 0.020 240);
+
+  /* ── Primitives — Status (5 steps each) ───────────── */
+  --green-100: oklch(0.930 0.060 145);
+  --green-400: oklch(0.680 0.160 145);
+  --green-500: oklch(0.600 0.180 145);
+  --green-700: oklch(0.420 0.130 145);
+  --green-900: oklch(0.220 0.060 145);
+
+  --red-100: oklch(0.930 0.050 25);
+  --red-400: oklch(0.650 0.200 25);
+  --red-500: oklch(0.580 0.220 25);
+  --red-700: oklch(0.420 0.160 25);
+  --red-900: oklch(0.220 0.070 25);
+
+  --orange-100: oklch(0.950 0.050 60);
+  --orange-400: oklch(0.750 0.150 60);
+  --orange-500: oklch(0.680 0.170 60);
+  --orange-700: oklch(0.480 0.120 60);
+  --orange-900: oklch(0.250 0.050 60);
+
+  --yellow-100: oklch(0.960 0.050 90);
+  --yellow-400: oklch(0.850 0.150 90);
+  --yellow-500: oklch(0.820 0.160 90);
+  --yellow-700: oklch(0.550 0.130 90);
+  --yellow-900: oklch(0.300 0.060 90);
+
+  /* ── Primitives — Base ─────────────────────────────── */
+  --base-white: oklch(1 0 0);
+  --base-black: oklch(0 0 0);
+
+  /* ── Semantic — Dark (default) ─────────────────────── */
+  --bg-page:     var(--neutral-950);
+  --bg-surface:  var(--neutral-900);
+  --bg-elevated: var(--neutral-800);
+  --bg-overlay:  var(--neutral-700);
+
+  --text-primary:   var(--neutral-50);
+  --text-secondary: var(--neutral-400);
+  --text-tertiary:  var(--neutral-500);
+  --text-disabled:  var(--neutral-600);
+  --text-inverse:   var(--neutral-900);
+  --text-brand:     var(--teal-400);
+
+  --border-default: var(--neutral-700);
+  --border-subtle:  var(--neutral-750);
+  --border-strong:  var(--neutral-600);
+  --border-focus:   var(--neutral-400);
+
+  --brand-bg-default: var(--teal-500);
+  --brand-bg-hover:   var(--teal-600);
+  --brand-bg-subtle:  var(--teal-900);
+  --brand-fg:         var(--base-white);
+
+  /* Unified focus ring: 1px CTA border + 4px CTA-15% halo */
+  --focus-ring: 0 0 0 4px color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
+
+  --surface-hover:           rgba(255,255,255,.04);
+  --surface-active:          rgba(255,255,255,.06);
+  --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
+  --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
+
+  --status-success-bg:    var(--green-900);
+  --status-success-fg:    var(--green-400);
+  --status-success-solid: var(--green-500);
+  --status-error-bg:      var(--red-900);
+  --status-error-fg:      var(--red-400);
+  --status-error-solid:   var(--red-500);
+  --status-warning-bg:    var(--orange-900);
+  --status-warning-fg:    var(--orange-400);
+  --status-warning-solid: var(--orange-500);
+  --status-info-bg:       var(--teal-900);
+  --status-info-fg:       var(--teal-400);
+  --status-info-solid:    var(--teal-500);
+
+  /* ── Components ────────────────────────────────────── */
+  --button-primary-bg:         var(--brand-bg-default);
+  --button-primary-bg-hover:   var(--brand-bg-hover);
+  --button-primary-fg:         var(--teal-950);
+  --button-secondary-bg:       transparent;
+  --button-secondary-bg-hover: var(--surface-hover);
+  --button-secondary-fg:       var(--text-primary);
+  --button-secondary-border:   var(--border-default);
+  --button-ghost-bg:           transparent;
+  --button-ghost-bg-hover:     var(--surface-hover);
+  --button-ghost-fg:           var(--text-secondary);
+  --button-destructive-bg:     var(--status-error-solid);
+  --button-destructive-fg:     var(--base-white);
+
+  --input-bg:             var(--bg-elevated);
+  --input-fg:             var(--text-primary);
+  --input-placeholder:    var(--text-secondary);
+  --input-border-default: var(--border-default);
+  --input-border-focus:   var(--brand-bg-default);
+  --input-border-error:   var(--status-error-solid);
+  --input-label:          var(--text-secondary);
+  --input-helper:         var(--text-tertiary);
+
+  --table-header-bg:        var(--neutral-700);
+  --table-header-fg:        var(--text-primary);
+  --table-header-border:    var(--border-default);
+  --table-row-bg:           transparent;
+  --table-row-fg:           var(--text-secondary);
+  --table-row-fg-secondary: var(--text-tertiary);
+  --table-row-bg-hover:     color-mix(in oklch, oklch(0.75 0.06 240) 10%, transparent);
+  --table-row-bg-selected:  var(--surface-selected);
+  --table-row-border:       var(--border-subtle);
+  --table-row-zebra:        rgba(255, 255, 255, 0.04);
+
+  --badge-success-bg: var(--status-success-bg);
+  --badge-success-fg: var(--status-success-fg);
+  --badge-error-bg:   var(--status-error-bg);
+  --badge-error-fg:   var(--status-error-fg);
+  --badge-warning-bg: var(--status-warning-bg);
+  --badge-warning-fg: var(--status-warning-fg);
+  --badge-info-bg:    var(--status-info-bg);
+  --badge-info-fg:    var(--status-info-fg);
+  --badge-neutral-bg: var(--bg-elevated);
+  --badge-neutral-fg: var(--text-secondary);
+
+  --sidebar-bg:             var(--bg-elevated);
+  --sidebar-border:         transparent;
+  --sidebar-item-fg:        var(--text-secondary);
+  --sidebar-item-fg-active: var(--text-primary);
+  --sidebar-item-bg-hover:  var(--surface-hover);
+  --sidebar-item-bg-active: var(--surface-active);
+  --sidebar-group-fg:       var(--text-secondary);
+
+  /* ── Typography ────────────────────────────────────── */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Roboto Mono', 'Courier New', monospace;
+
+  /* ── Spacing (4px grid) ────────────────────────────── */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s8: 32px;
+  --s10: 40px; --s12: 48px; --s16: 64px;
+
+  /* ── Radius ────────────────────────────────────────── */
+  --r-none: 0;
+  --r-sm: 2px; --r-md: 4px; --r-lg: 6px; --r-xl: 8px;
+  --r-2xl: 12px; --r-3xl: 16px;
+  --r-full: 9999px;
+}
+
+/* ─── Semantic — Light ────────────────────────────────── */
+[data-theme="light"] {
+  --bg-page:     var(--neutral-50);
+  --bg-surface:  var(--neutral-100);
+  --bg-elevated: var(--base-white);
+  --bg-overlay:  var(--neutral-200);
+
+  --text-primary:   var(--neutral-900);
+  --text-secondary: var(--neutral-500);
+  --text-tertiary:  var(--neutral-500);
+  --text-disabled:  var(--neutral-300);
+  --text-inverse:   var(--neutral-50);
+  --text-brand:     var(--teal-600);
+
+  --border-default: var(--neutral-300);
+  --border-subtle:  var(--neutral-200);
+  --border-strong:  var(--neutral-400);
+  --border-focus:   var(--neutral-400);
+
+  --brand-bg-default: var(--teal-500);
+  --brand-bg-hover:   var(--teal-600);
+  --brand-bg-subtle:  var(--teal-50);
+  --brand-fg:         var(--base-white);
+
+  --surface-hover:           rgba(0,0,0,.03);
+  --surface-active:          rgba(0,0,0,.06);
+  --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
+  --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
+
+  --status-success-bg: var(--green-100);
+  --status-success-fg: var(--green-700);
+  --status-error-bg:   var(--red-100);
+  --status-error-fg:   var(--red-700);
+  --status-warning-bg: var(--orange-100);
+  --status-warning-fg: var(--orange-700);
+  --status-info-bg:    var(--teal-100);
+  --status-info-fg:    var(--teal-700);
+  --table-row-zebra:   rgba(0, 0, 0, 0.04);
+  --table-header-bg:   var(--bg-surface);
+}
+
+/* Restore filter-select bg in light */
+[data-theme="light"] .filter-select,
+[data-theme="light"] input.filter-input,
+[data-theme="light"] .date-range input[type=date] {
+  color-scheme: light;
+}
+[data-theme="light"] .filter-select {
+  background-color: var(--bg-elevated);
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+/* ─── Icons ──────────────────────────────────────────── */
+.ph { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; line-height: 1; }
+
+/* ─── Reset ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Button reset so semantic <button> can carry our class-based styling
+   that originally targeted <div onclick> wrappers. */
+button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+/* Screen-reader-only utility (skip link target text, etc.) */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — only appears on keyboard focus. */
+.skip-link {
+  position: absolute;
+  left: 12px; top: -40px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: var(--brand-bg-default);
+  color: var(--brand-fg);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 120ms ease-out;
+}
+.skip-link:focus-visible { top: 12px; outline: 2px solid var(--brand-fg); outline-offset: 2px; }
+
+/* Respect user's motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Focus rings (keyboard a11y) ────────────────────── */
+:focus { outline: none; }
+/* Buttons & focusable wrappers: outline = the "border" since they have
+   no native one, layered with the halo via box-shadow. Excludes .field
+   and .date-range — they have a real border that handles the focus
+   colour change, so the outline would just stack on top of it. */
+button:focus-visible,
+[onclick]:not(.field):not(.date-range):not(.tag-chip):focus-visible,
+[role="button"]:not(.date-range):focus-visible,
+.nav-section:focus-visible,
+.nav-item:focus-visible,
+.view-tab:focus-visible,
+.btn-icon:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.collapse-btn:focus-visible,
+.toggle-switch:focus-visible {
+  outline: 1px solid var(--brand-bg-default);
+  outline-offset: 0;
+  box-shadow: var(--focus-ring);
+}
+/* Click/active state on fields: CTA border only, no halo */
+.field:focus-within,
+.date-range:focus-within,
+.tag-chip:focus-within,
+.field.is-select.open,
+.tag-chip.open {
+  border-color: var(--input-border-focus);
+}
+/* Halo only when the last user interaction was a key, not a click.
+   body.keyboard-nav is set on Tab (in JS) and cleared on mousedown.
+   This bypasses the :focus-visible quirks from label clicks and
+   flatpickr's programmatic input.focus(). */
+/* .field text-input lives inside <label>, so focus lands on a descendant
+   <input> → :has(:focus-visible) catches it. .date-range and
+   .field.is-select are themselves tabindex/role-focusable, so focus
+   lands on the wrapper directly → need :focus-visible on the wrapper
+   itself (covered for is-select by [role=combobox], added explicitly
+   for .date-range below). */
+body.keyboard-nav .field:has(:focus-visible),
+body.keyboard-nav .date-range:focus-visible,
+body.keyboard-nav [role="combobox"]:focus-visible,
+body.keyboard-nav [role="checkbox"]:focus-visible,
+body.keyboard-nav [role="switch"]:focus-visible,
+body.keyboard-nav th.sortable:focus-visible {
+  border-color: var(--input-border-focus);
+  box-shadow: var(--focus-ring);
+}
+
+/* ─── Sidebar ────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 0 var(--s2) var(--s2);
+}
+.sidebar::-webkit-scrollbar { display: none; }
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin: 0 calc(-1 * var(--s2));
+  padding: var(--s1) var(--s4) var(--s1);
+  min-height: 56px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-default);
+}
+.sidebar-logo-mark {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-full);
+  background: transparent;
+  border: 3px solid var(--base-white);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.sidebar-logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  letter-spacing: -.01em;
+}
+
+.nav { padding: var(--s2) 0; flex: 1; display: flex; flex-direction: column; gap: var(--s1); }
+
+.nav-section {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s3);
+  min-height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sidebar-item-fg);
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--r-md);
+  transition: background .12s, color .12s;
+  white-space: nowrap;
+}
+.nav-section:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
+.nav-section.active {
+  color: var(--sidebar-item-fg-active);
+  background: var(--sidebar-item-bg-active);
+}
+.nav-section.is-group {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  line-height: 14px;
+  color: var(--text-tertiary);
+  opacity: 0.8;
+  min-height: 28px;
+  padding: 0 var(--s3);
+  cursor: default;
+  pointer-events: none;
+}
+.nav-section.is-group:hover { background: transparent; color: var(--text-tertiary); }
+.sidebar.collapsed .nav-section.is-group,
+.sidebar.collapsed .nav-divider { display: none; }
+.nav-section > .ph-caret-down {
+  opacity: .6;
+  transition: transform .12s;
+}
+.nav-section.collapsed > .ph-caret-down { transform: rotate(-90deg); }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s3);
+  min-height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sidebar-item-fg);
+  cursor: pointer;
+  border-radius: var(--r-md);
+  transition: background .12s, color .12s;
+  user-select: none;
+  white-space: nowrap;
+}
+.nav-item:has(> i:first-child) { padding-right: calc(var(--s3) + 4px); }
+.nav-item:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
+.nav-item.active {
+  color: var(--brand-fg);
+  background: var(--brand-bg-default);
+  font-weight: 600;
+}
+
+.nav-subitem { /* same padding as nav-section */ }
+
+.nav-divider {
+  height: 1px;
+  background: var(--border-default);
+  margin: var(--s2) calc(-1 * var(--s2));
+}
+
+.sidebar-collapse {
+  flex-shrink: 0;
+  padding-top: var(--s1);
+}
+.collapse-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  color: var(--sidebar-item-fg);
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s, color .12s;
+}
+.collapse-btn:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
+
+/* ─── Sidebar collapsed state ────────────────────────── */
+.sidebar.collapsed { width: 56px; min-width: 56px; }
+.sidebar.collapsed .sidebar-logo-text,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .nav-section > .ph-caret-down { display: none; }
+.sidebar.collapsed .nav-section,
+.sidebar.collapsed .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
+
+/* ─── Main ───────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-page);
+}
+
+/* ─── Header ────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s1) var(--s4);
+  height: 56px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -.015em;
+  line-height: 1;
+}
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  min-width: 0;
+}
+.results-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-brand);
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.results-count strong { color: inherit; font-weight: inherit; }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+}
+
+/* ─── Filters ────────────────────────────────────────── */
+.filters {
+  padding: var(--s4);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  flex-shrink: 0;
+}
+.filter-row-primary,
+.filter-row-secondary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s2);
+  align-items: stretch;
+}
+.field-wide { grid-column: span 2; }
+
+/* ─── Unified field (icon + input/select) ────────────── */
+.field {
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px var(--s3);
+  background: var(--surface-active);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  color: var(--input-fg);
+  min-width: 0;
+  position: relative;
+  transition: border-color .15s, background .15s;
+}
+.field:hover { background: var(--bg-overlay); }
+.field:focus-within { background: var(--surface-active); }
+/* Whole-component clickable: text-input fields use <label> wrapper so any
+   click within the field padding focuses the input. */
+label.field:has(input[type=text]) { cursor: text; }
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+  min-height: 20px;
+}
+.field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
+/* Hide leading icons inside field rows; keep the caret indicator */
+
+/* ─── Persistent eyebrow label ───────────────────────── */
+.field-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  line-height: 12px;
+  pointer-events: none;
+  user-select: none;
+}
+.field:focus-within .field-label,
+.date-range:focus-within .field-label,
+.tag-chip:focus-within .field-label,
+.field.is-select.open .field-label,
+.tag-chip.open .field-label { color: var(--text-brand); opacity: 1; }
+/* Leading icon (search magnifier, calendar) brightens to the primary
+   text colour (white in dark / ink in light) on focus, so the whole
+   field reads as "active" without competing with the brand-coloured
+   eyebrow label. field-caret is excluded — it's a passive affordance. */
+.field:focus-within .field-row > i:not(.field-caret),
+.date-range:focus-within .field-row > i:not(.field-caret),
+.tag-chip:focus-within .field-row > i:not(.field-caret) { color: var(--text-primary); }
+
+/* ─── Field affix (chevron + clear, unified style) ────── */
+.field-caret,
+.field-clear {
+  position: absolute;
+  right: var(--s3);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  border-radius: var(--r-sm);
+  pointer-events: none;
+}
+.field-clear {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+  transition: background .12s, color .12s;
+}
+.date-range.has-value .field-clear { display: flex; }
+.field-clear:hover { background: var(--surface-hover); color: var(--text-primary); }
+/* Make room for the affix on fields that carry one */
+.field.is-select .field-row,
+.tag-chip .field-row { padding-right: 22px; }
+.date-range.has-value .field-row { padding-right: 22px; }
+
+/* ─── Tag multiselect ────────────────────────────────── */
+.tag-chip { cursor: pointer; }
+.field-caret { margin-left: auto; }
+.tag-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  padding: var(--s1);
+  z-index: 50;
+  cursor: default;
+}
+.tag-chip.open .tag-dropdown { display: block; }
+.tag-option {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+.tag-option:hover { background: var(--surface-hover); }
+.tag-option input[type=checkbox] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+.tag-option .checkbox { flex-shrink: 0; }
+.tag-option input[type=checkbox]:checked ~ .checkbox {
+  background: var(--brand-bg-default);
+  border-color: var(--brand-bg-default);
+}
+.tag-option input[type=checkbox]:checked ~ .checkbox > i { display: inline-flex; }
+
+/* ─── Custom select dropdown (replaces native <select>) ─ */
+.field.is-select { cursor: pointer; }
+.custom-select-value {
+  flex: 1;
+  min-width: 0;
+  color: var(--input-fg);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  line-height: 20px;
+}
+.field.is-select:not(.has-value) .custom-select-value::before {
+  content: attr(data-placeholder);
+  color: var(--input-placeholder);
+  font-weight: 500;
+}
+.custom-select-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  padding: var(--s1);
+  z-index: 50;
+  max-height: 280px;
+  overflow-y: auto;
+  cursor: default;
+}
+.field.is-select.open .custom-select-dropdown { display: block; }
+.field.is-select .field-caret,
+.tag-chip .field-caret { transition: transform .15s; }
+.field.is-select.open .field-caret,
+.tag-chip.open .field-caret { transform: translateY(-50%) rotate(180deg); }
+.custom-option {
+  padding: var(--s2) var(--s3);
+  border-radius: var(--r-sm);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s;
+}
+.custom-option:hover { background: var(--surface-hover); }
+.custom-option.is-selected { background: var(--sidebar-item-bg-active); color: var(--text-primary); font-weight: 600; }
+
+.tag-chip-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tag-counter {
+  position: absolute;
+  right: calc(var(--s3) + 22px + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--brand-bg-default);
+  color: var(--neutral-900);
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.tag-chip:not(.has-value) .tag-counter { display: none; }
+/* Counter is the hover target itself — pill keeps its brand shape +
+   number-driven width on hover; the X overlays via absolute positioning
+   so swapping glyphs doesn't change the pill geometry. */
+.tag-counter { pointer-events: auto; cursor: pointer; }
+.tag-counter-num,
+.tag-counter-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .12s;
+}
+.tag-counter-x {
+  position: absolute;
+  inset: 0;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+}
+.tag-counter:hover .tag-counter-num { opacity: 0; }
+.tag-counter:hover .tag-counter-x   { opacity: 1; }
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 22px;
+  padding: 0 var(--s1) 0 var(--s2);
+  background: var(--brand-bg-subtle);
+  border: 1px solid var(--status-info-fg);
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-brand);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tag-pill-remove {
+  width: 16px; height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-full);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: var(--text-brand);
+  padding: 0;
+}
+.tag-pill-remove:hover { background: rgba(255,255,255,.08); }
+.tag-placeholder { color: var(--input-placeholder); font-weight: 500; }
+.field-row > input,
+.field-row > select {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--input-fg);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  padding: 0;
+  height: 20px;
+  line-height: 20px;
+}
+.field-row > input::placeholder {
+  color: var(--input-placeholder);
+  font-weight: 500;
+}
+.field:not(.has-value) .field-row > select { color: var(--input-placeholder); }
+.field-row > select {
+  appearance: none;
+  cursor: pointer;
+  padding-right: var(--s5);
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+}
+.field-row > select option { color: var(--input-fg); background: var(--input-bg); }
+
+/* ─── Filter Controls ────────────────────────────────── */
+.filter-input, .filter-select, .filter-date {
+  height: 32px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border-default);
+  border-radius: var(--r-md);
+  color: var(--input-fg);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 0 var(--s3);
+  outline: none;
+  transition: border-color .15s;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.filter-input:focus, .filter-select:focus { border-color: var(--input-border-focus); }
+.filter-input { min-width: 160px; }
+
+input.filter-input { cursor: text; }
+input.filter-input::placeholder { color: var(--input-placeholder); }
+
+.filter-select {
+  cursor: pointer;
+  min-width: 130px;
+  appearance: none;
+  padding-right: var(--s6);
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-color: var(--input-bg);
+}
+
+.filter-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.filter-icon {
+  position: absolute;
+  left: 9px;
+  color: var(--input-placeholder);
+  pointer-events: none;
+  display: flex;
+}
+.filter-select-wrap .filter-select { padding-left: 28px; }
+
+.date-range {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  background: var(--surface-active);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  min-height: 48px;
+  padding: 8px var(--s3);
+  position: relative;
+  min-width: 0;
+  transition: background .15s, border-color .15s;
+}
+.date-range:hover { background: var(--bg-overlay); }
+.date-range .field-row { gap: var(--s2); }
+.date-range .field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
+.date-range-inline-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--input-placeholder);
+  flex-shrink: 0;
+}
+.date-range input#date-range-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: transparent;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.date-range:not(.has-value) .date-range-placeholder {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+.field-wide .field-row > input::placeholder { color: var(--text-tertiary); }
+.date-range.has-value .date-range-placeholder { display: none; }
+.date-range:not(.has-value) .date-range-values { display: none; }
+.date-range-values {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transform: translateY(-1px);
+}
+.date-range-value-start,
+.date-range-value-end {
+  color: var(--input-fg);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.date-range-sep {
+  color: var(--input-placeholder);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+}
+.date-range input[type=date] {
+  background: transparent;
+  border: none;
+  color: var(--input-placeholder);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 var(--s2) 0 var(--s2);
+  outline: none;
+  height: 38px;
+  width: 110px;
+  color-scheme: dark;
+}
+.date-range input[type=date]::-webkit-calendar-picker-indicator { display: none; }
+.date-range input[type=date]::-webkit-inner-spin-button { display: none; }
+.date-sep {
+  color: var(--input-helper);
+  font-size: 12px;
+  padding: 0 2px;
+}
+.date-range .btn-icon-sm {
+  padding: 0 var(--s2);
+  border-left: 1px solid var(--input-border-default);
+  height: 38px;
+  display: flex; align-items: center;
+}
+
+.tag-chip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 48px;
+  padding: 8px var(--s3);
+  background: var(--surface-active);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--input-placeholder);
+  cursor: pointer;
+  min-width: 0;
+  position: relative;
+  user-select: none;
+  transition: border-color .15s, background .15s;
+}
+.tag-chip:hover { background: var(--bg-overlay); }
+.tag-chip .field-row { gap: var(--s2); min-height: 20px; }
+.tag-chip .field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
+.tag-chip-remove { margin-left: auto; }
+.tag-chip-remove {
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: background .12s, color .12s;
+}
+.tag-chip-remove:hover { background: var(--button-ghost-bg-hover); color: var(--text-primary); }
+
+/* ─── Active filter chips bar ────────────────────────── */
+.filter-chips-bar {
+  display: none;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--s2);
+  margin-top: var(--s2);
+}
+.filters.has-chips .filter-chips-bar { display: grid; }
+.filter-chips-bar .chips-label { display: none; }
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px;
+  background: var(--surface-active);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  max-width: 280px;
+}
+.filter-chip-key { display: none; }
+.filter-chip-val {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.filter-chip-remove {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .12s, color .12s;
+}
+.filter-chip-remove:hover { background: var(--surface-hover); color: var(--text-secondary); }
+.chips-clear-all {
+  align-self: start;
+  /* Match .filter-chip height so the button's text baseline lines up
+     with the chip text on the first row. align-self: start keeps it
+     pinned to the top row when chips wrap. */
+  height: 28px;
+  background: transparent;
+  border: none;
+  color: var(--text-brand);
+  font-family: var(--font);
+  font-size: 12px;
+  white-space: nowrap;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 0 0 0 var(--s3);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.chips-clear-all::before {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 14px;
+  background: var(--border-default);
+}
+.chips-clear-all:hover { text-decoration: underline; }
+
+/* ─── Table Toolbar ──────────────────────────────────── */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s4);
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+}
+.toolbar-left { gap: var(--s6); }
+.toolbar-right { gap: var(--s2); }
+
+/* ─── View tabs (segmented control) ──────────────────── */
+.view-tabs {
+  display: inline-flex;
+  background: var(--neutral-850);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  padding: 3px;
+  gap: 0;
+}
+.view-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0 var(--s4);
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: background .12s, color .12s;
+}
+.view-tab:hover { color: var(--text-primary); }
+.view-tab.active {
+  background: var(--neutral-750);
+  color: var(--base-white);
+}
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-label:has(.toggle-switch.on) { color: var(--text-primary); }
+.toggle-label > span { transform: translateY(-1px); }
+.toggle-switch {
+  width: 44px; height: 26px;
+  background: var(--border-default);
+  border-radius: 13px;
+  position: relative;
+  transition: background .15s;
+  cursor: pointer;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 5px; left: 5px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--base-white);
+  transition: transform .15s;
+}
+.toggle-switch.on { background: var(--brand-bg-default); }
+.toggle-switch.on::after { transform: translateX(18px); }
+
+/* ─── Buttons ────────────────────────────────────────── */
+.btn-icon {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-md);
+  border: none;
+  background: var(--button-ghost-bg);
+  color: var(--button-ghost-fg);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.btn-icon:hover { background: var(--button-ghost-bg-hover); color: var(--text-primary); }
+.btn-icon.active { background: var(--brand-bg-subtle); color: var(--text-brand); }
+.header-right .btn-icon { width: 36px; height: 36px; border-radius: var(--r-md); }
+
+.btn-icon-sm {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-sm);
+  background: var(--button-ghost-bg);
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.btn-icon-sm:hover { background: var(--button-ghost-bg-hover); color: var(--text-primary); }
+
+.btn-primary,
+.btn-secondary {
+  height: 36px;
+  padding: 0 var(--s4);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  cursor: pointer;
+  display: flex; align-items: center; gap: var(--s2);
+  transition: background .12s;
+}
+.btn-primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-fg);
+}
+/* Leading-icon buttons get +4px right padding so the text doesn't sit
+   visually closer to the right edge than it does to the icon — corrects
+   for the gap distance the icon contributes on the left side. */
+.btn-primary:has(> i:first-child),
+.btn-secondary:has(> i:first-child) {
+  padding-right: calc(var(--s4) + 4px);
+}
+.btn-primary:hover { background: var(--button-primary-bg-hover); }
+.btn-secondary {
+  background: var(--surface-active);
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+.btn-secondary:hover { background: var(--bg-overlay); }
+
+/* ─── Table ──────────────────────────────────────────── */
+.table-head-wrap {
+  flex-shrink: 0;
+  background: var(--table-header-bg);
+  /* No scrollbar gutter — .table-wrap below also hides its scrollbar,
+     so the head and body columns stay aligned without reserving 5px
+     on the right. */
+  overflow-y: hidden;
+  overflow-x: hidden;
+  position: relative;
+}
+.table-head-wrap::-webkit-scrollbar { width: 5px; height: 0; }
+.table-head-wrap::-webkit-scrollbar-thumb,
+.table-head-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 0;
+  /* Hide the native scrollbar completely — no reserved gutter means
+     the table content extends to the full right edge of .table-zone
+     with no 5px gap. Scrolling still works via wheel, touchpad, and
+     keyboard (arrow keys / PageUp / PageDown when the table-wrap or
+     a row inside is focused). */
+  scrollbar-width: none;
+}
+.table-wrap::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* Custom scroll thumb: thin bar overlaid on the table's right edge,
+   no track / no arrows / no background. JS positions it based on
+   .table-wrap's scrollTop. Fades in while scrolling or when the
+   table-zone is hovered, fades out after a short idle. */
+.scroll-thumb {
+  position: absolute;
+  right: 4px;
+  width: 5px;
+  /* Bright neutral base (white in dark / ink in light) overlaid at
+     very low opacity so the thumb reads as a translucent highlight.
+     Kept under ~0.2 specifically so it doesn't turn muddy grey when
+     it crosses the brand-tinted selected rows underneath. */
+  background: var(--text-primary);
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+  z-index: 6;
+}
+.table-zone:hover .scroll-thumb,
+.scroll-thumb.is-scrolling { opacity: 0.15; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+/* Body computes content-based widths; head is fixed and JS mirrors
+   the body's widths onto its colgroup so the two stay aligned. */
+.table-wrap table      { table-layout: auto; }
+.table-head-wrap table { table-layout: fixed; }
+
+th {
+  background: var(--table-header-bg);
+  color: var(--table-header-fg);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 var(--s4);
+  height: 44px;
+  text-align: left;
+  border-bottom: 1px solid var(--table-header-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+th.sortable { cursor: pointer; }
+/* Sort icons (both hover preview + active) share Phosphor geometry so
+   the swap on click doesn't shift the title. */
+.sort-icon,
+.sort-preview {
+  font-size: 14px;
+  margin-left: 8px;
+  vertical-align: -2px;
+  pointer-events: none;
+}
+th.sort-icon-left .sort-icon,
+th.sort-icon-left .sort-preview { margin-left: 0; margin-right: 8px; }
+/* Centered headers (e.g. Type): float the sort icon out of the text
+   flow so it doesn't push the label off geometric center. The body
+   icons are pure-centered, so the header text must also be pure-
+   centered to align. */
+th.sortable.center { position: relative; }
+th.sortable.center .sort-icon,
+th.sortable.center .sort-preview {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  margin: 0;
+}
+.sort-icon    { color: var(--text-tertiary); }
+.sort-preview { color: var(--text-disabled); opacity: 0; transition: opacity .12s; }
+th.col-sorted .sort-preview { display: none; }
+th.sortable:hover .sort-preview { opacity: 0.7; }
+/* Column hover: native :hover on the head th + a :has() rule per
+   sortable column tints the corresponding body td. Pure CSS, no JS,
+   no querySelectorAll on mouse-sweep. (Cols 2-10 are sortable;
+   col 1 = checkbox, col 11 = actions are excluded.) */
+.table-head-wrap th.sortable:hover,
+.table-zone:has(.table-head-wrap th:nth-child(2):hover) .table-wrap td:nth-child(2),
+.table-zone:has(.table-head-wrap th:nth-child(3):hover) .table-wrap td:nth-child(3),
+.table-zone:has(.table-head-wrap th:nth-child(4):hover) .table-wrap td:nth-child(4),
+.table-zone:has(.table-head-wrap th:nth-child(5):hover) .table-wrap td:nth-child(5),
+.table-zone:has(.table-head-wrap th:nth-child(6):hover) .table-wrap td:nth-child(6),
+.table-zone:has(.table-head-wrap th:nth-child(7):hover) .table-wrap td:nth-child(7),
+.table-zone:has(.table-head-wrap th:nth-child(8):hover) .table-wrap td:nth-child(8),
+.table-zone:has(.table-head-wrap th:nth-child(9):hover) .table-wrap td:nth-child(9),
+.table-zone:has(.table-head-wrap th:nth-child(10):hover) .table-wrap td:nth-child(10) {
+  box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.02);
+}
+th.center { text-align: center; }
+
+td {
+  padding: 0 var(--s4);
+  height: 56px;
+  vertical-align: middle;
+  color: var(--table-row-fg);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+tbody tr:nth-child(even) td { background: var(--table-row-zebra); }
+tbody tr:hover td { background: var(--table-row-bg-hover); }
+/* On hover, promote every text tier one step up so the row reads as
+   the foreground focus: tertiary → secondary, secondary → primary.
+   Brand colour (progress-filled) is left alone — it's already the
+   most emphatic state. --table-row-fg is overridden directly because
+   its var(--text-tertiary) chain resolves at :root scope, not at
+   the consumer — so just overriding --text-tertiary doesn't reach
+   plain <td> color through that intermediary variable. */
+tbody tr:hover {
+  --text-tertiary:  var(--neutral-400);
+  --text-secondary: var(--neutral-50);
+  --table-row-fg:   var(--neutral-50);
+}
+[data-theme="light"] tbody tr:hover {
+  --text-tertiary:  var(--neutral-500);
+  --text-secondary: var(--neutral-900);
+  --table-row-fg:   var(--neutral-900);
+}
+tbody tr.selected td { background: var(--table-row-bg-selected); }
+/* Preserve zebra differentiation when adjacent rows are selected —
+   without this, neighbouring .selected rows fuse into one solid
+   block with no visual boundary between them. Even rows get the
+   "strong" selected tint (30% brand vs 20%), so the existing
+   nth-child(even) zebra rhythm carries through into selection. */
+tbody tr.selected:nth-child(even) td { background: var(--surface-selected-strong); }
+/* Selected row: everything inside (text + icons + action buttons)
+   adopts the brand colour so the selection state reads as a
+   committed visual. Overriding the text tier vars cascades to
+   every consumer (plain td, vessel-name, cust-name, contract-badge,
+   vessel-num, cust-city, progress-label). act-btn needs an explicit
+   rule because it uses a hard-coded neutral. */
+tbody tr.selected {
+  --table-row-fg:   var(--text-primary);
+  --text-secondary: var(--text-primary);
+  --text-tertiary:  var(--text-primary);
+}
+tbody tr.selected .act-btn { color: var(--text-primary); }
+/* Progress ring + slash: SVG strokes and opacity'd glyphs don't
+   inherit from the text-tier vars, so override explicitly. */
+tbody tr.selected .progress-ring-fill  { stroke: var(--text-primary); }
+tbody tr.selected .progress-ring-track { stroke: color-mix(in oklch, var(--text-primary) 30%, transparent); }
+tbody tr.selected .progress-sep        { opacity: 1; }
+tbody tr.selected .progress-filled     { color: var(--text-primary); }
+/* Active-sort column: semi-transparent tint layered ON TOP of zebra /
+   hover / selected via inset box-shadow (background untouched, so the
+   stripes underneath still read). Plus primary text in body. */
+tbody td.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); }
+thead th.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); }
+/* On a selected row the brand tint is already the dominant signal —
+   stacking the sort-column highlight on top of it just muddies the
+   colour without adding info. Strip it for selected rows. */
+tbody tr.selected td.col-sorted { box-shadow: none; }
+
+/* (Previously: 5px box-shadow extensions painted into the scrollbar
+   gutter so row stripes didn't end short. The gutter now lives outside
+   .table-zone via .table-wrap's negative margin, so no extension is
+   needed — the table cells reach the visible right edge directly.) */
+
+/* All columns use percentages so the whole row scales proportionally
+   when the sidebar collapses (the extra width is shared across every
+   column, not dumped into Customer). Ratios match the previous px
+   widths (Customer baseline ~200px). */
+/* Column widths are determined by the longest content in each column
+   (table-layout: auto). col-cust gets 1% to take any leftover space
+   instead of inflating every column when total < container width. */
+col.col-cust    { width: 100%; }
+col.col-act     { width: 1px; }
+
+/* ─── Checkbox ───────────────────────────────────────── */
+.checkbox-cell { text-align: center; }
+.checkbox {
+  width: 16px; height: 16px;
+  border: 2px solid color-mix(in oklch, var(--border-strong), var(--border-default));
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  position: relative;
+  transition: border-color .12s, background .12s;
+  vertical-align: middle;
+}
+thead .checkbox {
+  border-color: var(--text-secondary);
+}
+.checkbox:hover {
+  border-color: var(--text-primary);
+  background: color-mix(in oklch, var(--text-primary) 8%, transparent);
+}
+.checkbox.checked,
+.checkbox.indeterminate {
+  background: var(--brand-bg-default);
+  border-color: var(--brand-bg-default);
+}
+/* When already checked/indeterminate: hover deepens to brand-hover.
+   No outer ring — on selected rows it stacked awkwardly against the
+   row's own brand tint and read as a dirty border. */
+.checkbox.checked:hover,
+.checkbox.indeterminate:hover {
+  background: var(--brand-bg-hover);
+  border-color: var(--brand-bg-hover);
+}
+.checkbox > i {
+  display: none;
+  color: var(--brand-fg);
+  font-size: 12px;
+  line-height: 1;
+}
+.checkbox.checked > .ph-check { display: inline-flex; }
+.checkbox.indeterminate > .ph-minus { display: inline-flex; }
+
+/* ─── Movement type icons (type + transport) ─────────── */
+.move-cell { padding: 0 var(--s4); text-align: center; }
+.move-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+/* ─── Vessel cell ────────────────────────────────────── */
+.vessel-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Customer cell — two-storey: company name (primary) + city (secondary) */
+.cust-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+}
+.cust-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cust-city {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vessel-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vessel-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.vessel-sep { display: none; }
+
+/* ─── Numeric cells (date / xab / qty / contract) ────── */
+.num-cell {
+  font-variant-numeric: tabular-nums;
+}
+.qty-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.contract-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.contract-badge {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.contract-prefix { margin-right: 4px; }
+.progress-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--s1);
+  min-width: 0;
+}
+.progress-ring {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  /* Negative vertical margin shrinks the ring's effective layout
+     height (16 → 14) so the progress-wrap matches vessel-num /
+     cust-city's 14.4px line-box; the ring still renders at 16px
+     visually because margin doesn't clip the SVG. */
+  margin: -1px 0;
+  transform: rotate(-90deg);
+}
+.progress-ring-track {
+  stroke: var(--border-default);
+  stroke-width: 2;
+  fill: none;
+}
+.progress-ring-fill {
+  stroke: var(--brand-bg-default);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .3s;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: left;
+}
+.progress-label .progress-total { color: inherit; font-weight: inherit; }
+.progress-label .progress-filled { color: var(--text-brand); font-weight: 500; }
+.progress-label .progress-sep { margin: 0 2px; opacity: 0.6; }
+
+/* ─── Row actions ────────────────────────────────────── */
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+}
+
+.act-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--neutral-500);
+  transition: background .1s, color .1s;
+  padding: 0;
+}
+.act-btn > i { font-size: 16px; }
+.act-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
+
+/* ─── Bulk-action bar — overlays thead when ≥1 row is selected ─── */
+.bulk-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: var(--brand-bg-default);
+  color: var(--brand-fg);
+  display: none;
+  align-items: center;
+  /* gap=0: bulk-checkbox-cell already has 12px right padding, which
+     gives the right visual breathing room between the checkbox and
+     the count. .bulk-actions is pinned right via margin-left: auto,
+     so a gap here would only push the count away from the checkbox. */
+  gap: 0;
+  padding: 0 var(--s4) 0 0;
+  z-index: 5;
+}
+.bulk-bar.visible { display: flex; }
+/* Width 40px = col-check rendered width (16 checkbox + 24 padding).
+   JS sync will overwrite this with the actual col-check width if it
+   differs, but 40 is the natural value for the static state. */
+.bulk-checkbox-cell {
+  width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Mirror td.checkbox-cell padding exactly so the inner 16px box
+     sits at the same x as the row + header checkboxes. The td uses
+     the global `td { padding: 0 var(--s4) }` rule. */
+  padding: 0 var(--s4);
+}
+.bulk-count {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--brand-fg);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.bulk-actions {
+  /* Pinned next to .bulk-count (which sits right after the checkbox).
+     var(--s3) separates "N selected" from the first action button so
+     they read as related but distinct. */
+  margin-left: var(--s3);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+/* Bulk-bar buttons: ghost white (transparent bg, white text). Delete
+   shares the same hover bg as Export — destructive intent via the
+   red text colour is enough. */
+.bulk-bar .btn-secondary,
+.bulk-bar .bulk-danger {
+  background: transparent;
+  color: var(--brand-fg);
+}
+.bulk-bar .btn-secondary:hover,
+.bulk-bar .bulk-danger:hover {
+  background: color-mix(in oklch, var(--brand-fg) 15%, transparent);
+}
+/* Bulk-bar's leading checkbox: white fill (both checked and
+   indeterminate). Both the check and minus glyphs are brand-tinted
+   on white. */
+.bulk-bar .checkbox.checked,
+.bulk-bar .checkbox.indeterminate {
+  background: var(--brand-fg);
+  border-color: var(--brand-fg);
+}
+/* On hover, stay in the white family — a subtle tonal shift (slight
+   brand tint) mirrors how the regular brand checkbox steps from
+   brand-default to brand-hover. Overrides the generic checked:hover
+   rule, which would otherwise flip the chip to the brand colour
+   against an already brand-coloured bar. */
+.bulk-bar .checkbox.checked:hover,
+.bulk-bar .checkbox.indeterminate:hover {
+  background: color-mix(in oklch, var(--brand-fg) 88%, var(--brand-bg-default));
+  border-color: color-mix(in oklch, var(--brand-fg) 88%, var(--brand-bg-default));
+}
+.bulk-bar .checkbox.checked > .ph-check,
+.bulk-bar .checkbox.indeterminate > .ph-minus { color: var(--brand-bg-default); }
+
+/* ─── SVG Icons (inline) ─────────────────────────────── */
+svg { flex-shrink: 0; }
+
+/* ─── Scrollbar top-right actions ────────────────────── */
+.header-right { display: flex; align-items: center; gap: var(--s2); }
+.notif-btn { position: relative; }
+.notif-badge {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 7px; height: 7px;
+  background: var(--brand-bg-default);
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-elevated);
+}
+
+/* ─── Zones (islands layout) ─────────────────────────── */
+body {
+  padding: var(--s2);
+  gap: var(--s2);
+  background: var(--bg-page);
+}
+.sidebar {
+  height: auto;
+  border: none;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.sidebar .nav { overflow: visible; }
+.main {
+  height: auto;
+  gap: var(--s2);
+  background: transparent;
+}
+.header-zone,
+.table-zone {
+  background: var(--bg-elevated);
+  border: none;
+  border-radius: var(--r-md);
+}
+.header-zone {
+  display: flex;
+  flex-direction: column;
+}
+.header-zone .header,
+.header-zone .toolbar {
+  background: transparent;
+  border-radius: 0;
+}
+.header-zone .header {
+  border-bottom: 1px solid var(--border-default);
+}
+.toolbar { overflow: visible; }
+.toolbar .filters {
+  border-bottom: 1px solid var(--border-default);
+  background: transparent;
+}
+.toolbar .table-toolbar {
+  border-bottom: none;
+  background: transparent;
+}
+.table-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+.table-zone .table-wrap { flex: 1; min-height: 0; }
+
+/* ─── Flatpickr overrides (match design system) ──────── */
+.flatpickr-calendar {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
+  font-family: var(--font) !important;
+  padding: var(--s2) !important;
+  width: auto !important;
+}
+.flatpickr-calendar.arrowTop:before,
+.flatpickr-calendar.arrowTop:after,
+.flatpickr-calendar.arrowBottom:before,
+.flatpickr-calendar.arrowBottom:after { display: none !important; }
+
+.flatpickr-months { padding-bottom: var(--s2); }
+.flatpickr-month {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  height: 36px !important;
+}
+.flatpickr-current-month {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  padding: 6px 0 !important;
+}
+.flatpickr-current-month input.cur-year { color: var(--text-primary) !important; font-weight: 600 !important; }
+.flatpickr-monthDropdown-months { background: var(--bg-elevated) !important; color: var(--text-primary) !important; }
+.flatpickr-monthDropdown-months option { background: var(--bg-elevated) !important; color: var(--text-primary) !important; }
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  fill: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
+  padding: 8px !important;
+  height: 36px !important;
+  width: 36px !important;
+  border-radius: var(--r-md) !important;
+  transition: background .12s !important;
+}
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+  background: var(--surface-hover) !important;
+  fill: var(--text-primary) !important;
+  color: var(--text-primary) !important;
+}
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg { fill: inherit !important; }
+
+.flatpickr-weekdays {
+  background: transparent !important;
+  height: 28px !important;
+  margin-bottom: var(--s1);
+}
+.flatpickr-weekday {
+  background: transparent !important;
+  color: var(--text-tertiary) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .04em !important;
+}
+
+.dayContainer { padding: 0 !important; }
+.flatpickr-day {
+  color: var(--text-primary) !important;
+  font-family: var(--font) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: var(--r-md) !important;
+  border: none !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  max-width: 38px !important;
+  margin: 1px !important;
+  transition: background .12s !important;
+}
+.flatpickr-day:hover { background: var(--surface-hover) !important; }
+.flatpickr-day.today {
+  border: 1px solid var(--border-focus) !important;
+  background: transparent !important;
+}
+.flatpickr-day.today:hover { background: var(--surface-hover) !important; }
+
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay { color: var(--text-disabled) !important; }
+
+.flatpickr-day.inRange {
+  background: var(--sidebar-item-bg-active) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected {
+  background: var(--brand-bg-default) !important;
+  color: var(--brand-fg) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.flatpickr-day.startRange { border-radius: var(--r-md) 0 0 var(--r-md) !important; }
+.flatpickr-day.endRange { border-radius: 0 var(--r-md) var(--r-md) 0 !important; }
+.flatpickr-day.startRange.endRange { border-radius: var(--r-md) !important; }
+
+/* ─── Responsive ──────────────────────────────────────
+   Scope: this is an admin tool for operations staff on a desktop
+   workstation. Phone is intentionally out of scope. The breakpoints
+   below ensure the layout survives a half-screen laptop and a
+   landscape tablet without catastrophic clipping.
+   - ≤1280: filter grid 5→4 cols (Search keeps span 2).
+   - ≤1024: sidebar collapses to a 56px icon rail; filter grid 3 cols;
+            body+main start scrolling instead of clipping.
+   - ≤768:  filter grid 2 cols; header right collapses notification
+            button only; sidebar overlays the page when expanded.
+   Touch (hover:none): row + nav targets grow to ≥44px. */
+
+@media (max-width: 1280px) {
+  .filter-row-primary,
+  .filter-row-secondary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  /* Allow vertical scroll of the page itself on narrow viewports. */
+  html, body { overflow: auto; }
+  .main { height: auto; overflow: visible; min-height: 100vh; }
+  .sidebar { height: 100vh; position: sticky; top: 0; }
+
+  /* Auto-collapse sidebar to icon rail unless explicitly toggled open
+     by the user (the toggleSidebar button removes .collapsed). */
+  .sidebar { width: 56px; min-width: 56px; }
+  .sidebar .sidebar-logo-text,
+  .sidebar .nav-label,
+  .sidebar .nav-section.is-group,
+  .sidebar .nav-divider { display: none; }
+  .sidebar .nav-section,
+  .sidebar .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
+
+  .filter-row-primary,
+  .filter-row-secondary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .field-wide { grid-column: span 3; }
+}
+
+@media (max-width: 768px) {
+  .filter-row-primary,
+  .filter-row-secondary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .field-wide { grid-column: span 2; }
+
+  /* Header right: keep notifications, hide settings/logout to free
+     space for the page title. The hidden controls live in the avatar
+     menu in the production app. */
+  .header { padding: var(--s2) var(--s3); height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--s2); }
+  .header-right .btn-icon:nth-child(n+2) { display: none; }
+
+  /* Bulk-bar buttons shrink labels to icon-only at this width to fit. */
+  .bulk-bar .btn-secondary { padding-left: var(--s2); padding-right: var(--s2); }
+  .bulk-bar .btn-secondary > :not(i) { display: none; }
+}
+
+/* Touch devices: enlarge tap targets. Pointer-precise devices keep
+   the denser desktop spacing. */
+@media (hover: none) and (pointer: coarse) {
+  .act-btn { width: 44px; height: 44px; }
+  .btn-icon { width: 44px; height: 44px; }
+  .header-right .btn-icon { width: 44px; height: 44px; }
+  .checkbox-cell { min-width: 44px; }
+  .checkbox-cell > .checkbox { width: 24px; height: 24px; }
+  .nav-section, .nav-item { min-height: 44px; }
+  .toggle-switch { min-width: 44px; }
+}
+
+</style>
+<script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- ─── Sidebar ──────────────────────────────────────── -->
+<aside class="sidebar" aria-label="Primary navigation">
+  <div class="sidebar-logo">
+    <span class="sidebar-logo-mark" aria-hidden="true"></span>
+    <span class="sidebar-logo-text">SemDev</span>
+  </div>
+
+  <nav class="nav" aria-label="Sections">
+    <div class="nav-section is-group" role="presentation">
+      <span class="nav-label">Contracts</span>
+    </div>
+    <button type="button" class="nav-item nav-subitem" onclick="selectNav(this)">
+      <i class="ph ph-stack" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Pig Iron</span>
+    </button>
+    <button type="button" class="nav-item nav-subitem" onclick="selectNav(this)">
+      <i class="ph ph-package" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Raw Materials</span>
+    </button>
+    <div class="nav-divider" role="presentation"></div>
+
+    <div class="nav-section is-group" role="presentation">
+      <span class="nav-label">Operations</span>
+    </div>
+    <button type="button" class="nav-section" onclick="selectNav(this)">
+      <i class="ph ph-user" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Counterparty</span>
+    </button>
+    <button type="button" class="nav-section" onclick="selectNav(this)">
+      <i class="ph ph-truck" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Transports</span>
+    </button>
+    <div class="nav-divider" role="presentation"></div>
+
+    <div class="nav-section is-group" role="presentation">
+      <span class="nav-label">Invoicing</span>
+    </div>
+    <button type="button" class="nav-item nav-subitem" onclick="selectNav(this)">
+      <i class="ph ph-arrows-clockwise" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Sync</span>
+    </button>
+    <div class="nav-divider" role="presentation"></div>
+
+    <div class="nav-section is-group" role="presentation">
+      <span class="nav-label">Inventory</span>
+    </div>
+    <button type="button" class="nav-section active" aria-current="page" onclick="selectNav(this)">
+      <i class="ph-fill ph-arrows-out-cardinal" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Movements</span>
+    </button>
+    <button type="button" class="nav-section" onclick="selectNav(this)">
+      <i class="ph ph-bank" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Deposit</span>
+    </button>
+    <button type="button" class="nav-section" onclick="selectNav(this)">
+      <i class="ph ph-checks" style="font-size:20px" aria-hidden="true"></i>
+      <span class="nav-label">Check Deposit</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-collapse">
+    <button type="button" class="collapse-btn" aria-label="Collapse sidebar" onclick="toggleSidebar()">
+      <i class="ph ph-sidebar-simple" style="font-size:20px" aria-hidden="true"></i>
+    </button>
+  </div>
+</aside>
+
+<!-- ─── Main ─────────────────────────────────────────── -->
+<main class="main" id="main-content">
+
+  <!-- Header + Toolbar (merged zone) -->
+  <section class="header-zone" aria-labelledby="page-title">
+  <header class="header">
+    <div class="header-left">
+      <h1 class="page-title" id="page-title">Warehouse Movements</h1>
+      <span class="results-count" id="results-count" aria-live="polite"></span>
+    </div>
+    <div class="header-right">
+      <button type="button" class="btn-icon notif-btn" aria-label="Notifications (3 new)">
+        <span class="notif-badge" aria-hidden="true"></span>
+        <i class="ph ph-bell" style="font-size:20px" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn-icon" aria-label="Settings">
+        <i class="ph ph-gear" style="font-size:20px" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn-icon" aria-label="Sign out" onclick="window.location.href='sem-001-login.html'">
+        <i class="ph ph-sign-out" style="font-size:20px" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Toolbar (filters + table actions) -->
+  <section class="toolbar">
+  <div class="filters" id="filters">
+
+    <!-- Primary row: 4 always-visible filters + More disclosure -->
+    <div class="filter-row-primary">
+      <label class="field field-wide" for="f-search" data-name="Search">
+        <div class="field-row">
+          <i class="ph ph-magnifying-glass" style="font-size:16px"></i>
+          <input type="text" id="f-search" placeholder="Search by product, movement or counterparty">
+        </div>
+      </label>
+
+      <div class="field is-select" data-name="Warehouse" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Warehouse" onclick="toggleSelect(event, this)">
+        <span class="field-label" aria-hidden="true">Warehouse</span>
+        <div class="field-row">
+          <span class="custom-select-value" data-placeholder="All"></span>
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+        </div>
+        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Porto Marghera</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Taranto</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Gaeta</div>
+        </div>
+      </div>
+
+      <div class="field is-select" data-name="Subproduct" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Subproduct" onclick="toggleSelect(event, this)">
+        <span class="field-label" aria-hidden="true">Subproduct</span>
+        <div class="field-row">
+          <span class="custom-select-value" data-placeholder="All"></span>
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+        </div>
+        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Standard</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">P10</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">P60</div>
+        </div>
+      </div>
+
+      <div class="date-range" data-name="Date range" role="button" tabindex="0" aria-label="Date range — open picker" aria-haspopup="dialog" onclick="openDateRangePicker(event)">
+        <div class="field-row">
+          <i class="ph ph-calendar-blank" style="font-size:16px" aria-hidden="true"></i>
+          <span class="date-range-placeholder">Pick a date range</span>
+          <div class="date-range-values">
+            <span class="date-range-value-start"></span>
+            <span class="date-range-sep" aria-hidden="true"></span>
+            <span class="date-range-value-end"></span>
+          </div>
+        </div>
+        <input type="text" id="date-range-input" tabindex="-1" aria-hidden="true">
+        <button type="button" class="field-clear" onclick="clearDateRange(event)" aria-label="Clear date range">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="filter-row-secondary">
+      <label class="field" for="f-contract" data-name="Contract">
+        <span class="field-label">Contract</span>
+        <div class="field-row">
+          <input type="text" id="f-contract" placeholder="All">
+        </div>
+      </label>
+
+      <div class="field is-select" data-name="Vessel" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Vessel" onclick="toggleSelect(event, this)">
+        <span class="field-label" aria-hidden="true">Vessel</span>
+        <div class="field-row">
+          <span class="custom-select-value" data-placeholder="All"></span>
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+        </div>
+        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Supra Monarch</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Desert Pioneer</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Amber Lagoon</div>
+        </div>
+      </div>
+
+      <div class="tag-chip" id="tag-select" data-name="Tags" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Tags" onclick="toggleTagDropdown(event)">
+        <span class="field-label" aria-hidden="true">Tags</span>
+        <div class="field-row">
+          <span class="tag-chip-text" id="tag-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" id="tag-counter" aria-label="Clear all tags" onclick="event.stopPropagation();clearField('Tags');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
+        </div>
+        <div class="tag-dropdown" id="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <label class="tag-option"><input type="checkbox" value="XAB"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> XAB</label>
+          <label class="tag-option"><input type="checkbox" value="IRON"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> IRON</label>
+          <label class="tag-option"><input type="checkbox" value="P10"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> P10</label>
+          <label class="tag-option"><input type="checkbox" value="P60"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> P60</label>
+          <label class="tag-option"><input type="checkbox" value="OEM"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> OEM</label>
+        </div>
+      </div>
+
+      <div class="field is-select" data-name="Destination" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Destination" onclick="toggleSelect(event, this)">
+        <span class="field-label" aria-hidden="true">Destination</span>
+        <div class="field-row">
+          <span class="custom-select-value" data-placeholder="All"></span>
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+        </div>
+        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Italy</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Germany</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">France</div>
+        </div>
+      </div>
+
+      <div class="field is-select" data-name="Job order" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Job order" onclick="toggleSelect(event, this)">
+        <span class="field-label" aria-hidden="true">Job order</span>
+        <div class="field-row">
+          <span class="custom-select-value" data-placeholder="All"></span>
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+        </div>
+        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">JO-2026-001</div>
+          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">JO-2026-002</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active filter chips -->
+    <div class="filter-chips-bar" id="filter-chips-bar">
+      <div class="filter-chips" id="filter-chips"></div>
+      <button type="button" class="chips-clear-all" onclick="clearAllFilters()">Clear all</button>
+    </div>
+  </div>
+
+  <!-- Table toolbar -->
+  <div class="table-toolbar">
+    <div class="toolbar-left">
+      <div class="view-tabs" role="tablist" aria-label="View mode">
+        <button type="button" class="view-tab active" role="tab" aria-selected="true" onclick="selectViewTab(this)">
+          <i class="ph-bold ph-rows" style="font-size:16px" aria-hidden="true"></i>
+          Table
+        </button>
+        <button type="button" class="view-tab" role="tab" aria-selected="false" onclick="selectViewTab(this)">
+          <i class="ph-bold ph-squares-four" style="font-size:16px" aria-hidden="true"></i>
+          Cards
+        </button>
+      </div>
+      <label class="toggle-label">
+        <button type="button" class="toggle-switch on" role="switch" aria-checked="true" aria-label="Auto search — apply filters as you type" onclick="toggleSwitch(this)"></button>
+        <span>Auto search</span>
+      </label>
+      <label class="toggle-label">
+        <button type="button" class="toggle-switch" role="switch" aria-checked="false" aria-label="Hide associated — hide records linked to other movements" onclick="toggleSwitch(this)"></button>
+        <span>Hide associated</span>
+      </label>
+    </div>
+    <div class="toolbar-right">
+      <button class="btn-secondary">
+        <i class="ph-bold ph-arrows-clockwise" style="font-size:16px"></i>
+        Update
+      </button>
+      <button class="btn-primary">
+        <i class="ph-bold ph-plus" style="font-size:16px"></i>
+        Add
+      </button>
+    </div>
+  </div>
+  </section>
+  </section>
+
+  <!-- Table -->
+  <section class="table-zone">
+  <!-- Bulk action bar overlays the thead area; lives in .table-zone
+       so it can extend to the rounded card edges without being clipped
+       by .table-head-wrap's overflow-x: hidden -->
+  <div class="bulk-bar" id="bulk-bar" role="region" aria-label="Bulk actions" aria-hidden="true">
+    <div class="bulk-checkbox-cell" onclick="delegateToCheckbox(event, this)">
+      <div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="Select all rows" onclick="event.stopPropagation();toggleAll(this)"><i class="ph-bold ph-check" aria-hidden="true"></i><i class="ph-bold ph-minus" aria-hidden="true"></i></div>
+    </div>
+    <span class="bulk-count" id="bulk-count" aria-live="polite">0 selected</span>
+    <div class="bulk-actions">
+      <button type="button" class="btn-secondary" onclick="alert('Export not wired in this prototype')">
+        <i class="ph-bold ph-download-simple" style="font-size:16px" aria-hidden="true"></i> Export
+      </button>
+      <button type="button" class="btn-secondary bulk-danger" onclick="alert('Delete not wired in this prototype')">
+        <i class="ph-bold ph-trash" style="font-size:16px" aria-hidden="true"></i> Delete
+      </button>
+    </div>
+  </div>
+  <div class="table-head-wrap">
+    <table>
+      <colgroup>
+        <col class="col-check"><col class="col-type">
+        <col class="col-wh"><col class="col-vessel">
+        <col class="col-sub"><col class="col-cust"><col class="col-date">
+        <col class="col-xab"><col class="col-qty"><col class="col-cont">
+        <col class="col-act">
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col" class="checkbox-cell" onclick="delegateToCheckbox(event, this)"><div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="Select all rows" onclick="event.stopPropagation();toggleAll(this)"><i class="ph-bold ph-check" aria-hidden="true"></i><i class="ph-bold ph-minus" aria-hidden="true"></i></div></th>
+          <th scope="col" class="sortable center" tabindex="0" aria-sort="none" onclick="sortCol(this)">Type</th>
+          <th scope="col" class="sortable" tabindex="0" aria-sort="descending" onclick="sortCol(this)">Warehouse</th>
+          <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Vessel</th>
+          <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Subproduct</th>
+          <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Customer</th>
+          <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Date</th>
+          <th scope="col" class="sortable sort-icon-left" tabindex="0" aria-sort="none" onclick="sortCol(this)" style="text-align:right;">XAB</th>
+          <th scope="col" class="sortable sort-icon-left" tabindex="0" aria-sort="none" onclick="sortCol(this)" style="text-align:right;">Quantity</th>
+          <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Contract</th>
+          <th scope="col" style="padding-left:var(--s4);">Actions</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col class="col-check"><col class="col-type">
+        <col class="col-wh"><col class="col-vessel">
+        <col class="col-sub"><col class="col-cust"><col class="col-date">
+        <col class="col-xab"><col class="col-qty"><col class="col-cont">
+        <col class="col-act">
+      </colgroup>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  </section>
+
+</main>
+
+<script>
+// ─── Sample data ──────────────────────────────────────
+var rows = [
+  { type:'std',  id:71124, wh:'Porto Marghera', vessel:'AFF ZAPO\n25079',         sub:'Standard', cust:'Fonderie Cortiana Cav. Bortolo (Montebelluna)', date:'23/02/2026', xab:71124,  qty:-30880, cont:'25/0165',  filled:2615, total:10000 },
+  { type:'std',  id:71124, wh:'Taranto',        vessel:'SUPRA MONARCH\n25084',     sub:'Standard', cust:'Cal.Me. S.p.A. Calce Meridionale (Marcellinara)', date:'23/02/2026', xab:'7168/24', qty:-30000, cont:'26/0004',  filled:3522, total:5000 },
+  { type:'std',  id:71124, wh:'Taranto',        vessel:'SUPRA MONARCH\n25084',     sub:'Standard', cust:'Cal.Me. S.p.A. Calce Meridionale (Marcellinara)', date:'23/02/2026', xab:'7169/24', qty:-30800, cont:'26/0004',  filled:3522, total:5000 },
+  { type:'std',  id:71124, wh:'Taranto',        vessel:'SUPRA MONARCH\n25084',     sub:'Standard', cust:'Cal.Me. S.p.A. Calce Meridionale (Marcellinara)', date:'23/02/2026', xab:'7170/24', qty:-30730, cont:'26/0004',  filled:3522, total:5000 },
+  { type:'std',  id:71124, wh:'Taranto',        vessel:'SUPRA MONARCH\n25084',     sub:'Standard', cust:'Heidelberg Materials Italia Cementis S.p.A. (Peschiera Borromeo)', date:'23/02/2026', xab:'7172/24', qty:-30310, cont:'25/0193',  filled:1640, total:12000 },
+  { type:'std',  id:71124, wh:'Taranto',        vessel:'SUPRA MONARCH\n25084',     sub:'Standard', cust:'Heidelberg Materials Italia Cementis S.p.A. (Peschiera Borromeo)', date:'23/02/2026', xab:'7175/24', qty:-29640, cont:'25/0193',  filled:1640, total:12000 },
+  { type:'other',id:5170,  wh:'Porto Marghera', vessel:'CINDY\n25031',             sub:'Standard', cust:'Sipag-Bisalta S.p.A. (Sovizzo)',                   date:'23/02/2026', xab:5170,   qty:-31220, cont:'25/0179',  filled:148,  total:2000 },
+  { type:'edit', id:71125, wh:'Porto Marghera', vessel:'SAGA ENTERPRISE\n25065',   sub:'P60',      cust:'Acciaierie Venete S.p.A. (Sarezzo)',              date:'23/02/2026', xab:71125,  qty:-29300, cont:'25/G0666', filled:4,    total:5000 },
+  { type:'edit', id:71141, wh:'Porto Marghera', vessel:'SAGA ENTERPRISE\n25065',   sub:'P60',      cust:'Acciaierie Venete S.p.A. (Sarezzo)',              date:'23/02/2026', xab:71141,  qty:-29280, cont:'25/G0666', filled:4,    total:5000 },
+  { type:'std',  id:5184,  wh:'Porto Marghera', vessel:'TORRENT\n25072',           sub:'Standard', cust:'Solvay Chimica Italia S.p.A. (Massa)',            date:'23/02/2026', xab:5184,   qty:-29440, cont:'25/0173',  filled:3192, total:4500 },
+  { type:'edit', id:71130, wh:'Porto Marghera', vessel:'IZUMO HERMES\n25073',      sub:'P10',      cust:'ZML Industries S.p.A. Socio Unico (Maniago)',     date:'23/02/2026', xab:71130,  qty:-31800, cont:'26/G0010', filled:144,  total:540 },
+  { type:'std',  id:5175,  wh:'Porto Marghera', vessel:'DESERT PIONEER\n25061',    sub:'Standard', cust:'Carbofer Tecnologie S.p.A. (Brescia)',            date:'23/02/2026', xab:5175,   qty:-32680, cont:'26/0002',  filled:762,  total:2000 },
+  { type:'std',  id:5190,  wh:'Porto Marghera', vessel:'DESERT PIONEER\n25061',    sub:'Standard', cust:'Drycarbo S.r.l. (Bagnolo Mella)',                 date:'23/02/2026', xab:5190,   qty:-30880, cont:'26/0014',  filled:701,  total:1000 },
+  { type:'edit', id:71132, wh:'Porto Marghera', vessel:'SAGA ENTERPRISE\n25065',   sub:'P60',      cust:'Perucchini S.p.A. (Omegna)',                      date:'23/02/2026', xab:71132,  qty:-31200, cont:'25/G0724', filled:1,    total:300 },
+  { type:'std',  id:5177,  wh:'Porto Marghera', vessel:'AMBER LAGOON\n25036',      sub:'Standard', cust:'Pontenossa S.p.A. (Ponte Nossa)',                 date:'23/02/2026', xab:5177,   qty:-28420, cont:'25/0165',  filled:2615, total:10000 },
+  { type:'std',  id:5178,  wh:'Porto Marghera', vessel:'AMBER LAGOON\n25036',      sub:'Standard', cust:'Pontenossa S.p.A. (Ponte Nossa)',                 date:'23/02/2026', xab:5178,   qty:-28280, cont:'25/0165',  filled:2615, total:10000 },
+];
+
+function progressClass(filled, total) {
+  var pct = filled / total;
+  if (pct >= 1) return 'overrun';
+  if (pct >= 0.75) return 'warn';
+  if (pct >= 0.25) return 'ok';
+  return 'ok';
+}
+
+function titleCase(s) {
+  return String(s).toLowerCase().replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+function formatQty(n) {
+  return (n / 1000).toFixed(3).replace('.', ',') + ' Mt';
+}
+
+function splitCustomer(s) {
+  var m = String(s).match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  if (m) return { name: m[1].trim(), city: m[2].trim() };
+  return { name: String(s), city: '' };
+}
+
+function renderRows() {
+  var tbody = document.getElementById('tbody');
+  tbody.innerHTML = rows.map(function(r) {
+    var parts = r.vessel.split('\n');
+    var vName = parts[0], vNum = parts[1] || '';
+    var pct = Math.min(r.filled / r.total, 1);
+    var pClass = progressClass(r.filled, r.total);
+
+    var typeIconName = r.type === 'edit' ? 'trolley-suitcase'
+                     : r.type === 'other' ? 'sketch-logo'
+                     : 'stack';
+    var typeTitle = r.type === 'edit' ? 'Edit movement'
+                   : r.type === 'other' ? 'Other movement'
+                   : 'Standard movement';
+    var typeBadge = '<span class="move-icons" title="' + typeTitle + '">'
+      + '<i class="ph-fill ph-' + typeIconName + '"></i>'
+      + '<i class="ph-fill ph-truck"></i>'
+    + '</span>';
+
+    return '<tr onclick="toggleRow(this)">'
+      + '<td class="checkbox-cell"><div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="Select row ' + (r.xab || r.id) + '" onclick="event.stopPropagation();toggleRowCheckbox(this)"><i class="ph-bold ph-check" aria-hidden="true"></i></div></td>'
+      + '<td class="move-cell">' + typeBadge + '</td>'
+      + '<td>' + r.wh + '</td>'
+      + '<td><div class="vessel-cell">'
+        + '<span class="vessel-name">' + titleCase(vName) + '</span>'
+        + '<span class="vessel-num">' + vNum + '</span>'
+        + '</div></td>'
+      + '<td>' + r.sub + '</td>'
+      + (function() {
+          var c = splitCustomer(r.cust);
+          return '<td><div class="cust-cell">'
+            + '<span class="cust-name">' + c.name + '</span>'
+            + (c.city ? '<span class="cust-city">' + c.city + '</span>' : '')
+            + '</div></td>';
+        })()
+      + '<td class="num-cell">' + r.date + '</td>'
+      + '<td class="num-cell" style="text-align:right;">' + r.xab + '</td>'
+      + '<td class="qty-cell">' + (r.qty / 1000).toFixed(3) + ' Mt</td>'
+      + (function() {
+          var C = 2 * Math.PI * 6;
+          var off = C * (1 - pct);
+          return '<td><div class="contract-cell">'
+            + '<span class="contract-badge"><span class="contract-prefix">№</span>' + r.cont + '</span>'
+            + '<div class="progress-wrap">'
+              + '<svg class="progress-ring" viewBox="0 0 16 16" aria-hidden="true">'
+                + '<circle class="progress-ring-track" cx="8" cy="8" r="6"/>'
+                + '<circle class="progress-ring-fill" cx="8" cy="8" r="6"'
+                  + ' style="stroke-dasharray:' + C.toFixed(2) + ';stroke-dashoffset:' + off.toFixed(2) + ';"/>'
+              + '</svg>'
+              + '<span class="progress-label">'
+                + '<span class="progress-filled">' + r.filled.toLocaleString('en-US') + '</span>'
+                + '<span class="progress-sep">/</span>'
+                + '<span class="progress-total">' + r.total.toLocaleString('en-US') + '</span>'
+              + '</span>'
+            + '</div>'
+          + '</div></td>';
+        })()
+      + '<td><div class="row-actions">'
+        + '<button type="button" class="act-btn" aria-label="Open document for ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
+        + '<button type="button" class="act-btn" aria-label="View row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
+        + '<button type="button" class="act-btn" aria-label="Flag row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
+        + '<button type="button" class="act-btn" aria-label="Delete row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
+      + '</div></td>'
+      + '</tr>';
+  }).join('');
+  updateResultsCount();
+  updateBulkBar();
+  _queueSync();
+}
+
+/* Two-table layout: compute max(head label width, body content width)
+   per column, then pin both tables to that width. .col-cust is left
+   unpinned so it soaks the leftover space.
+
+   Performance contract:
+   - Refs are resolved once at module load.
+   - One unsetWidths() pass (writes), one measurement pass (reads),
+     one applyWidths() pass (writes) — no interleaving = no thrash.
+   - rAF-coalesced; multiple triggers in the same frame collapse to one.
+   - ResizeObserver on .table-wrap fires only on real geometry changes,
+     unlike the global resize event which fires for every pixel of drag. */
+var _tHead, _tBody, _tBulkCell, _tHeadCols, _tBodyCols, _tHeadCells;
+var _syncQueued = false;
+var COL_CAPS = { 'col-xab': 92, 'col-act': 166 };
+var CUST_CAP = 260;
+var MIN_COL = 72;
+
+function _resolveTableRefs() {
+  _tHead = document.querySelector('.table-head-wrap table');
+  _tBody = document.querySelector('.table-wrap table');
+  _tBulkCell = document.querySelector('.bulk-checkbox-cell');
+  if (_tHead) {
+    _tHeadCols = _tHead.querySelectorAll('colgroup col');
+    _tHeadCells = _tHead.querySelectorAll('thead th');
+  }
+  if (_tBody) _tBodyCols = _tBody.querySelectorAll('colgroup col');
+}
+
+function syncHeadColumnWidths() {
+  if (!_tHead || !_tBody) _resolveTableRefs();
+  if (!_tHead || !_tBody) return;
+  var bodyRows = _tBody.tBodies[0] && _tBody.tBodies[0].rows;
+  if (!bodyRows || !bodyRows.length) return;
+
+  // Write pass 1: release pinned widths so the browser can measure
+  // natural content width.
+  for (var i = 0; i < _tHeadCols.length; i++) _tHeadCols[i].style.width = 'auto';
+  for (var j = 0; j < _tBodyCols.length; j++) _tBodyCols[j].style.width = 'auto';
+  _tHead.style.tableLayout = 'auto';
+  _tBody.style.tableLayout = 'auto';
+  _tBody.style.width = 'auto';
+
+  // Read pass: column width = max(headerText, bodyText) + 32px
+  // padding + iconSpace. iconSpace reserves room for the sort icon
+  // (14px Phosphor glyph + 8px gap = 22px) on sortable columns;
+  // non-sortable columns get no extra. Header text is measured via
+  // Range on the text node only; body width is the cell boundingRect
+  // (already includes its own 32px padding, so subtract before
+  // comparing with the header text).
+  var PAD = 32;        // var(--s4) * 2
+  var ICON_SPACE = 22; // 14px sort icon + 8px gap
+  var widths = new Array(_tHeadCells.length);
+  var _range = document.createRange();
+  for (var k = 0; k < _tHeadCells.length; k++) {
+    var col = _tBodyCols[k];
+    var isCheck = col && col.classList.contains('col-check');
+    var th = _tHeadCells[k];
+    var isSortable = th.classList.contains('sortable');
+    // Pure header text width (skip sort icons + sort-previews).
+    var headTextW = 0;
+    for (var n = 0; n < th.childNodes.length; n++) {
+      var node = th.childNodes[n];
+      if (node.nodeType === 3 && node.textContent.trim()) {
+        _range.selectNodeContents(node);
+        var tw = _range.getBoundingClientRect().width;
+        if (tw > headTextW) headTextW = tw;
+      }
+    }
+    // Widest body cell content (strip its 24px padding so we can
+    // compare apples-to-apples with header text).
+    var bodyTextW = 0;
+    for (var r = 0; r < bodyRows.length; r++) {
+      var cell = bodyRows[r].children[k];
+      if (cell) {
+        var cw = cell.getBoundingClientRect().width - PAD;
+        if (cw > bodyTextW) bodyTextW = cw;
+      }
+    }
+    // column = widest content + 24 padding + icon reservation
+    var w = Math.max(headTextW, bodyTextW) + PAD + (isSortable ? ICON_SPACE : 0);
+    if (col) {
+      for (var capKey in COL_CAPS) {
+        if (col.classList.contains(capKey)) { if (w > COL_CAPS[capKey]) w = COL_CAPS[capKey]; break; }
+      }
+    }
+    widths[k] = Math.ceil(isCheck ? w : Math.max(w, MIN_COL));
+  }
+
+  // Customer special case: cust = max(natural, leftover). On wide
+  // viewports cust soaks the leftover so Actions sits flush right.
+  // On narrow viewports cust keeps its natural width and the table
+  // overflows horizontally (the .table-wrap handles the scroll) —
+  // long company names never ellipsise.
+  var custIdx = -1;
+  for (var c = 0; c < _tBodyCols.length; c++) {
+    if (_tBodyCols[c].classList.contains('col-cust')) { custIdx = c; break; }
+  }
+  if (custIdx >= 0) {
+    var containerW = _tBody.parentElement.clientWidth;
+    var sumOthers = 0;
+    for (var s = 0; s < widths.length; s++) if (s !== custIdx) sumOthers += widths[s];
+    var leftover = containerW - sumOthers;
+    if (leftover > widths[custIdx]) widths[custIdx] = leftover;
+  }
+
+  // Write pass 2: apply pinned widths.
+  for (var m = 0; m < widths.length; m++) {
+    var hc = _tHeadCols[m], bc = _tBodyCols[m];
+    if (hc) hc.style.width = widths[m] + 'px';
+    if (bc) bc.style.width = widths[m] + 'px';
+  }
+
+  _tHead.style.tableLayout = 'fixed';
+  _tBody.style.tableLayout = 'fixed';
+  _tBody.style.width = '';
+
+  // Mirror col-check's rendered width onto bulk-bar's leading cell so
+  // the bulk checkbox shares the same x as head + row checkboxes.
+  if (_tBulkCell && widths.length) _tBulkCell.style.width = widths[0] + 'px';
+}
+
+/* Coalesce multiple triggers in the same frame to a single sync. */
+function _queueSync() {
+  if (_syncQueued) return;
+  _syncQueued = true;
+  requestAnimationFrame(function() { _syncQueued = false; syncHeadColumnWidths(); });
+}
+
+/* ResizeObserver fires only when geometry actually changes (zoom,
+   sidebar collapse, content reflow) — much cheaper than the global
+   resize event which fires for every pixel of a window drag. The
+   global resize listener is kept as a fallback for browsers that
+   don't ship ResizeObserver. */
+function _installSyncObserver() {
+  var wrap = document.querySelector('.table-wrap');
+  if (!wrap) return;
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(_queueSync).observe(wrap);
+  } else {
+    window.addEventListener('resize', _queueSync);
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _installSyncObserver);
+} else {
+  _installSyncObserver();
+}
+
+function updateResultsCount() {
+  var el = document.getElementById('results-count');
+  if (!el) return;
+  var n = document.querySelectorAll('#tbody tr').length;
+  el.innerHTML = '<strong>' + n + '</strong> ' + (n === 1 ? 'movement' : 'movements');
+}
+
+function toggleRowCheckbox(cb) {
+  cb.classList.toggle('checked');
+  var isChecked = cb.classList.contains('checked');
+  cb.setAttribute('aria-checked', String(isChecked));
+  var tr = cb.closest('tr');
+  if (tr) {
+    tr.classList.toggle('selected', isChecked);
+    tr.setAttribute('aria-selected', String(isChecked));
+  }
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  var bar = document.getElementById('bulk-bar');
+  var count = document.getElementById('bulk-count');
+  if (!bar || !count) return;
+  var n = document.querySelectorAll('#tbody .checkbox.checked').length;
+  var total = document.querySelectorAll('#tbody .checkbox').length;
+  var topCbs = document.querySelectorAll('thead .checkbox, .bulk-bar .checkbox');
+
+  if (n === 0) {
+    bar.classList.remove('visible');
+    bar.setAttribute('aria-hidden', 'true');
+    topCbs.forEach(function(c) {
+      c.classList.remove('checked', 'indeterminate');
+      c.setAttribute('aria-checked', 'false');
+    });
+  } else {
+    bar.classList.add('visible');
+    bar.setAttribute('aria-hidden', 'false');
+    count.textContent = n + ' selected';
+    if (n === total) {
+      topCbs.forEach(function(c) {
+        c.classList.add('checked'); c.classList.remove('indeterminate');
+        c.setAttribute('aria-checked', 'true');
+      });
+    } else {
+      topCbs.forEach(function(c) {
+        c.classList.add('indeterminate'); c.classList.remove('checked');
+        c.setAttribute('aria-checked', 'mixed');
+      });
+    }
+  }
+}
+
+function clearSelection() {
+  document.querySelectorAll('#tbody .checkbox.checked').forEach(function(c) {
+    c.classList.remove('checked');
+    c.setAttribute('aria-checked', 'false');
+  });
+  document.querySelectorAll('#tbody tr.selected').forEach(function(tr) {
+    tr.classList.remove('selected');
+    tr.removeAttribute('aria-selected');
+  });
+  updateBulkBar();
+}
+
+function toggleRow(tr) {
+  var cb = tr.querySelector('.checkbox');
+  if (cb) toggleRowCheckbox(cb);
+}
+
+/* Tristate header/bulk checkbox cycle:
+   - empty / indeterminate → select all (becomes checked)
+   - checked (all selected) → clear all (becomes empty) */
+/* Click delegator for wrapper cells (header th + bulk-bar cell) so
+   tapping any pixel of the cell — not just the inner 16px box —
+   activates the checkbox. WCAG 2.5.5 (target size 24×24+). */
+function delegateToCheckbox(e, wrapper) {
+  if (e.target.closest('.checkbox')) return; // inner already handled it
+  var cb = wrapper.querySelector('.checkbox');
+  if (cb) cb.click();
+}
+
+function toggleAll(cb) {
+  var total = document.querySelectorAll('#tbody .checkbox').length;
+  var checked = document.querySelectorAll('#tbody .checkbox.checked').length;
+  if (checked === total && total > 0) {
+    clearSelection();
+  } else {
+    document.querySelectorAll('#tbody .checkbox').forEach(function(c) {
+      c.classList.add('checked');
+      c.setAttribute('aria-checked', 'true');
+    });
+    document.querySelectorAll('#tbody tr').forEach(function(tr) {
+      tr.classList.add('selected');
+      tr.setAttribute('aria-selected', 'true');
+    });
+    updateBulkBar();
+  }
+}
+
+/* Sort state: which column is active + direction (asc/desc).
+   2-state cycle: every click toggles direction; clicking a new
+   column resets dir to asc and moves the col-sorted highlight. */
+var sortedColIdx = null;
+var sortDir = 'desc';
+
+function applySortedCol(idx) {
+  // Clear col-sorted from every th + every td in the prior column
+  document.querySelectorAll('thead th.col-sorted, #tbody td.col-sorted').forEach(function(el) {
+    el.classList.remove('col-sorted');
+  });
+  if (idx == null) return;
+  var ths = document.querySelectorAll('.table-head-wrap thead th');
+  if (ths[idx]) ths[idx].classList.add('col-sorted');
+  document.querySelectorAll('#tbody tr').forEach(function(tr) {
+    if (tr.children[idx]) tr.children[idx].classList.add('col-sorted');
+  });
+}
+
+function applySortIcon(th) {
+  // Remove any leftover sort-icon from every other th
+  document.querySelectorAll('thead .sort-icon').forEach(function(el) {
+    if (el.closest('th') !== th) el.remove();
+  });
+  var icon = th.querySelector('.sort-icon');
+  if (!icon) {
+    icon = document.createElement('i');
+    icon.className = 'ph-fill sort-icon';
+    // For right-aligned headers (.sort-icon-left), prepend so the icon
+    // sits BEFORE the text and doesn't shift the value's right edge.
+    if (th.classList.contains('sort-icon-left')) {
+      th.insertBefore(icon, th.firstChild);
+    } else {
+      th.appendChild(icon);
+    }
+  }
+  icon.classList.remove('ph-caret-up', 'ph-caret-down');
+  icon.classList.add(sortDir === 'asc' ? 'ph-caret-up' : 'ph-caret-down');
+}
+
+function sortCol(th) {
+  var ths = Array.from(th.parentElement.querySelectorAll('th'));
+  var idx = ths.indexOf(th);
+  if (idx === sortedColIdx) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortedColIdx = idx;
+    sortDir = 'asc';
+  }
+  applySortedCol(idx);
+  applySortIcon(th);
+  // Reset aria-sort on every sortable th, then set the active one.
+  document.querySelectorAll('thead th.sortable').forEach(function(t) {
+    t.setAttribute('aria-sort', 'none');
+  });
+  th.setAttribute('aria-sort', sortDir === 'asc' ? 'ascending' : 'descending');
+}
+
+function toggleSection(el) {
+  el.classList.toggle('collapsed');
+  var next = el.nextElementSibling;
+  while (next && next.classList.contains('nav-subitem')) {
+    next.style.display = next.style.display === 'none' ? '' : 'none';
+    next = next.nextElementSibling;
+  }
+}
+
+function toggleSidebar() {
+  document.querySelector('.sidebar').classList.toggle('collapsed');
+}
+
+function selectNav(el) {
+  document.querySelectorAll('.nav-section, .nav-item').forEach(function(n) {
+    n.classList.remove('active');
+    n.removeAttribute('aria-current');
+    var ic = n.querySelector('i');
+    if (ic && ic.classList.contains('ph-fill')) {
+      ic.classList.remove('ph-fill');
+      ic.classList.add('ph');
+    }
+  });
+  el.classList.add('active');
+  el.setAttribute('aria-current', 'page');
+  var activeIc = el.querySelector('i');
+  if (activeIc) {
+    activeIc.classList.remove('ph');
+    activeIc.classList.add('ph-fill');
+  }
+}
+
+function selectViewTab(el) {
+  document.querySelectorAll('.view-tab').forEach(function(t) {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  el.classList.add('active');
+  el.setAttribute('aria-selected', 'true');
+}
+
+function toggleSwitch(el) {
+  el.classList.toggle('on');
+  el.setAttribute('aria-checked', el.classList.contains('on') ? 'true' : 'false');
+}
+
+function openDateRangePicker(e) {
+  // Programmatically open flatpickr; called from the date-range div's click
+  // AND from keyboard activation. Guard against bubbling from the clear btn.
+  if (e && e.target && e.target.closest && e.target.closest('.field-clear')) return;
+  if (dateRangePicker && typeof dateRangePicker.open === 'function') dateRangePicker.open();
+}
+
+var dateRangePicker = null;
+
+function clearDateRange(e) {
+  if (e) e.stopPropagation();
+  if (dateRangePicker) dateRangePicker.clear();
+  document.querySelector('.date-range-value-start').textContent = '';
+  document.querySelector('.date-range-value-end').textContent = '';
+  document.querySelector('.date-range-sep').textContent = '';
+  document.querySelector('.date-range').classList.remove('has-value');
+  syncFilters();
+}
+
+function closeOpenDropdowns(except) {
+  document.querySelectorAll('.field.is-select.open, .tag-chip.open').forEach(function(d) {
+    if (d !== except) {
+      d.classList.remove('open');
+      d.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+function toggleTagDropdown(e) {
+  e.stopPropagation();
+  var chip = document.getElementById('tag-select');
+  closeOpenDropdowns(chip);
+  chip.classList.toggle('open');
+  chip.setAttribute('aria-expanded', chip.classList.contains('open') ? 'true' : 'false');
+}
+
+function updateTagChip() {
+  var checked = document.querySelectorAll('#tag-dropdown input:checked');
+  var chip = document.getElementById('tag-select');
+  var text = document.getElementById('tag-chip-text');
+  var counter = document.getElementById('tag-counter');
+  var counterNum = counter.querySelector('.tag-counter-num');
+  if (checked.length === 0) {
+    text.innerHTML = '<span class="tag-placeholder">All</span>';
+    counterNum.textContent = '';
+    chip.classList.remove('has-value');
+  } else {
+    text.textContent = Array.from(checked).map(function(c) { return c.value; }).join('; ');
+    counterNum.textContent = checked.length;
+    chip.classList.add('has-value');
+  }
+  syncFilters();
+}
+
+function removeTag(e, value) {
+  e.stopPropagation();
+  var cb = document.querySelector('#tag-dropdown input[value="' + value + '"]');
+  if (cb) { cb.checked = false; updateTagChip(); }
+}
+
+function toggleSelect(e, el) {
+  e.stopPropagation();
+  closeOpenDropdowns(el);
+  el.classList.toggle('open');
+  el.setAttribute('aria-expanded', el.classList.contains('open') ? 'true' : 'false');
+}
+
+function selectOption(opt) {
+  var field = opt.closest('.field.is-select');
+  var value = opt.textContent.trim();
+  var valEl = field.querySelector('.custom-select-value');
+  field.querySelectorAll('.custom-option').forEach(function(o) {
+    o.classList.remove('is-selected');
+    o.setAttribute('aria-selected', 'false');
+  });
+  field.classList.remove('open');
+  field.setAttribute('aria-expanded', 'false');
+  // "All" == no filter set
+  if (value === 'All') {
+    valEl.textContent = '';
+    field.classList.remove('has-value');
+  } else {
+    valEl.textContent = value;
+    field.classList.add('has-value');
+    opt.classList.add('is-selected');
+    opt.setAttribute('aria-selected', 'true');
+  }
+  syncFilters();
+}
+
+/* ─── Wave A: filter sync ──────────────────────────── */
+
+function readField(el) {
+  // Returns array of { name, value, tag? } — one entry per chip to render
+  var name = el.getAttribute('data-name');
+  if (!name) return [];
+  if (el.classList.contains('date-range')) {
+    if (!el.classList.contains('has-value')) return [];
+    var s = el.querySelector('.date-range-value-start').textContent;
+    var e = el.querySelector('.date-range-value-end').textContent;
+    return [{ name: name, value: s + ' — ' + e }];
+  }
+  if (el.classList.contains('tag-chip')) {
+    var checked = el.querySelectorAll('input:checked');
+    return Array.from(checked).map(function(c) {
+      return { name: name, value: c.value, tag: c.value };
+    });
+  }
+  if (el.classList.contains('is-select')) {
+    if (!el.classList.contains('has-value')) return [];
+    return [{ name: name, value: el.querySelector('.custom-select-value').textContent }];
+  }
+  var input = el.querySelector('input');
+  if (input && input.value.trim()) return [{ name: name, value: input.value.trim() }];
+  return [];
+}
+
+function clearField(name) {
+  var fields = document.querySelectorAll('[data-name="' + name + '"]');
+  fields.forEach(function(el) {
+    if (el.classList.contains('date-range')) {
+      clearDateRange();
+      return;
+    }
+    if (el.classList.contains('tag-chip')) {
+      el.querySelectorAll('input:checked').forEach(function(cb){ cb.checked = false; });
+      updateTagChip();
+      return;
+    }
+    if (el.classList.contains('is-select')) {
+      el.querySelector('.custom-select-value').textContent = '';
+      el.classList.remove('has-value');
+      el.querySelectorAll('.custom-option').forEach(function(o){ o.classList.remove('is-selected'); });
+      return;
+    }
+    var input = el.querySelector('input');
+    if (input) { input.value = ''; }
+  });
+  syncFilters();
+}
+
+function clearAllFilters() {
+  document.querySelectorAll('[data-name]').forEach(function(el) {
+    clearField(el.getAttribute('data-name'));
+  });
+}
+
+function escAttr(s) {
+  return String(s).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+  });
+}
+
+function syncFilters() {
+  var actives = [];
+  document.querySelectorAll('[data-name]').forEach(function(el) {
+    readField(el).forEach(function(item) { actives.push(item); });
+  });
+
+  var filters = document.getElementById('filters');
+  var chipsContainer = document.getElementById('filter-chips');
+
+  if (actives.length) {
+    filters.classList.add('has-chips');
+    chipsContainer.innerHTML = actives.map(function(a){
+      var val = a.value.length > 36 ? a.value.slice(0, 35) + '…' : a.value;
+      var handler = a.tag
+        ? 'removeTag(event, \'' + escAttr(a.tag) + '\')'
+        : 'clearField(\'' + escAttr(a.name) + '\')';
+      return '<span class="filter-chip">'
+        + '<span class="filter-chip-val">' + escAttr(val) + '</span>'
+        + '<button type="button" class="filter-chip-remove" aria-label="Remove ' + escAttr(a.name) + ' filter" onclick="' + handler + '">'
+        +   '<i class="ph-bold ph-x" style="font-size:12px" aria-hidden="true"></i>'
+        + '</button>'
+      + '</span>';
+    }).join('');
+  } else {
+    filters.classList.remove('has-chips');
+    chipsContainer.innerHTML = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof flatpickr !== 'undefined') {
+    var fmt = function(d) {
+      var dd = String(d.getDate()).padStart(2, '0');
+      var mm = String(d.getMonth() + 1).padStart(2, '0');
+      return dd + '/' + mm + '/' + d.getFullYear();
+    };
+    var dr = document.querySelector('.date-range');
+    var startEl = dr.querySelector('.date-range-value-start');
+    var endEl = dr.querySelector('.date-range-value-end');
+    var sepEl = dr.querySelector('.date-range-sep');
+    dateRangePicker = flatpickr('#date-range-input', {
+      mode: 'range',
+      dateFormat: 'd/m/Y',
+      onChange: function(dates) {
+        if (dates.length === 2) {
+          startEl.textContent = fmt(dates[0]);
+          endEl.textContent = fmt(dates[1]);
+          sepEl.textContent = '—';
+          dr.classList.add('has-value');
+        } else if (dates.length === 0) {
+          startEl.textContent = '';
+          endEl.textContent = '';
+          sepEl.textContent = '';
+          dr.classList.remove('has-value');
+        }
+        syncFilters();
+      }
+    });
+  }
+
+  // Tag multiselect: track checkbox state
+  document.querySelectorAll('#tag-dropdown input').forEach(function(cb) {
+    cb.addEventListener('change', updateTagChip);
+  });
+
+  // Sync filter chips bar + More count on any input change
+  document.querySelectorAll('.field input[type=text]').forEach(function(input) {
+    input.addEventListener('input', syncFilters);
+  });
+  syncFilters();
+
+  // Close any open dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    var chip = document.getElementById('tag-select');
+    if (chip && !chip.contains(e.target)) {
+      chip.classList.remove('open');
+      chip.setAttribute('aria-expanded', 'false');
+    }
+    document.querySelectorAll('.field.is-select.open').forEach(function(f) {
+      if (!f.contains(e.target)) {
+        f.classList.remove('open');
+        f.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+});
+
+/* ─── Keyboard activation for custom controls ──────── */
+/* Custom widgets built from <div role="…"> don't get native key handling.
+   This single delegated handler covers Enter/Space activation and Escape
+   close for every role'd surface in the page. */
+document.addEventListener('keydown', function(e) {
+  var t = e.target;
+  if (!t || !t.getAttribute) return;
+
+  // Escape closes any open dropdown (and the date picker if open).
+  if (e.key === 'Escape') {
+    var open = document.querySelectorAll('.field.is-select.open, .tag-chip.open');
+    if (open.length) {
+      open.forEach(function(d) {
+        d.classList.remove('open');
+        d.setAttribute('aria-expanded', 'false');
+      });
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // Enter/Space activate role'd elements that aren't native buttons.
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+
+  var role = t.getAttribute('role');
+  var isOption = role === 'option';
+  var isCheckbox = role === 'checkbox';
+  var isSwitch = role === 'switch';
+  var isCombobox = role === 'combobox';
+  var isButton = role === 'button';
+  var isSortableTh = t.tagName === 'TH' && t.classList.contains('sortable');
+
+  if (isOption || isCheckbox || isSwitch || isCombobox || isButton || isSortableTh) {
+    e.preventDefault();
+    t.click();
+  }
+});
+
+renderRows();
+
+/* Pre-render a Phosphor preview icon in every sortable th so the
+   hover-preview matches the active sort icon's geometry exactly —
+   no jump on click. */
+(function() {
+  document.querySelectorAll('.table-head-wrap thead th.sortable').forEach(function(th) {
+    var prev = document.createElement('i');
+    prev.className = 'ph-fill ph-caret-up sort-preview';
+    if (th.classList.contains('sort-icon-left')) {
+      th.insertBefore(prev, th.firstChild);
+    } else {
+      th.appendChild(prev);
+    }
+  });
+})();
+
+/* Initial sort: Warehouse descending. */
+(function() {
+  var ths = document.querySelectorAll('.table-head-wrap thead th');
+  var whIdx = -1;
+  ths.forEach(function(th, i) {
+    if (th.textContent.trim() === 'Warehouse') whIdx = i;
+  });
+  if (whIdx >= 0) {
+    sortedColIdx = whIdx;
+    sortDir = 'desc';
+    applySortedCol(whIdx);
+    applySortIcon(ths[whIdx]);
+  }
+})();
+
+/* Track keyboard-vs-mouse interaction so we can show the focus halo
+   only on real Tab navigation, not on click-triggered focus. */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') document.body.classList.add('keyboard-nav');
+});
+document.addEventListener('mousedown', function() {
+  document.body.classList.remove('keyboard-nav');
+});
+
+/* Custom scroll-thumb overlay for the table. Native scrollbar is
+   hidden (so the table content can span the full card width); this
+   thumb is the visual scroll indicator that replaces it. */
+(function() {
+  const wrap = document.querySelector('.table-wrap');
+  const zone = document.querySelector('.table-zone');
+  const head = zone && zone.querySelector('.table-head-wrap');
+  if (!wrap || !zone) return;
+
+  const thumb = document.createElement('div');
+  thumb.className = 'scroll-thumb';
+  zone.appendChild(thumb);
+
+  /* 4px breathing room at top and bottom of the thumb's travel range
+     so it doesn't kiss the head divider or the bottom card edge. */
+  const TRACK_INSET = 4;
+  let fadeTimer = null;
+  function updateThumb() {
+    const visibleH = wrap.clientHeight;
+    const totalH = wrap.scrollHeight;
+    if (totalH <= visibleH + 1) { thumb.style.display = 'none'; return; }
+    thumb.style.display = '';
+    const headH = head ? head.offsetHeight : 0;
+    const trackH = visibleH - TRACK_INSET * 2;
+    const minThumb = 24;
+    const thumbH = Math.max(minThumb, (visibleH / totalH) * trackH);
+    const maxScroll = totalH - visibleH;
+    const scrollRatio = maxScroll > 0 ? wrap.scrollTop / maxScroll : 0;
+    const thumbTop = headH + TRACK_INSET + (trackH - thumbH) * scrollRatio;
+    thumb.style.height = thumbH + 'px';
+    thumb.style.top = thumbTop + 'px';
+  }
+
+  wrap.addEventListener('scroll', function() {
+    updateThumb();
+    thumb.classList.add('is-scrolling');
+    clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(() => thumb.classList.remove('is-scrolling'), 700);
+  }, { passive: true });
+
+  new ResizeObserver(updateThumb).observe(wrap);
+  if (head) new ResizeObserver(updateThumb).observe(head);
+  updateThumb();
+})();
+</script>
+</body>
+</html>
