@@ -18,6 +18,7 @@
   --teal-200: #cce7de;
   --teal-300: #99cfbd;
   --teal-400: #149167;
+  --teal-450: #2bb27f;
   --teal-500: #00875a;
   --teal-600: #006946;
   --teal-700: #00553a;
@@ -59,7 +60,10 @@
   --brand-bg-hover:   var(--teal-500);
   --brand-fg:         var(--base-white);
 
-  --focus-ring: 0 0 0 4px color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
+  /* White ring matches the field's focused border (solid white) for a
+     cohesive "snow-edge" look on the emerald aura, instead of the
+     brand-emerald halo we use elsewhere. */
+  --focus-ring: 0 0 0 4px rgba(255, 255, 255, 0.18);
 
   --surface-hover:  rgba(255,255,255,.04);
   --surface-active: rgba(255,255,255,.06);
@@ -102,10 +106,7 @@ html, body { height: 100%; }
 body {
   font-family: var(--font);
   font-size: 14px;
-  background:
-    radial-gradient(109.02% 100% at 50% 100%,
-                    var(--teal-600) 10%,
-                    var(--neutral-900) 100%);
+  background: var(--neutral-900);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   display: flex;
@@ -113,6 +114,29 @@ body {
   justify-content: center;
   min-height: 100vh;
   padding: var(--s4);
+}
+/* Animated emerald aura: pseudo-element pinned to viewport (position
+   fixed) so it doesn't disturb body's flex centering. transform is
+   GPU-accelerated and clip-path keeps the scaled gradient within
+   viewport bounds without needing overflow:hidden on body. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(109.02% 100% at 50% 100%,
+                    var(--teal-500) 10%,
+                    var(--neutral-900) 100%);
+  transform-origin: 50% 100%;
+  animation: bg-breathe 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes bg-breathe {
+  from { transform: scale(1)   translateY(0);    opacity: 0.85; }
+  to   { transform: scale(1.3) translateY(-4%);  opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
 }
 [data-theme="light"] body {
   background:
@@ -124,10 +148,18 @@ body {
 
 button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 input { font: inherit; color: inherit; background: transparent; border: none; outline: none; width: 100%; }
-input:-webkit-autofill {
-  -webkit-text-fill-color: var(--input-fg);
-  -webkit-box-shadow: 0 0 0 1000px var(--bg-elevated) inset;
-  caret-color: var(--input-fg);
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  /* Keep the field looking transparent over the emerald aura by stalling
+     Chrome's autofill background-color transition for an effectively
+     infinite duration. The known 600000s hack is the only reliable way
+     to bypass UA-paint without a solid inset overlay (which can't match
+     a moving gradient). */
+  -webkit-text-fill-color: #fff;
+  transition: background-color 600000s ease-in-out 0s, color 600000s ease-in-out 0s;
+  caret-color: #fff;
 }
 a { color: var(--text-brand); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -151,23 +183,23 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ─── Login card ──────────────────────────────────────── */
 .login-card {
+  /* position: relative (no z-index) keeps the card in the root stacking
+     context so its descendants' mix-blend-mode can reach the body::before
+     gradient as a backdrop. Source-order is still enough to paint the
+     card above the pseudo (positioned children paint after pseudo). */
+  position: relative;
   width: 100%;
   /* 404px ≈ 475px − 15%. Height-affecting tokens (padding, gap, type
      scale, field/button heights) are unchanged — only the card's
      horizontal footprint contracts. */
   max-width: 404px;
   border-radius: var(--r-2xl);
-  padding: 48px 30px 44px;
+  padding: 48px 0 44px;
   display: flex;
   flex-direction: column;
-  gap: 26px;
-  border: 1px solid transparent;
-  box-shadow: 0 48px 80px -8px color-mix(in oklch, var(--teal-900) 35%, transparent);
-  background:
-    linear-gradient(var(--bg-elevated), var(--bg-elevated)) padding-box,
-    linear-gradient(to bottom,
-                    color-mix(in oklch, var(--brand-bg-default) 25%, transparent),
-                    color-mix(in oklch, var(--brand-bg-default) 10%, transparent)) border-box;
+  gap: 40px;
+  border: none;
+  background: transparent;
 }
 
 /* ─── Brand lockup (mark + wordmark) ──────────────────── */
@@ -175,8 +207,8 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--s5);
-  padding-bottom: var(--s2);
+  gap: 32px;
+  padding-bottom: 0;
 }
 .brand-mark {
   position: relative;
@@ -186,22 +218,41 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   justify-content: center;
   font-size: 48px;
   line-height: 1;
+  padding: 12px;
+  border-radius: var(--r-xl);
+  background: var(--brand-bg-default);
+}
+/* White 100%→20% gradient border via masked pseudo, plus-lighter blend
+   so the ring glows additively over the emerald aura. Same pattern as
+   the field border previously had. */
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(to bottom,
+                              rgba(255, 255, 255, 0.20),
+                              rgba(255, 255, 255, 0));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  mix-blend-mode: plus-lighter;
+  pointer-events: none;
 }
 /* Glyph: top-to-bottom CTA-100%→20% gradient via background-clip:text,
    plus a small drop-shadow on the painted result so the icon lifts
    off its tinted plate. */
 .brand-mark i {
   background: linear-gradient(to bottom,
-                              color-mix(in oklch, var(--brand-bg-default) 100%, transparent),
-                              color-mix(in oklch, var(--brand-bg-default) 20%,  transparent));
+                              var(--teal-50),
+                              var(--teal-300));
   -webkit-background-clip: text;
           background-clip: text;
   -webkit-text-fill-color: transparent;
           color: transparent;
-  /* Stroke runs along the glyph silhouette, so the icon gets a thin
-     outline that hugs its shape (not the bounding rect). */
-  -webkit-text-stroke: 1px color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
-  filter: drop-shadow(0 2px 4px color-mix(in oklch, var(--teal-900) 50%, transparent));
+  filter: drop-shadow(0 4px 2px color-mix(in srgb, var(--teal-800) 25%, transparent));
+  mix-blend-mode: normal;
 }
 .wordmark {
   text-align: center;
@@ -209,7 +260,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   font-weight: 600;
   line-height: 1.15;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
@@ -218,64 +269,109 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
-  padding: 8px var(--s3);
-  background: var(--surface-active);
+  gap: 4px;
+  padding: 8px var(--s4);
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   color: var(--input-fg);
   min-width: 0;
   position: relative;
   transition: border-color .15s, background .15s;
-  min-height: 60px;
+  min-height: 64px;
   cursor: text;
 }
-.field:hover { background: rgba(255,255,255,.08); }
-[data-theme="light"] .field:hover { background: rgba(0,0,0,.04); }
-.field:focus-within { background: var(--surface-active); border-color: var(--input-border-focus); }
-.field.is-invalid {
-  border-color: var(--danger-fg, #e5484d);
-  background: color-mix(in oklch, var(--danger-fg, #e5484d) 7%, var(--surface-active));
+.field:hover { background: rgba(255, 255, 255, 0.08); }
+/* Gradient border via a masked pseudo-element so the overlay blend
+   mode is scoped to JUST the border, leaving the field surface and
+   inner content unaffected. Top: 50% white, bottom: 10% — gives a
+   subtle "lit edge" feel against the emerald aura. The focus rule
+   below sets a solid white border by overriding border-color on the
+   field itself (which paints over the masked gradient). */
+.field::before {
+  content: "";
+  position: absolute;
+  /* abs-positioned pseudo's containing block is the padding-box, so
+     inset:0 sits 1px inside .field's outer edge (because of the field's
+     own transparent border). Pull it out by -1px so the 1px gradient
+     ring lands precisely on the border line, matching the field's
+     visible outer rectangle. */
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(to bottom,
+                              color-mix(in srgb, var(--brand-bg-default) 65%, transparent),
+                              color-mix(in srgb, var(--brand-bg-default) 20%, transparent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
 }
-.field.is-invalid .field-label { color: var(--danger-fg, #e5484d); }
+.field:focus-within { border-color: var(--base-white); background: rgba(255, 255, 255, 0.10); }
+.field:focus-within::before { opacity: 0; }
+.field.is-invalid {
+  border-color: #ff3d3d;
+  background: rgba(255, 61, 61, 0.16);
+}
+/* Hide the brand-gradient pseudo border so the red error border isn't
+   visually competing with an overlay of emerald. */
+.field.is-invalid::before { opacity: 0; }
+.field.is-invalid .field-label { color: #ff3d3d; opacity: 1; mix-blend-mode: normal; }
 /* When the user re-focuses an invalid field, switch the whole shell
    back to focus styling so border/bg/label read consistently as
    "actively editing". The .is-invalid class will be cleared on
    the next input event; if they tab away still-invalid, blur
    re-applies the red treatment. */
 .field.is-invalid:focus-within {
-  border-color: var(--input-border-focus);
-  background: var(--surface-active);
+  border-color: var(--base-white);
+  background: rgba(255, 255, 255, 0.10);
 }
-.field.is-invalid:focus-within .field-label { color: var(--text-brand); }
+.field.is-invalid:focus-within .field-label { color: var(--base-white); }
 .field.has-error { border-color: var(--input-border-error); }
 
 .field-label {
   font-size: 10px;
   font-weight: 600;
-  color: var(--text-tertiary);
+  color: #fff;
+  opacity: 0.4;
+  mix-blend-mode: plus-lighter;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.75px;
   line-height: 12px;
   pointer-events: none;
   user-select: none;
+  transition: opacity .12s;
 }
-.field:focus-within .field-label { color: var(--text-brand); }
+.field:focus-within .field-label {
+  color: var(--base-white);
+  opacity: 1;
+  mix-blend-mode: normal;
+}
 
 .field-row {
   display: flex;
   align-items: center;
   gap: var(--s2);
   min-height: 20px;
+  color: #fff;
 }
+/* Typed value is solid white — meaningful content reads at full
+   opacity. Placeholder + leading icons get the same 50% overlay
+   treatment as forgot/eye-toggle so the "empty field" affordances
+   feel cohesive. */
 .field-row > i:not(.field-affix) {
-  color: var(--input-placeholder);
+  color: #fff;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
   flex-shrink: 0;
   font-size: 16px;
 }
-.field:focus-within .field-row > i:not(.field-affix) { color: var(--text-primary); }
+.field-row input { color: #fff; font-size: 16px; }
 
-input::placeholder { color: var(--input-placeholder); }
+input::placeholder {
+  color: rgba(255,255,255,0.15);
+  mix-blend-mode: plus-lighter;
+}
 
 /* Password: wider tracking so dot/letter rhythm reads more deliberate */
 #password { letter-spacing: 0.2em; }
@@ -291,14 +387,16 @@ input::placeholder { color: var(--input-placeholder); }
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-tertiary);
+  color: #fff;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
   border-radius: var(--r-sm);
   font-size: 16px;
   cursor: pointer;
   background: transparent;
-  transition: background .12s, color .12s;
+  transition: opacity .12s, background .12s;
 }
-.field-affix:hover { background: var(--surface-hover); color: var(--text-primary); }
+.field-affix:hover { background: var(--surface-hover); opacity: 1; }
 .field:has(.field-affix) .field-row { padding-right: 28px; }
 
 /* Error helper text below the field */
@@ -314,14 +412,21 @@ input::placeholder { color: var(--input-placeholder); }
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: var(--s3);
+  /* X = 8px gap between fields. Items needing 2X/3X visual distance
+     add an explicit margin-top on top of the gap. */
+  gap: var(--s2);
+  align-items: stretch;
 }
 .form-actions {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--s3);
-  margin-top: 48px;
+  /* gap (s2=8) + margin-top (s8=32) → 40px = 5X password→button. */
+  margin-top: var(--s8);
+}
+.login-form .forgot {
+  align-self: center;
+  /* gap (s2=8) + margin-top (s6=24) → 32px = 4X button→forgot. */
+  margin-top: var(--s6);
 }
 
 /* ─── Buttons (matches sem-015 .btn-primary) ──────────── */
@@ -333,35 +438,40 @@ input::placeholder { color: var(--input-placeholder); }
   width: 100%;
   height: 56px;
   padding: 0 var(--s4);
-  background: var(--brand-bg-default);
-  color: var(--brand-fg);
+  background: var(--base-white);
+  color: var(--teal-950);
   font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-radius: var(--r-md);
-  transition: background .12s;
+  border-radius: var(--r-lg);
+  transition: background .12s, color .12s;
 }
-.btn-primary:hover { background: var(--brand-bg-hover); }
+.btn-primary:hover { background: color-mix(in srgb, var(--base-white) 90%, var(--teal-500)); }
+.btn-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  animation: btn-spin 0.6s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
 
-/* Disabled: switch to a neutral surface + muted text instead of opacity.
-   Keeps the primary CTA hue reserved for actionable states, and the
-   contrast stays predictable regardless of what sits behind the card. */
+/* Disabled: a frosted white surface blended over the emerald aura,
+   echoing the same translucent-white-with-overlay treatment used on
+   labels, placeholders, eye-toggle and forgot. Reads clearly as
+   "inactive" without dropping the design's tonal language. */
 .btn-primary:disabled,
 .btn-primary[disabled] {
-  background: var(--neutral-700);
-  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.15);
+  mix-blend-mode: plus-lighter;
   cursor: not-allowed;
 }
 .btn-primary:disabled:hover,
 .btn-primary:disabled:active,
 .btn-primary[disabled]:hover,
-.btn-primary[disabled]:active { background: var(--neutral-700); }
-
-[data-theme="light"] .btn-primary:disabled,
-[data-theme="light"] .btn-primary[disabled] {
-  background: var(--neutral-200);
-}
+.btn-primary[disabled]:active { background: rgba(255, 255, 255, 0.04); }
 [data-theme="light"] .btn-primary:disabled:hover,
 [data-theme="light"] .btn-primary:disabled:active,
 [data-theme="light"] .btn-primary[disabled]:hover,
@@ -371,13 +481,13 @@ input::placeholder { color: var(--input-placeholder); }
 button:focus-visible,
 .field-affix:focus-visible,
 a:focus-visible {
-  outline: 1px solid var(--brand-bg-default);
+  outline: 1px solid var(--base-white);
   outline-offset: 0;
   box-shadow: var(--focus-ring);
   border-radius: var(--r-sm);
 }
 body.keyboard-nav .field:has(:focus-visible) {
-  border-color: var(--input-border-focus);
+  border-color: var(--base-white);
   box-shadow: var(--focus-ring);
 }
 
@@ -395,9 +505,9 @@ body.keyboard-nav .field:has(:focus-visible) {
    only while the field carries .is-invalid. Animated height/opacity
    so the form doesn't shudder when the message appears/disappears. */
 .field-hint {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--danger-fg, #e5484d);
+  color: #ff3d3d;
   padding: 0 var(--s3);
   max-height: 0;
   opacity: 0;
@@ -410,17 +520,18 @@ body.keyboard-nav .field:has(:focus-visible) {
 }
 .forgot {
   align-self: flex-start;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  /* Was 0.06em (~0.66px @ 11px) — reduced by ~0.5px for a tighter,
-     less spaced caps look that matches the smaller font size. */
-  letter-spacing: 0.16px;
-  color: var(--text-tertiary);
+  letter-spacing: 1.5px;
+  color: #fff;
+  opacity: 0.3;
+  mix-blend-mode: plus-lighter;
   padding: 0 var(--s1);
-  transition: color .12s;
+  transition: opacity .12s, color .12s;
 }
-.forgot:hover { color: var(--text-brand); text-decoration: none; }
+.forgot:hover  { opacity: 1; text-decoration: none; }
+.forgot:active { color: var(--teal-450); opacity: 1; text-decoration: none; }
 /* Page-level footer: pinned to the bottom of the viewport, outside
    the login card. Uses --text-tertiary (most muted text colour) plus
    ~70% opacity so it sits subtly above the radial-gradient backdrop
@@ -434,8 +545,9 @@ body.keyboard-nav .field:has(:focus-visible) {
   text-align: center;
   font-size: 12px;
   font-weight: 300;
+  letter-spacing: 0.5px;
   color: #fff;
-  opacity: .25;
+  opacity: .2;
   mix-blend-mode: plus-lighter;
   pointer-events: none;
 }
@@ -473,22 +585,21 @@ body.keyboard-nav .field:has(:focus-visible) {
       <p class="field-hint" id="email-hint" role="alert">Enter a valid email like name@example.com</p>
     </div>
 
-    <div class="password-block">
-      <label class="field" for="password">
-        <span class="field-label">Password</span>
-        <div class="field-row">
-          <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••••">
-        </div>
-        <button type="button" class="field-affix" id="pw-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePassword()">
-          <i class="ph-fill ph-eye" id="pw-toggle-glyph" aria-hidden="true"></i>
-        </button>
-      </label>
-      <a class="forgot" href="#" onclick="event.preventDefault();alert('Forgot password not wired in this prototype')">Forgot password</a>
-    </div>
+    <label class="field" for="password">
+      <span class="field-label">Password</span>
+      <div class="field-row">
+        <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="••••••••">
+      </div>
+      <button type="button" class="field-affix" id="pw-toggle" aria-label="Show password" aria-pressed="false" onclick="togglePassword()">
+        <i class="ph-fill ph-eye" id="pw-toggle-glyph" aria-hidden="true"></i>
+      </button>
+    </label>
 
     <div class="form-actions">
       <button type="submit" class="btn-primary" id="login-btn" disabled>Login</button>
     </div>
+
+    <a class="forgot" href="#" onclick="event.preventDefault();alert('Forgot password not wired in this prototype')">Forgot password</a>
   </form>
 </main>
 
@@ -550,11 +661,11 @@ function onSubmit(e) {
   e.preventDefault();
   const btn = document.getElementById('login-btn');
   if (btn.disabled) return;
-  btn.textContent = 'Signing in…';
+  btn.innerHTML = '<i class="ph-bold ph-circle-notch btn-spinner" aria-hidden="true"></i><span>Signing in…</span>';
   btn.disabled = true;
   setTimeout(() => {
     window.location.href = 'sem-015-warehouse-movements.html';
-  }, 500);
+  }, 700);
 }
 </script>
 </body>

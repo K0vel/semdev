@@ -663,7 +663,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .date-range:focus-within .field-label,
 .tag-chip:focus-within .field-label,
 .field.is-select.open .field-label,
-.tag-chip.open .field-label { color: var(--text-brand); opacity: 1; }
+.tag-chip.open .field-label { color: var(--teal-450); opacity: 1; }
 /* Leading icon (search magnifier, calendar) brightens to the primary
    text colour (white in dark / ink in light) on focus, so the whole
    field reads as "active" without competing with the brand-coloured
@@ -822,7 +822,7 @@ label.field:has(input[type=text]) { cursor: text; }
   height: 20px;
   padding: 0 6px;
   background: var(--brand-bg-default);
-  color: var(--neutral-900);
+  color: var(--brand-fg);
   border-radius: 9999px;
   font-size: 11px;
   font-weight: 700;
@@ -1717,6 +1717,18 @@ thead .checkbox {
 }
 .act-btn > i { font-size: 16px; }
 .act-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
+/* Action row hover semantics: flag (3rd) reveals warning hue, delete
+   (4th, last) reveals destructive hue. Default color stays neutral
+   so the row reads calmly until the user reaches for a destructive
+   action. */
+.row-actions .act-btn:nth-child(3):hover {
+  background: color-mix(in oklch, var(--orange-500) 12%, transparent);
+  color: var(--orange-500);
+}
+.row-actions .act-btn:last-child:hover {
+  background: color-mix(in oklch, var(--red-500) 12%, transparent);
+  color: var(--red-500);
+}
 
 /* ─── Bulk-action bar — overlays thead when ≥1 row is selected ─── */
 .bulk-bar {
@@ -1814,7 +1826,7 @@ svg { flex-shrink: 0; }
   position: absolute;
   top: 3px; right: 3px;
   width: 7px; height: 7px;
-  background: var(--brand-bg-default);
+  background: var(--teal-450);
   border-radius: 50%;
   border: 1.5px solid var(--bg-elevated);
 }
