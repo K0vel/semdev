@@ -16,18 +16,26 @@
 /* ─── Design Tokens ──────────────────────────────────────────── */
 /* OKLCH primitives: brand H=50, neutral H=50 C=0.006     */
 :root {
-  /* ── Primitives — Teal (brand, H=151 vivid green) ── */
-  --teal-50:  oklch(0.970 0.025 151.41);
-  --teal-100: oklch(0.940 0.045 151.41);
-  --teal-200: oklch(0.880 0.080 151.41);
-  --teal-300: oklch(0.810 0.115 151.41);
-  --teal-400: oklch(0.7196 0.145 151.41);
-  --teal-500: oklch(0.7196 0.1784 151.41); /* brand base — vivid green */
-  --teal-600: oklch(0.545 0.145 151.41);
-  --teal-700: oklch(0.440 0.120 151.41);
-  --teal-800: oklch(0.340 0.090 151.41);
-  --teal-900: oklch(0.240 0.060 151.41);
-  --teal-950: oklch(0.160 0.040 151.41);
+  /* ── Primitives — Brand (emerald) ───────────────────
+     Mapped from user palette: 600→teal-100, 500→teal-200,
+     400→teal-300, 300→teal-400, primary→teal-500,
+     200→teal-600, 100→teal-800. Missing rungs (50/700/900/950)
+     are interpolated to keep the ramp continuous. */
+  --teal-50:  #f0f9f5;
+  --teal-100: #e0f1eb;
+  --teal-200: #cce7de;
+  --teal-300: #99cfbd;
+  --teal-400: #149167;
+  /* Sits in the 400→300 lightness gap so it actually reads as
+     "lighter" rather than a duplicate of 400/500. ~L 0.70, kept
+     saturated (not pastel like teal-300). */
+  --teal-450: #2bb27f;
+  --teal-500: #00875a; /* brand base — CTA */
+  --teal-600: #006946;
+  --teal-700: #00553a;
+  --teal-800: #003d28;
+  --teal-900: #002b1c;
+  --teal-950: #001a10;
 
   /* ── Primitives — Neutral (navy-cool, H=240 C=0.014) ─ */
   --neutral-50:  oklch(0.985 0.008 240);
@@ -84,15 +92,15 @@
   --text-tertiary:  var(--neutral-500);
   --text-disabled:  var(--neutral-600);
   --text-inverse:   var(--neutral-900);
-  --text-brand:     var(--teal-400);
+  --text-brand:     var(--teal-300);
 
   --border-default: var(--neutral-700);
   --border-subtle:  var(--neutral-750);
   --border-strong:  var(--neutral-600);
   --border-focus:   var(--neutral-400);
 
-  --brand-bg-default: var(--teal-500);
-  --brand-bg-hover:   var(--teal-600);
+  --brand-bg-default: var(--teal-400);
+  --brand-bg-hover:   var(--teal-500);
   --brand-bg-subtle:  var(--teal-900);
   --brand-fg:         var(--base-white);
 
@@ -120,7 +128,7 @@
   /* ── Components ────────────────────────────────────── */
   --button-primary-bg:         var(--brand-bg-default);
   --button-primary-bg-hover:   var(--brand-bg-hover);
-  --button-primary-fg:         var(--teal-950);
+  --button-primary-fg:         var(--brand-fg);
   --button-secondary-bg:       transparent;
   --button-secondary-bg-hover: var(--surface-hover);
   --button-secondary-fg:       var(--text-primary);
@@ -198,15 +206,15 @@
   --text-tertiary:  var(--neutral-500);
   --text-disabled:  var(--neutral-300);
   --text-inverse:   var(--neutral-50);
-  --text-brand:     var(--teal-600);
+  --text-brand:     var(--teal-500);
 
   --border-default: var(--neutral-300);
   --border-subtle:  var(--neutral-200);
   --border-strong:  var(--neutral-400);
   --border-focus:   var(--neutral-400);
 
-  --brand-bg-default: var(--teal-500);
-  --brand-bg-hover:   var(--teal-600);
+  --brand-bg-default: var(--teal-400);
+  --brand-bg-hover:   var(--teal-500);
   --brand-bg-subtle:  var(--teal-50);
   --brand-fg:         var(--base-white);
 
@@ -364,6 +372,13 @@ body.keyboard-nav th.sortable:focus-visible {
   overflow-y: auto;
   scrollbar-width: none;
   padding: 0 var(--s2) var(--s2);
+  /* Smooth the collapsed ↔ expanded swap so the layout doesn't snap. */
+  transition: width .18s ease, min-width .18s ease;
+}
+.sidebar .nav-item,
+.sidebar .nav-section,
+.sidebar .sidebar-logo {
+  transition: padding .18s ease, gap .18s ease, justify-content .18s ease, background .12s, color .12s;
 }
 .sidebar::-webkit-scrollbar { display: none; }
 
@@ -371,8 +386,17 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--s2);
+  /* Clip the wordmark text when the sidebar is mid-transition so it
+     doesn't bleed past the narrowing sidebar's right edge — that
+     instantaneous overflow is what reads as a logo "jump". */
+  overflow: hidden;
   margin: 0 calc(-1 * var(--s2));
-  padding: var(--s1) var(--s4) var(--s1);
+  /* 22px left-pad puts the 24px mark's CENTER at the same x as the
+     20px nav-item icon center (x=34 from sidebar outer). When the
+     sidebar collapses, justify-content:center re-centres the mark
+     in the 60px sidebar, also at icon-centre — so the mark shifts
+     the same 4px as the icons rather than 6px. */
+  padding: var(--s1) 22px;
   min-height: 56px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-default);
@@ -400,7 +424,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--s2);
-  padding: var(--s3);
+  padding: var(--s3) var(--s4);
   min-height: 40px;
   font-size: 14px;
   font-weight: 600;
@@ -412,9 +436,24 @@ body.keyboard-nav th.sortable:focus-visible {
   white-space: nowrap;
 }
 .nav-section:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
-.nav-section.active {
-  color: var(--sidebar-item-fg-active);
-  background: var(--sidebar-item-bg-active);
+.nav-section.active,
+.nav-item.active {
+  position: relative;
+  color: var(--teal-450);
+  background: color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
+  font-weight: 600;
+}
+.nav-section.active::before,
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 12px;
+  background: var(--brand-bg-default);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
 }
 .nav-section.is-group {
   font-size: 12px;
@@ -425,7 +464,7 @@ body.keyboard-nav th.sortable:focus-visible {
   color: var(--text-tertiary);
   opacity: 0.8;
   min-height: 28px;
-  padding: 0 var(--s3);
+  padding: 0 var(--s4);
   cursor: default;
   pointer-events: none;
 }
@@ -442,7 +481,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--s2);
-  padding: var(--s3);
+  padding: var(--s3) var(--s4);
   min-height: 40px;
   font-size: 14px;
   font-weight: 600;
@@ -453,12 +492,17 @@ body.keyboard-nav th.sortable:focus-visible {
   user-select: none;
   white-space: nowrap;
 }
-.nav-item:has(> i:first-child) { padding-right: calc(var(--s3) + 4px); }
+.nav-item:has(> i:first-child) { padding-right: calc(var(--s4) + 4px); }
 .nav-item:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
-.nav-item.active {
-  color: var(--brand-fg);
-  background: var(--brand-bg-default);
-  font-weight: 600;
+
+/* Hover-over-active: keep the brand styling, with a slightly stronger
+   tint so the hover is still felt. Without this, the generic :hover
+   rules above (declared later than .active) win on specificity tie
+   and the active item visually reverts to white-on-dim. */
+.nav-section.active:hover,
+.nav-item.active:hover {
+  color: var(--teal-450);
+  background: color-mix(in oklch, var(--brand-bg-default) 22%, transparent);
 }
 
 .nav-subitem { /* same padding as nav-section */ }
@@ -488,10 +532,17 @@ body.keyboard-nav th.sortable:focus-visible {
 .collapse-btn:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
 
 /* ─── Sidebar collapsed state ────────────────────────── */
-.sidebar.collapsed { width: 56px; min-width: 56px; }
+.sidebar.collapsed { width: 60px; min-width: 60px; }
 .sidebar.collapsed .sidebar-logo-text,
 .sidebar.collapsed .nav-label,
 .sidebar.collapsed .nav-section > .ph-caret-down { display: none; }
+/* In collapsed (sidebar 60), shift the logo padding-left from 22→18 so
+   the 24-mark is visually centred in the 60-wide sidebar. The 4px
+   shift animates smoothly via the padding transition — no discrete
+   jump like justify-content would cause, so no flicker. The mark also
+   shifts the SAME 4px as the icons do (24→20), keeping the motion
+   coherent. */
+.sidebar.collapsed .sidebar-logo { padding: var(--s1) 18px; }
 .sidebar.collapsed .nav-section,
 .sidebar.collapsed .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
 
@@ -532,7 +583,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .results-count {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-brand);
+  color: var(--teal-450);
   text-transform: uppercase;
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
@@ -1163,8 +1214,12 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 }
 .view-tab:hover { color: var(--text-primary); }
 .view-tab.active {
-  background: var(--neutral-750);
-  color: var(--base-white);
+  color: var(--teal-450);
+  background: color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
+}
+.view-tab.active:hover {
+  color: var(--teal-450);
+  background: color-mix(in oklch, var(--brand-bg-default) 27%, transparent);
 }
 .toggle-label {
   display: flex;
@@ -1446,6 +1501,13 @@ thead th.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); 
    stacking the sort-column highlight on top of it just muddies the
    colour without adding info. Strip it for selected rows. */
 tbody tr.selected td.col-sorted { box-shadow: none; }
+/* Once a row is checked, focus shifts from "sorting" to "acting on
+   the selection". Drop the column-sort tint everywhere — head + body —
+   so the table reads as one consistent surface under bulk-mode. */
+.table-zone:has(tr.selected) thead th.col-sorted,
+.table-zone:has(tr.selected) tbody td.col-sorted {
+  box-shadow: none;
+}
 
 /* (Previously: 5px box-shadow extensions painted into the scrollbar
    gutter so row stripes didn't end short. The gutter now lives outside
@@ -1580,7 +1642,7 @@ thead .checkbox {
 .contract-cell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .contract-badge {
@@ -1631,7 +1693,7 @@ thead .checkbox {
   text-align: left;
 }
 .progress-label .progress-total { color: inherit; font-weight: inherit; }
-.progress-label .progress-filled { color: var(--text-brand); font-weight: 500; }
+.progress-label .progress-filled { color: var(--brand-bg-default); font-weight: 600; }
 .progress-label .progress-sep { margin: 0 2px; opacity: 0.6; }
 
 /* ─── Row actions ────────────────────────────────────── */
@@ -1664,7 +1726,7 @@ thead .checkbox {
   right: 0;
   height: 44px;
   background: var(--brand-bg-default);
-  color: var(--brand-fg);
+  color: var(--button-primary-fg);
   display: none;
   align-items: center;
   /* gap=0: bulk-checkbox-cell already has 12px right padding, which
@@ -1696,7 +1758,7 @@ thead .checkbox {
   height: 36px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--brand-fg);
+  color: var(--button-primary-fg);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -1715,11 +1777,11 @@ thead .checkbox {
 .bulk-bar .btn-secondary,
 .bulk-bar .bulk-danger {
   background: transparent;
-  color: var(--brand-fg);
+  color: var(--button-primary-fg);
 }
 .bulk-bar .btn-secondary:hover,
 .bulk-bar .bulk-danger:hover {
-  background: color-mix(in oklch, var(--brand-fg) 15%, transparent);
+  background: color-mix(in oklch, var(--button-primary-fg) 15%, transparent);
 }
 /* Bulk-bar's leading checkbox: white fill (both checked and
    indeterminate). Both the check and minus glyphs are brand-tinted
@@ -2044,7 +2106,7 @@ body {
       <span class="nav-label">Inventory</span>
     </div>
     <button type="button" class="nav-section active" aria-current="page" onclick="selectNav(this)">
-      <i class="ph-fill ph-arrows-out-cardinal" style="font-size:20px" aria-hidden="true"></i>
+      <i class="ph ph-arrows-out-cardinal" style="font-size:20px" aria-hidden="true"></i>
       <span class="nav-label">Movements</span>
     </button>
     <button type="button" class="nav-section" onclick="selectNav(this)">
@@ -2809,19 +2871,9 @@ function selectNav(el) {
   document.querySelectorAll('.nav-section, .nav-item').forEach(function(n) {
     n.classList.remove('active');
     n.removeAttribute('aria-current');
-    var ic = n.querySelector('i');
-    if (ic && ic.classList.contains('ph-fill')) {
-      ic.classList.remove('ph-fill');
-      ic.classList.add('ph');
-    }
   });
   el.classList.add('active');
   el.setAttribute('aria-current', 'page');
-  var activeIc = el.querySelector('i');
-  if (activeIc) {
-    activeIc.classList.remove('ph');
-    activeIc.classList.add('ph-fill');
-  }
 }
 
 function selectViewTab(el) {

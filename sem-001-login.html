@@ -12,18 +12,18 @@
 <style>
 /* ─── Design Tokens (shared with sem-015) ─────────────── */
 :root {
-  /* Primitives — Teal (brand, H=151 vivid green) */
-  --teal-50:  oklch(0.970 0.025 151.41);
-  --teal-100: oklch(0.940 0.045 151.41);
-  --teal-200: oklch(0.880 0.080 151.41);
-  --teal-300: oklch(0.810 0.115 151.41);
-  --teal-400: oklch(0.7196 0.145 151.41);
-  --teal-500: oklch(0.7196 0.1784 151.41);
-  --teal-600: oklch(0.545 0.145 151.41);
-  --teal-700: oklch(0.440 0.120 151.41);
-  --teal-800: oklch(0.340 0.090 151.41);
-  --teal-900: oklch(0.240 0.060 151.41);
-  --teal-950: oklch(0.160 0.040 151.41);
+  /* Primitives — Brand (emerald) */
+  --teal-50:  #f0f9f5;
+  --teal-100: #e0f1eb;
+  --teal-200: #cce7de;
+  --teal-300: #99cfbd;
+  --teal-400: #149167;
+  --teal-500: #00875a;
+  --teal-600: #006946;
+  --teal-700: #00553a;
+  --teal-800: #003d28;
+  --teal-900: #002b1c;
+  --teal-950: #001a10;
 
   /* Primitives — Neutral (navy-cool, H=240) */
   --neutral-50:  oklch(0.985 0.008 240);
@@ -50,13 +50,13 @@
   --text-primary:   var(--neutral-50);
   --text-secondary: var(--neutral-400);
   --text-tertiary:  var(--neutral-500);
-  --text-brand:     var(--teal-400);
+  --text-brand:     var(--teal-300);
 
   --border-default: var(--neutral-700);
   --border-subtle:  var(--neutral-800);
 
-  --brand-bg-default: var(--teal-500);
-  --brand-bg-hover:   var(--teal-600);
+  --brand-bg-default: var(--teal-400);
+  --brand-bg-hover:   var(--teal-500);
   --brand-fg:         var(--base-white);
 
   --focus-ring: 0 0 0 4px color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
@@ -84,13 +84,13 @@
   --text-primary:   var(--neutral-900);
   --text-secondary: var(--neutral-500);
   --text-tertiary:  var(--neutral-500);
-  --text-brand:     var(--teal-600);
+  --text-brand:     var(--teal-500);
 
   --border-default: var(--neutral-300);
   --border-subtle:  var(--neutral-200);
 
-  --brand-bg-default: var(--teal-500);
-  --brand-bg-hover:   var(--teal-600);
+  --brand-bg-default: var(--teal-400);
+  --brand-bg-hover:   var(--teal-500);
 
   --surface-hover:  rgba(0,0,0,.03);
   --surface-active: rgba(0,0,0,.06);
@@ -333,8 +333,8 @@ input::placeholder { color: var(--input-placeholder); }
   width: 100%;
   height: 56px;
   padding: 0 var(--s4);
-  background: var(--teal-500);
-  color: var(--teal-950);
+  background: var(--brand-bg-default);
+  color: var(--brand-fg);
   font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
