@@ -423,6 +423,7 @@ input::placeholder {
 
 /* ─── Buttons (matches sem-015 .btn-primary) ──────────── */
 .btn-primary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -430,8 +431,8 @@ input::placeholder {
   width: 100%;
   height: 56px;
   padding: 0 var(--s4);
-  background: var(--base-white);
-  color: var(--teal-950);
+  background: var(--brand-bg-default);
+  color: var(--base-white);
   font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
@@ -439,7 +440,25 @@ input::placeholder {
   border-radius: var(--r-lg);
   transition: background .12s, color .12s;
 }
-.btn-primary:hover { background: color-mix(in srgb, var(--base-white) 90%, var(--teal-500)); }
+/* Same masked-pseudo gradient border as the icon plate. */
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(to bottom,
+                              rgba(255, 255, 255, 0.20),
+                              rgba(255, 255, 255, 0));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  mix-blend-mode: plus-lighter;
+  pointer-events: none;
+}
+.btn-primary:disabled::after,
+.btn-primary[disabled]::after { display: none; }
+.btn-primary:hover { background: var(--brand-bg-hover); }
 .btn-spinner {
   display: inline-flex;
   align-items: center;
@@ -652,7 +671,7 @@ function togglePassword() {
   function place() {
     const cb = card.getBoundingClientRect().bottom;
     const ft = footer.getBoundingClientRect().top;
-    const mid = (cb + ft) / 2 - 16;
+    const mid = (cb + ft) / 2 - 24;
     dot.style.top = mid + 'px';
     dot.style.transform = 'translate(-50%, -50%)';
   }
