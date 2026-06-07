@@ -235,17 +235,9 @@
   --table-header-bg:   var(--bg-surface);
 }
 
-/* Restore filter-select bg in light */
-[data-theme="light"] .filter-select,
-[data-theme="light"] input.filter-input,
+/* Light-mode date input uses the light color-scheme so its text reads. */
 [data-theme="light"] .date-range input[type=date] {
   color-scheme: light;
-}
-[data-theme="light"] .filter-select {
-  background-color: var(--bg-elevated);
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
 }
 
 /* ─── Icons ──────────────────────────────────────────── */
@@ -922,52 +914,9 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .field-row > select option { color: var(--input-fg); background: var(--input-bg); }
 
-/* ─── Filter Controls ────────────────────────────────── */
-.filter-input, .filter-select, .filter-date {
-  height: 32px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border-default);
-  border-radius: var(--r-md);
-  color: var(--input-fg);
-  font-family: var(--font);
-  font-size: 12px;
-  padding: 0 var(--s3);
-  outline: none;
-  transition: border-color .15s;
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-}
-.filter-input:focus, .filter-select:focus { border-color: var(--input-border-focus); }
-.filter-input { min-width: 160px; }
-
-input.filter-input { cursor: text; }
-input.filter-input::placeholder { color: var(--input-placeholder); }
-
-.filter-select {
-  cursor: pointer;
-  min-width: 130px;
-  appearance: none;
-  padding-right: var(--s6);
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-color: var(--input-bg);
-}
-
-.filter-select-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.filter-icon {
-  position: absolute;
-  left: 9px;
-  color: var(--input-placeholder);
-  pointer-events: none;
-  display: flex;
-}
-.filter-select-wrap .filter-select { padding-left: 28px; }
+/* (Removed unused legacy .filter-input / .filter-select / .filter-date
+   control system — the live filters are built from .field, .date-range
+   and .tag-chip above.) */
 
 .date-range {
   display: flex;
@@ -2004,6 +1953,142 @@ body {
 .flatpickr-day.endRange { border-radius: 0 var(--r-md) var(--r-md) 0 !important; }
 .flatpickr-day.startRange.endRange { border-radius: var(--r-md) !important; }
 
+/* ─── Movement-type legend popover ───────────────────── */
+.legend-wrap { position: relative; display: inline-flex; }
+.legend-wrap.open .btn-icon { background: var(--brand-bg-subtle); color: var(--text-brand); }
+.legend-pop {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 210px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  padding: var(--s2);
+  z-index: 60;
+}
+.legend-wrap.open .legend-pop { display: block; }
+.legend-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  padding: var(--s1) var(--s2) var(--s2);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.legend-icons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  font-size: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.legend-sep { height: 1px; background: var(--border-subtle); margin: var(--s1) 0; }
+
+/* ─── Empty state ────────────────────────────────────── */
+.empty-row td { height: auto; border: none; }
+.empty-row:hover td { background: transparent; }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  padding: var(--s16) var(--s4);
+  text-align: center;
+}
+.empty-icon { font-size: 40px; color: var(--text-disabled); }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+.empty-sub { font-size: 13px; font-weight: 500; color: var(--text-tertiary); margin-top: -6px; }
+
+/* Disabled / busy buttons (e.g. Update mid-refresh). */
+.btn-primary:disabled,
+.btn-secondary:disabled { opacity: .6; cursor: not-allowed; }
+/* Spinner: rotate the leading icon while a refresh is in flight. */
+.spin { display: inline-flex; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Skeleton (loading) ─────────────────────────────── */
+.skeleton-row td { height: 56px; }
+.skeleton-row:hover td { background: transparent; }
+.skel {
+  display: inline-block;
+  height: 12px;
+  width: 60%;
+  border-radius: var(--r-sm);
+  background: var(--bg-overlay);
+  animation: skel-pulse 1.2s ease-in-out infinite;
+}
+@keyframes skel-pulse { 0%, 100% { opacity: .4; } 50% { opacity: .8; } }
+
+/* ─── Quantity direction (outflow) ───────────────────── */
+.qty-cell .qty-dir { font-size: 12px; margin-right: 2px; color: var(--text-tertiary); vertical-align: -1px; }
+
+/* ─── Contract progress thresholds ───────────────────────
+   Ring + filled count shift hue as the contract nears (≥75%) or
+   exceeds (≥100%) its total. Skipped on selected rows, where the brand
+   tint already owns the row's colour. */
+tbody tr:not(.selected) .progress-wrap.warn .progress-ring-fill { stroke: var(--status-warning-solid); }
+tbody tr:not(.selected) .progress-wrap.warn .progress-filled { color: var(--status-warning-fg); }
+tbody tr:not(.selected) .progress-wrap.overrun .progress-ring-fill { stroke: var(--status-error-solid); }
+tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--status-error-fg); }
+
+/* ─── Undo toast ─────────────────────────────────────── */
+.toast-stack {
+  position: fixed;
+  left: 50%;
+  bottom: var(--s6);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  z-index: 200;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-lg);
+  padding: 10px 10px 10px var(--s4);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  font-size: 14px;
+  font-weight: 500;
+  animation: toast-in .2s cubic-bezier(.22,1,.36,1);
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.toast-undo {
+  height: 28px;
+  padding: 0 var(--s3);
+  background: transparent;
+  border: none;
+  color: var(--text-brand);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .12s;
+}
+.toast-undo:hover { background: var(--surface-hover); }
+
 /* ─── Responsive ──────────────────────────────────────
    Scope: this is an admin tool for operations staff on a desktop
    workstation. Phone is intentionally out of scope. The breakpoints
@@ -2355,7 +2440,20 @@ body {
       </label>
     </div>
     <div class="toolbar-right">
-      <button class="btn-secondary">
+      <div class="legend-wrap">
+        <button type="button" class="btn-icon" id="legend-btn" aria-label="Movement type legend" aria-haspopup="dialog" aria-expanded="false" onclick="toggleLegend(event)">
+          <i class="ph ph-info" style="font-size:20px" aria-hidden="true"></i>
+        </button>
+        <div class="legend-pop" id="legend-pop" role="dialog" aria-label="Movement type legend">
+          <div class="legend-title">Movement types</div>
+          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-stack" aria-hidden="true"></i></span> Standard</div>
+          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-trolley-suitcase" aria-hidden="true"></i></span> Edit</div>
+          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-sketch-logo" aria-hidden="true"></i></span> Other</div>
+          <div class="legend-sep" role="presentation"></div>
+          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-truck" aria-hidden="true"></i></span> Transported by truck</div>
+        </div>
+      </div>
+      <button type="button" class="btn-secondary" onclick="runUpdate(this)">
         <i class="ph-bold ph-arrows-clockwise" style="font-size:16px"></i>
         Update
       </button>
@@ -2379,10 +2477,10 @@ body {
     </div>
     <span class="bulk-count" id="bulk-count" aria-live="polite">0 selected</span>
     <div class="bulk-actions">
-      <button type="button" class="btn-secondary" onclick="alert('Export not wired in this prototype')">
+      <button type="button" class="btn-secondary" onclick="showToast('Export isn\'t available in this prototype.')">
         <i class="ph-bold ph-download-simple" style="font-size:16px" aria-hidden="true"></i> Export
       </button>
-      <button type="button" class="btn-secondary bulk-danger" onclick="alert('Delete not wired in this prototype')">
+      <button type="button" class="btn-secondary bulk-danger" onclick="deleteSelected()">
         <i class="ph-bold ph-trash" style="font-size:16px" aria-hidden="true"></i> Delete
       </button>
     </div>
@@ -2456,6 +2554,26 @@ var rows = [
    click handlers look the row up by uid. */
 rows.forEach(function(r, i) { r._uid = i; r._selected = false; });
 
+/* Prototype seed: Destination and Job order aren't in the source data
+   extract, so assign deterministic demo values by index so those filters
+   have something to act on. Tags are derived from subproduct + movement
+   type (see deriveTags) rather than stored per row. */
+var _DEST = ['Italy', 'Italy', 'Germany', 'Italy', 'France'];
+rows.forEach(function(r, i) {
+  r.dest = _DEST[i % _DEST.length];
+  r.job  = (i % 2) ? 'JO-2026-002' : 'JO-2026-001';
+});
+
+function deriveTags(r) {
+  var t = [];
+  if (r.sub === 'P10') t.push('P10');
+  if (r.sub === 'P60') t.push('P60');
+  if (typeof r.xab === 'number') t.push('XAB');
+  if (r.type === 'std') t.push('IRON');
+  if (r.type === 'edit') t.push('OEM');
+  return t;
+}
+
 function progressClass(filled, total) {
   var pct = filled / total;
   if (pct >= 1) return 'overrun';
@@ -2469,7 +2587,9 @@ function titleCase(s) {
 }
 
 function formatQty(n) {
-  return (n / 1000).toFixed(3).replace('.', ',') + ' Mt';
+  /* Absolute value — direction (in/out) is conveyed by the arrow glyph,
+     not a leading minus. European decimal (comma) to match dd/mm/yyyy. */
+  return (Math.abs(n) / 1000).toFixed(3).replace('.', ',') + ' Mt';
 }
 
 function splitCustomer(s) {
@@ -2478,9 +2598,103 @@ function splitCustomer(s) {
   return { name: String(s), city: '' };
 }
 
+/* ─── Filtering ─────────────────────────────────────────
+   Read the committed value of every filter field and reduce the row set.
+   Fields left at "All" / empty are skipped, so an untouched filter never
+   excludes anything. (readField + _parseDate are hoisted declarations
+   defined further down.) */
+function collectFilters() {
+  var f = { tags: [] };
+  document.querySelectorAll('[data-name]').forEach(function(el) {
+    var name = el.getAttribute('data-name');
+    var items = readField(el);
+    if (el.classList.contains('tag-chip')) {
+      f.tags = items.map(function(i) { return i.value; });
+    } else if (el.classList.contains('date-range')) {
+      if (items.length) {
+        var parts = items[0].value.split(' — ');
+        f.dateStart = _parseDate(parts[0]);
+        f.dateEnd = _parseDate(parts[1]);
+      }
+    } else if (items.length) {
+      f[name] = items[0].value;
+    }
+  });
+  return f;
+}
+
+function hasActiveFilters() {
+  var f = collectFilters();
+  return !!(f.Search || f.Warehouse || f.Subproduct || f.Vessel || f.Contract
+    || f.Destination || f['Job order'] || f.dateStart || (f.tags && f.tags.length));
+}
+
+function matchesFilters(r, f) {
+  if (f.Warehouse && r.wh !== f.Warehouse) return false;
+  if (f.Subproduct && r.sub !== f.Subproduct) return false;
+  if (f.Destination && r.dest !== f.Destination) return false;
+  if (f['Job order'] && r.job !== f['Job order']) return false;
+  if (f.Vessel && titleCase((r.vessel || '').split('\n')[0]) !== f.Vessel) return false;
+  // Contract options are counterparty names; the row's customer string
+  // carries the full legal name, so match by substring.
+  if (f.Contract && r.cust.toLowerCase().indexOf(f.Contract.toLowerCase()) === -1) return false;
+  if (f.tags && f.tags.length) {
+    var rt = deriveTags(r);
+    if (!f.tags.some(function(t) { return rt.indexOf(t) !== -1; })) return false;
+  }
+  if (f.dateStart) {
+    var d = _parseDate(r.date);
+    if (d == null || d < f.dateStart) return false;
+    if (f.dateEnd && d > f.dateEnd) return false;
+  }
+  if (f.Search) {
+    var q = f.Search.toLowerCase();
+    var hay = [r.wh, r.vessel, r.sub, r.cust, r.cont, r.dest, r.job, String(r.xab)]
+      .join(' ').toLowerCase();
+    if (hay.indexOf(q) === -1) return false;
+  }
+  return true;
+}
+
+function getFilteredRows() {
+  var f = collectFilters();
+  return rows.filter(function(r) { return matchesFilters(r, f); });
+}
+
+/* Auto search toggle: when on, filters apply live; when off, the table
+   only refreshes on the Update button. */
+function isAutoSearch() {
+  var t = document.querySelector('.toggle-switch[aria-label^="Auto search"]');
+  return t ? t.classList.contains('on') : true;
+}
+
+function renderEmptyState() {
+  var active = hasActiveFilters();
+  return '<tr class="empty-row"><td colspan="11"><div class="empty-state">'
+    + '<i class="ph ph-package empty-icon" aria-hidden="true"></i>'
+    + '<p class="empty-title">' + (active
+        ? 'No movements match the current filters.'
+        : 'No movements yet.') + '</p>'
+    + (active
+        ? '<button type="button" class="btn-secondary" onclick="clearAllFilters()">'
+          + '<i class="ph-bold ph-x" style="font-size:16px" aria-hidden="true"></i>Clear all filters</button>'
+        : '')
+    + '</div></td></tr>';
+}
+
 function renderRows() {
   var tbody = document.getElementById('tbody');
-  tbody.innerHTML = rows.map(function(r) {
+  var visible = getFilteredRows();
+
+  if (!visible.length) {
+    tbody.innerHTML = renderEmptyState();
+    updateResultsCount(0);
+    updateBulkBar();
+    _queueSync();
+    return;
+  }
+
+  tbody.innerHTML = visible.map(function(r) {
     var parts = r.vessel.split('\n');
     var vName = parts[0], vNum = parts[1] || '';
     var pct = Math.min(r.filled / r.total, 1);
@@ -2492,9 +2706,13 @@ function renderRows() {
     var typeTitle = r.type === 'edit' ? 'Edit movement'
                    : r.type === 'other' ? 'Other movement'
                    : 'Standard movement';
-    var typeBadge = '<span class="move-icons" title="' + typeTitle + '">'
-      + '<i class="ph-fill ph-' + typeIconName + '"></i>'
-      + '<i class="ph-fill ph-truck"></i>'
+    // role=img + aria-label so the type is announced to screen readers /
+    // keyboard users, not just exposed via the hover title. The two glyphs
+    // themselves are decorative.
+    var typeLabel = typeTitle + ', transported by truck';
+    var typeBadge = '<span class="move-icons" role="img" title="' + escAttr(typeTitle) + '" aria-label="' + escAttr(typeLabel) + '">'
+      + '<i class="ph-fill ph-' + typeIconName + '" aria-hidden="true"></i>'
+      + '<i class="ph-fill ph-truck" aria-hidden="true"></i>'
     + '</span>';
 
     var sel = r._selected ? ' selected' : '';
@@ -2502,49 +2720,54 @@ function renderRows() {
     var cbCheck = r._selected ? ' checked' : '';
     var cbAria = r._selected ? 'true' : 'false';
     return '<tr data-uid="' + r._uid + '" class="' + sel.trim() + '"' + ariaSel + ' onclick="toggleRow(this)">'
-      + '<td class="checkbox-cell"><div class="checkbox' + cbCheck + '" role="checkbox" tabindex="0" aria-checked="' + cbAria + '" aria-label="Select row ' + (r.xab || r.id) + '" onclick="event.stopPropagation();toggleRowCheckbox(this)"><i class="ph-bold ph-check" aria-hidden="true"></i></div></td>'
+      + '<td class="checkbox-cell"><div class="checkbox' + cbCheck + '" role="checkbox" tabindex="0" aria-checked="' + cbAria + '" aria-label="Select row ' + escAttr(r.xab || r.id) + '" onclick="event.stopPropagation();toggleRowCheckbox(this)"><i class="ph-bold ph-check" aria-hidden="true"></i></div></td>'
       + '<td class="move-cell">' + typeBadge + '</td>'
-      + '<td>' + r.wh + '</td>'
+      + '<td>' + escAttr(r.wh) + '</td>'
       + '<td><div class="vessel-cell">'
-        + '<span class="vessel-name">' + titleCase(vName) + '</span>'
-        + '<span class="vessel-num">' + vNum + '</span>'
+        + '<span class="vessel-name">' + escAttr(titleCase(vName)) + '</span>'
+        + '<span class="vessel-num">' + escAttr(vNum) + '</span>'
         + '</div></td>'
-      + '<td>' + r.sub + '</td>'
+      + '<td>' + escAttr(r.sub) + '</td>'
       + (function() {
           var c = splitCustomer(r.cust);
           return '<td><div class="cust-cell">'
-            + '<span class="cust-name">' + c.name + '</span>'
-            + (c.city ? '<span class="cust-city">' + c.city + '</span>' : '')
+            + '<span class="cust-name">' + escAttr(c.name) + '</span>'
+            + (c.city ? '<span class="cust-city">' + escAttr(c.city) + '</span>' : '')
             + '</div></td>';
         })()
-      + '<td class="num-cell">' + r.date + '</td>'
-      + '<td class="num-cell" style="text-align:right;">' + r.xab + '</td>'
-      + '<td class="qty-cell">' + (r.qty / 1000).toFixed(3) + ' Mt</td>'
+      + '<td class="num-cell">' + escAttr(r.date) + '</td>'
+      + '<td class="num-cell" style="text-align:right;">' + escAttr(r.xab) + '</td>'
+      + '<td class="qty-cell' + (r.qty < 0 ? ' qty-out' : '') + '">'
+        + (r.qty < 0 ? '<i class="ph-bold ph-arrow-down qty-dir" aria-hidden="true"></i><span class="sr-only">outbound </span>' : '')
+        + formatQty(r.qty) + '</td>'
       + (function() {
           var C = 2 * Math.PI * 6;
           var off = C * (1 - pct);
           return '<td><div class="contract-cell">'
-            + '<span class="contract-badge"><span class="contract-prefix">№</span>' + r.cont + '</span>'
-            + '<div class="progress-wrap">'
+            + '<span class="contract-badge"><span class="contract-prefix">№</span>' + escAttr(r.cont) + '</span>'
+            + '<div class="progress-wrap ' + pClass + '">'
               + '<svg class="progress-ring" viewBox="0 0 16 16" aria-hidden="true">'
                 + '<circle class="progress-ring-track" cx="8" cy="8" r="6"/>'
                 + '<circle class="progress-ring-fill" cx="8" cy="8" r="6"'
                   + ' style="stroke-dasharray:' + C.toFixed(2) + ';stroke-dashoffset:' + off.toFixed(2) + ';"/>'
               + '</svg>'
               + '<span class="progress-label">'
-                + '<span class="progress-filled">' + r.filled.toLocaleString('en-US') + '</span>'
+                + '<span class="progress-filled">' + r.filled.toLocaleString('de-DE') + '</span>'
                 + '<span class="progress-sep">/</span>'
-                + '<span class="progress-total">' + r.total.toLocaleString('en-US') + '</span>'
+                + '<span class="progress-total">' + r.total.toLocaleString('de-DE') + '</span>'
               + '</span>'
             + '</div>'
           + '</div></td>';
         })()
-      + '<td><div class="row-actions">'
-        + '<button type="button" class="act-btn" aria-label="Open document for ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
-        + '<button type="button" class="act-btn" aria-label="View row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
-        + '<button type="button" class="act-btn" aria-label="Flag row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
-        + '<button type="button" class="act-btn" aria-label="Delete row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
-      + '</div></td>'
+      + (function() {
+          var lbl = escAttr(r.xab || r.id);
+          return '<td><div class="row-actions">'
+            + '<button type="button" class="act-btn" aria-label="Open document for ' + lbl + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" aria-label="View row ' + lbl + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" aria-label="Flag row ' + lbl + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" aria-label="Delete row ' + lbl + '" onclick="event.stopPropagation();deleteRow(' + r._uid + ')"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
+          + '</div></td>';
+        })()
       + '</tr>';
   }).join('');
   updateResultsCount();
@@ -2585,6 +2808,10 @@ function syncHeadColumnWidths() {
   if (!_tHead || !_tBody) return;
   var bodyRows = _tBody.tBodies[0] && _tBody.tBodies[0].rows;
   if (!bodyRows || !bodyRows.length) return;
+  // Skip while the body shows a non-data state (empty / error use a
+  // colspan row; skeleton uses placeholder cells) — measuring those would
+  // corrupt the per-column widths. Keep the last good widths instead.
+  if (!_tBody.querySelector('tbody tr[data-uid]')) return;
 
   // Write pass 1: release pinned widths so the browser can measure
   // natural content width.
@@ -2700,10 +2927,11 @@ if (document.readyState === 'loading') {
   _installSyncObserver();
 }
 
-function updateResultsCount() {
+function updateResultsCount(n) {
   var el = document.getElementById('results-count');
   if (!el) return;
-  var n = document.querySelectorAll('#tbody tr').length;
+  // Count only real data rows (empty/skeleton rows carry no data-uid).
+  if (typeof n !== 'number') n = document.querySelectorAll('#tbody tr[data-uid]').length;
   el.innerHTML = '<strong>' + n + '</strong> ' + (n === 1 ? 'movement' : 'movements');
 }
 
@@ -2787,21 +3015,15 @@ function delegateToCheckbox(e, wrapper) {
 }
 
 function toggleAll(cb) {
-  var total = rows.length;
-  var checked = rows.filter(function(r) { return r._selected; }).length;
-  if (checked === total && total > 0) {
+  // Operate on the currently visible (filtered) rows only — "select all"
+  // shouldn't reach rows the active filters have hidden.
+  var vis = getFilteredRows();
+  var allSel = vis.length > 0 && vis.every(function(r) { return r._selected; });
+  if (allSel) {
     clearSelection();
   } else {
-    rows.forEach(function(r) { r._selected = true; });
-    document.querySelectorAll('#tbody .checkbox').forEach(function(c) {
-      c.classList.add('checked');
-      c.setAttribute('aria-checked', 'true');
-    });
-    document.querySelectorAll('#tbody tr').forEach(function(tr) {
-      tr.classList.add('selected');
-      tr.setAttribute('aria-selected', 'true');
-    });
-    updateBulkBar();
+    vis.forEach(function(r) { r._selected = true; });
+    renderRows();
   }
 }
 
@@ -2924,6 +3146,22 @@ function selectNav(el) {
   });
   el.classList.add('active');
   el.setAttribute('aria-current', 'page');
+}
+
+function toggleLegend(e) {
+  e.stopPropagation();
+  var btn = document.getElementById('legend-btn');
+  var wrap = btn.parentElement;
+  var open = wrap.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeLegend() {
+  var wrap = document.querySelector('.legend-wrap.open');
+  if (!wrap) return false;
+  wrap.classList.remove('open');
+  var btn = wrap.querySelector('#legend-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+  return true;
 }
 
 function selectViewTab(el) {
@@ -3201,6 +3439,19 @@ function escAttr(s) {
   });
 }
 
+/* Debounce: collapse a burst of calls into one trailing call. Used for
+   the live text inputs so a fast typist doesn't re-filter + re-render on
+   every keystroke (matters once the dataset grows past a few rows). */
+function debounce(fn, wait) {
+  var t = null;
+  return function() {
+    var ctx = this, args = arguments;
+    clearTimeout(t);
+    t = setTimeout(function() { fn.apply(ctx, args); }, wait);
+  };
+}
+var debouncedSync = debounce(syncFilters, 200);
+
 function syncFilters() {
   var actives = [];
   document.querySelectorAll('[data-name]').forEach(function(el) {
@@ -3228,6 +3479,10 @@ function syncFilters() {
     filters.classList.remove('has-chips');
     chipsContainer.innerHTML = '';
   }
+
+  // Apply the filters to the table live when Auto search is on; otherwise
+  // the chips update but the table waits for the Update button.
+  if (isAutoSearch()) renderRows();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -3266,9 +3521,9 @@ document.addEventListener('DOMContentLoaded', function() {
     cb.addEventListener('change', updateTagChip);
   });
 
-  // Sync filter chips bar + More count on any input change
+  // Sync filter chips bar + table on any text input (debounced).
   document.querySelectorAll('.field input[type=text]').forEach(function(input) {
-    input.addEventListener('input', syncFilters);
+    input.addEventListener('input', debouncedSync);
   });
   syncFilters();
 
@@ -3285,6 +3540,8 @@ document.addEventListener('DOMContentLoaded', function() {
         f.setAttribute('aria-expanded', 'false');
       }
     });
+    var lw = document.querySelector('.legend-wrap.open');
+    if (lw && !lw.contains(e.target)) closeLegend();
   });
 });
 
@@ -3298,6 +3555,7 @@ document.addEventListener('keydown', function(e) {
 
   // Escape closes any open dropdown (and the date picker if open).
   if (e.key === 'Escape') {
+    if (closeLegend()) { e.preventDefault(); return; }
     var open = document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open');
     if (open.length) {
       open.forEach(function(d) {
@@ -3325,6 +3583,115 @@ document.addEventListener('keydown', function(e) {
     t.click();
   }
 });
+
+/* ─── Update (skeleton refresh) ────────────────────────
+   The Update button simulates a refetch: paint skeleton rows, then
+   re-render once "data" settles. While in flight the button is disabled
+   (aria-busy + spinner) so a refresh can't be double-fired.
+
+   Failure path: set `window._simulateError = true` and click Update to
+   exercise the failed-load state + Retry (there's no real backend to
+   fail on its own). Retry calls runUpdate() again. */
+var _loadTimer = null;
+function _setUpdateBusy(btn, busy) {
+  if (!btn) return;
+  btn.disabled = busy;
+  btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+  var ic = btn.querySelector('i');
+  if (ic) ic.classList.toggle('spin', busy);
+}
+function renderErrorState() {
+  return '<tr class="error-row"><td colspan="11"><div class="empty-state">'
+    + '<i class="ph ph-warning-circle empty-icon" style="color:var(--status-error-fg)" aria-hidden="true"></i>'
+    + '<p class="empty-title">Couldn\'t load movements.</p>'
+    + '<p class="empty-sub">Check your connection, then try again.</p>'
+    + '<button type="button" class="btn-secondary" onclick="runUpdate()">'
+      + '<i class="ph-bold ph-arrows-clockwise" style="font-size:16px" aria-hidden="true"></i>Retry</button>'
+    + '</div></td></tr>';
+}
+function runUpdate(btn) {
+  var tbody = document.getElementById('tbody');
+  _setUpdateBusy(btn, true);
+  tbody.innerHTML = Array.from({ length: 8 }).map(function() {
+    return '<tr class="skeleton-row">' + Array.from({ length: 11 }).map(function(_, i) {
+      var w = i === 0 ? '16px' : (35 + ((i * 17) % 55)) + '%';
+      return '<td><span class="skel" style="width:' + w + '"></span></td>';
+    }).join('') + '</tr>';
+  }).join('');
+  clearTimeout(_loadTimer);
+  _loadTimer = setTimeout(function() {
+    if (window._simulateError) {
+      tbody.innerHTML = renderErrorState();
+      updateResultsCount(0);
+      updateBulkBar();
+      _queueSync();
+    } else {
+      renderRows();
+    }
+    _setUpdateBusy(btn, false);
+  }, 700);
+}
+
+/* ─── Delete with undo ─────────────────────────────────
+   Destructive actions remove rows from the data immediately, then offer
+   a 6s undo toast — cheaper for the user than a blocking confirm dialog,
+   and fully reversible. */
+var _undoTimer = null;
+function deleteRow(uid) {
+  var idx = rows.findIndex(function(r) { return r._uid === uid; });
+  if (idx < 0) return;
+  var removed = [{ row: rows[idx], idx: idx }];
+  rows.splice(idx, 1);
+  renderRows();
+  showUndoToast(removed, '1 movement deleted');
+}
+function deleteSelected() {
+  var removed = [];
+  rows.forEach(function(r, i) { if (r._selected) removed.push({ row: r, idx: i }); });
+  if (!removed.length) return;
+  rows = rows.filter(function(r) { return !r._selected; });
+  renderRows();
+  showUndoToast(removed, removed.length + ' movement' + (removed.length === 1 ? '' : 's') + ' deleted');
+}
+/* Generic toast. `action` is optional: { label, onClick }. One toast at a
+   time; auto-dismisses after `timeout` ms. The single feedback channel for
+   the whole page, so the alert() native dialogs don't reappear. */
+function showToast(msg, action, timeout) {
+  var stack = document.getElementById('toast-stack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.id = 'toast-stack';
+    stack.className = 'toast-stack';
+    document.body.appendChild(stack);
+  }
+  stack.innerHTML = '';
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.innerHTML = '<span class="toast-msg">' + escAttr(msg) + '</span>'
+    + (action ? '<button type="button" class="toast-undo">' + escAttr(action.label) + '</button>' : '');
+  if (action) {
+    toast.querySelector('.toast-undo').addEventListener('click', function() {
+      clearTimeout(_undoTimer);
+      stack.innerHTML = '';
+      action.onClick();
+    });
+  }
+  stack.appendChild(toast);
+  clearTimeout(_undoTimer);
+  _undoTimer = setTimeout(function() { stack.innerHTML = ''; }, timeout || 6000);
+}
+
+function showUndoToast(removed, msg) {
+  showToast(msg, { label: 'Undo', onClick: function() {
+    // Reinsert at original indices (ascending) so positions are restored.
+    removed.sort(function(a, b) { return a.idx - b.idx; }).forEach(function(item) {
+      item.row._selected = false;
+      rows.splice(Math.min(item.idx, rows.length), 0, item.row);
+    });
+    renderRows();
+  } });
+}
 
 renderRows();
 
