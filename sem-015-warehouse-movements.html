@@ -16,26 +16,26 @@
 /* ─── Design Tokens ──────────────────────────────────────────── */
 /* OKLCH primitives: brand H=50, neutral H=50 C=0.006     */
 :root {
-  /* ── Primitives — Brand (emerald) ───────────────────
-     Mapped from user palette: 600→teal-100, 500→teal-200,
-     400→teal-300, 300→teal-400, primary→teal-500,
-     200→teal-600, 100→teal-800. Missing rungs (50/700/900/950)
+  /* ── Primitives — Brand (blue, H=233.41) ───────────────────
+     Mapped from user palette: 600→blue-100, 500→blue-200,
+     400→blue-300, 300→blue-400, primary→blue-500,
+     200→blue-600, 100→blue-800. Missing rungs (50/700/900/950)
      are interpolated to keep the ramp continuous. */
-  --teal-50:  #f0f9f5;
-  --teal-100: #e0f1eb;
-  --teal-200: #cce7de;
-  --teal-300: #99cfbd;
-  --teal-400: #149167;
+  --blue-50:  oklch(0.970 0.025 233.41);
+  --blue-100: oklch(0.930 0.050 233.41);
+  --blue-200: oklch(0.870 0.085 233.41);
+  --blue-300: oklch(0.780 0.110 233.41);
+  --blue-400: oklch(0.700 0.134 233.41);
   /* Sits in the 400→300 lightness gap so it actually reads as
      "lighter" rather than a duplicate of 400/500. ~L 0.70, kept
-     saturated (not pastel like teal-300). */
-  --teal-450: #2bb27f;
-  --teal-500: #00875a; /* brand base — CTA */
-  --teal-600: #006946;
-  --teal-700: #00553a;
-  --teal-800: #003d28;
-  --teal-900: #002b1c;
-  --teal-950: #001a10;
+     saturated (not pastel like blue-300). */
+  --blue-450: oklch(0.760 0.130 233.41);
+  --blue-500: oklch(0.696 0.134 233.41); /* brand base — CTA */
+  --blue-600: oklch(0.560 0.134 233.41);
+  --blue-700: oklch(0.440 0.120 233.41);
+  --blue-800: oklch(0.320 0.100 233.41);
+  --blue-900: oklch(0.220 0.080 233.41);
+  --blue-950: oklch(0.150 0.060 233.41);
 
   /* ── Primitives — Neutral (navy-cool, H=240 C=0.014) ─ */
   --neutral-50:  oklch(0.985 0.008 240);
@@ -92,16 +92,16 @@
   --text-tertiary:  var(--neutral-500);
   --text-disabled:  var(--neutral-600);
   --text-inverse:   var(--neutral-900);
-  --text-brand:     var(--teal-300);
+  --text-brand:     var(--blue-300);
 
   --border-default: var(--neutral-700);
   --border-subtle:  var(--neutral-750);
   --border-strong:  var(--neutral-600);
   --border-focus:   var(--neutral-400);
 
-  --brand-bg-default: var(--teal-400);
-  --brand-bg-hover:   var(--teal-500);
-  --brand-bg-subtle:  var(--teal-900);
+  --brand-bg-default: var(--blue-400);
+  --brand-bg-hover:   var(--blue-500);
+  --brand-bg-subtle:  var(--blue-900);
   --brand-fg:         var(--base-white);
 
   /* Unified focus ring: 1px CTA border + 4px CTA-15% halo */
@@ -121,9 +121,9 @@
   --status-warning-bg:    var(--orange-900);
   --status-warning-fg:    var(--orange-400);
   --status-warning-solid: var(--orange-500);
-  --status-info-bg:       var(--teal-900);
-  --status-info-fg:       var(--teal-400);
-  --status-info-solid:    var(--teal-500);
+  --status-info-bg:       var(--blue-900);
+  --status-info-fg:       var(--blue-400);
+  --status-info-solid:    var(--blue-500);
 
   /* ── Components ────────────────────────────────────── */
   --button-primary-bg:         var(--brand-bg-default);
@@ -206,16 +206,16 @@
   --text-tertiary:  var(--neutral-500);
   --text-disabled:  var(--neutral-300);
   --text-inverse:   var(--neutral-50);
-  --text-brand:     var(--teal-500);
+  --text-brand:     var(--blue-500);
 
   --border-default: var(--neutral-300);
   --border-subtle:  var(--neutral-200);
   --border-strong:  var(--neutral-400);
   --border-focus:   var(--neutral-400);
 
-  --brand-bg-default: var(--teal-400);
-  --brand-bg-hover:   var(--teal-500);
-  --brand-bg-subtle:  var(--teal-50);
+  --brand-bg-default: var(--blue-400);
+  --brand-bg-hover:   var(--blue-500);
+  --brand-bg-subtle:  var(--blue-50);
   --brand-fg:         var(--base-white);
 
   --surface-hover:           rgba(0,0,0,.03);
@@ -229,8 +229,8 @@
   --status-error-fg:   var(--red-700);
   --status-warning-bg: var(--orange-100);
   --status-warning-fg: var(--orange-700);
-  --status-info-bg:    var(--teal-100);
-  --status-info-fg:    var(--teal-700);
+  --status-info-bg:    var(--blue-100);
+  --status-info-fg:    var(--blue-700);
   --table-row-zebra:   rgba(0, 0, 0, 0.04);
   --table-header-bg:   var(--bg-surface);
 }
@@ -439,7 +439,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .nav-section.active,
 .nav-item.active {
   position: relative;
-  color: var(--teal-450);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
   font-weight: 600;
 }
@@ -501,7 +501,7 @@ body.keyboard-nav th.sortable:focus-visible {
    and the active item visually reverts to white-on-dim. */
 .nav-section.active:hover,
 .nav-item.active:hover {
-  color: var(--teal-450);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 22%, transparent);
 }
 
@@ -583,7 +583,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .results-count {
   font-size: 14px;
   font-weight: 600;
-  color: var(--teal-450);
+  color: var(--blue-450);
   text-transform: uppercase;
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
@@ -663,7 +663,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .date-range:focus-within .field-label,
 .tag-chip:focus-within .field-label,
 .field.is-select.open .field-label,
-.tag-chip.open .field-label { color: var(--teal-450); opacity: 1; }
+.tag-chip.open .field-label { color: var(--blue-450); opacity: 1; }
 /* Leading icon (search magnifier, calendar) brightens to the primary
    text colour (white in dark / ink in light) on focus, so the whole
    field reads as "active" without competing with the brand-coloured
@@ -802,6 +802,18 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .custom-option:hover { background: var(--surface-hover); }
 .custom-option.is-selected { background: var(--sidebar-item-bg-active); color: var(--text-primary); font-weight: 600; }
+
+/* ─── Searchable dropdown (Contract combo) ──────────── */
+.field.is-combo { cursor: text; }
+.field.is-combo .field-row { padding-right: 22px; }
+.field.is-combo.has-value .field-clear { display: flex; }
+.field.is-combo.open .custom-select-dropdown { display: block; }
+.custom-option.combo-active { background: var(--surface-hover); }
+.combo-empty {
+  padding: var(--s2) var(--s3);
+  font-size: 14px; font-weight: 500;
+  color: var(--text-tertiary); user-select: none;
+}
 
 .tag-chip-text {
   flex: 1;
@@ -1214,11 +1226,11 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 }
 .view-tab:hover { color: var(--text-primary); }
 .view-tab.active {
-  color: var(--teal-450);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
 }
 .view-tab.active:hover {
-  color: var(--teal-450);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 27%, transparent);
 }
 .toggle-label {
@@ -1826,7 +1838,7 @@ svg { flex-shrink: 0; }
   position: absolute;
   top: 3px; right: 3px;
   width: 7px; height: 7px;
-  background: var(--teal-450);
+  background: var(--blue-450);
   border-radius: 50%;
   border: 1.5px solid var(--bg-elevated);
 }
@@ -2222,12 +2234,33 @@ body {
     </div>
 
     <div class="filter-row-secondary">
-      <label class="field" for="f-contract" data-name="Contract">
-        <span class="field-label">Contract</span>
+      <div class="field is-combo" data-name="Contract" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="contract-listbox" aria-label="Contract"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="contract-label">Contract</span>
         <div class="field-row">
-          <input type="text" id="f-contract" placeholder="All">
+          <i class="ph ph-magnifying-glass" style="font-size:16px" aria-hidden="true"></i>
+          <input type="text" class="combo-input" id="f-contract" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="contract-listbox" aria-labelledby="contract-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
         </div>
-      </label>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Contract">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="contract-listbox" role="listbox" aria-label="Contract">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Fonderie Cortiana</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">CAL.ME. S.P.A.</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Heidelberg Materials</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">SIPAG-BISALTA</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Acciaierie Venete</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Solvay Chimica</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">ZML Industries</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Carbofer Tecnologie</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Pontenossa S.P.A.</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Perucchini S.P.A.</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        </div>
+      </div>
 
       <div class="field is-select" data-name="Vessel" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Vessel" onclick="toggleSelect(event, this)">
         <span class="field-label" aria-hidden="true">Vessel</span>
@@ -2922,7 +2955,7 @@ function clearDateRange(e) {
 }
 
 function closeOpenDropdowns(except) {
-  document.querySelectorAll('.field.is-select.open, .tag-chip.open').forEach(function(d) {
+  document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open').forEach(function(d) {
     if (d !== except) {
       d.classList.remove('open');
       d.setAttribute('aria-expanded', 'false');
@@ -2992,6 +3025,109 @@ function selectOption(opt) {
   syncFilters();
 }
 
+/* ─── Searchable combobox (Contract) ───────────────────
+   Commit-only model: field.dataset.value + .has-value = the committed
+   selection; the input's live text is just the query. Closing without a
+   commit reverts the text to the committed value. */
+function comboField(input) { return input.closest('.field.is-combo'); }
+function comboOptions(field) {
+  return Array.prototype.slice.call(field.querySelectorAll('.custom-option'));
+}
+function comboVisibleOptions(field) {
+  return comboOptions(field).filter(function(o){ return o.style.display !== 'none'; });
+}
+function setComboActive(field, opt) {
+  comboOptions(field).forEach(function(o){ o.classList.remove('combo-active'); });
+  if (opt) {
+    opt.classList.add('combo-active');
+    opt.scrollIntoView({ block: 'nearest' });
+  }
+}
+function openCombo(input) {
+  var field = comboField(input);
+  closeOpenDropdowns(field);
+  field.classList.add('open');
+  field.setAttribute('aria-expanded', 'true');
+  // show all options fresh on open
+  comboOptions(field).forEach(function(o){ o.style.display = ''; });
+  field.querySelector('.combo-empty').style.display = 'none';
+  setComboActive(field, null);
+  input.select();
+}
+function closeCombo(input) {
+  var field = comboField(input);
+  field.classList.remove('open');
+  field.setAttribute('aria-expanded', 'false');
+  setComboActive(field, null);
+  // revert any uncommitted query back to the committed value
+  input.value = field.classList.contains('has-value') ? (field.getAttribute('data-value') || '') : '';
+}
+function filterCombo(input) {
+  var field = comboField(input);
+  var q = input.value.trim().toLowerCase();
+  var any = false;
+  comboOptions(field).forEach(function(o){
+    var match = o.textContent.toLowerCase().indexOf(q) !== -1;
+    o.style.display = match ? '' : 'none';
+    if (match) any = true;
+  });
+  field.querySelector('.combo-empty').style.display = any ? 'none' : 'block';
+  setComboActive(field, null);
+}
+function commitCombo(field, opt) {
+  var input = field.querySelector('.combo-input');
+  var value = opt.textContent.trim();
+  input.value = value;
+  field.setAttribute('data-value', value);
+  field.classList.add('has-value');
+  comboOptions(field).forEach(function(o){ o.classList.remove('is-selected'); });
+  opt.classList.add('is-selected');
+  field.classList.remove('open');
+  field.setAttribute('aria-expanded', 'false');
+  syncFilters();
+  input.blur();
+}
+function selectCombo(e, opt) {
+  // mousedown handler: preventDefault keeps focus on the input through the click
+  e.preventDefault();
+  commitCombo(comboField(opt), opt);
+}
+function resetCombo(field) {
+  var input = field.querySelector('.combo-input');
+  input.value = '';
+  field.removeAttribute('data-value');
+  field.classList.remove('has-value');
+  comboOptions(field).forEach(function(o){ o.classList.remove('is-selected'); o.style.display = ''; });
+  field.querySelector('.combo-empty').style.display = 'none';
+}
+function clearCombo(e) {
+  e.stopPropagation();
+  var field = e.target.closest('.field.is-combo');
+  resetCombo(field);
+  syncFilters();
+  field.querySelector('.combo-input').focus();
+}
+function comboKeydown(e, input) {
+  var field = comboField(input);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!field.classList.contains('open')) { openCombo(input); }
+    var vis = comboVisibleOptions(field);
+    if (!vis.length) return;
+    var cur = field.querySelector('.custom-option.combo-active');
+    var idx = vis.indexOf(cur);
+    if (e.key === 'ArrowDown') idx = idx < vis.length - 1 ? idx + 1 : 0;
+    else idx = idx > 0 ? idx - 1 : vis.length - 1;
+    setComboActive(field, vis[idx]);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    var target = field.querySelector('.custom-option.combo-active') || comboVisibleOptions(field)[0];
+    if (target) commitCombo(field, target);
+  } else if (e.key === 'Escape') {
+    if (field.classList.contains('open')) { e.preventDefault(); input.blur(); }
+  }
+}
+
 /* ─── Wave A: filter sync ──────────────────────────── */
 
 function readField(el) {
@@ -3009,6 +3145,10 @@ function readField(el) {
     return Array.from(checked).map(function(c) {
       return { name: name, value: c.value, tag: c.value };
     });
+  }
+  if (el.classList.contains('is-combo')) {
+    if (!el.classList.contains('has-value')) return [];
+    return [{ name: name, value: el.getAttribute('data-value') || '' }];
   }
   if (el.classList.contains('is-select')) {
     if (!el.classList.contains('has-value')) return [];
@@ -3031,6 +3171,7 @@ function clearField(name) {
       updateTagChip();
       return;
     }
+    if (el.classList.contains('is-combo')) { resetCombo(el); return; }
     if (el.classList.contains('is-select')) {
       el.querySelector('.custom-select-value').textContent = '';
       el.classList.remove('has-value');
@@ -3133,7 +3274,7 @@ document.addEventListener('DOMContentLoaded', function() {
       chip.classList.remove('open');
       chip.setAttribute('aria-expanded', 'false');
     }
-    document.querySelectorAll('.field.is-select.open').forEach(function(f) {
+    document.querySelectorAll('.field.is-select.open, .field.is-combo.open').forEach(function(f) {
       if (!f.contains(e.target)) {
         f.classList.remove('open');
         f.setAttribute('aria-expanded', 'false');
@@ -3152,7 +3293,7 @@ document.addEventListener('keydown', function(e) {
 
   // Escape closes any open dropdown (and the date picker if open).
   if (e.key === 'Escape') {
-    var open = document.querySelectorAll('.field.is-select.open, .tag-chip.open');
+    var open = document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open');
     if (open.length) {
       open.forEach(function(d) {
         d.classList.remove('open');

@@ -12,19 +12,19 @@
 <style>
 /* ─── Design Tokens (shared with sem-015) ─────────────── */
 :root {
-  /* Primitives — Brand (emerald) */
-  --teal-50:  #f0f9f5;
-  --teal-100: #e0f1eb;
-  --teal-200: #cce7de;
-  --teal-300: #99cfbd;
-  --teal-400: #149167;
-  --teal-450: #2bb27f;
-  --teal-500: #00875a;
-  --teal-600: #006946;
-  --teal-700: #00553a;
-  --teal-800: #003d28;
-  --teal-900: #002b1c;
-  --teal-950: #001a10;
+  /* Primitives — Brand (blue, H=233.41) */
+  --blue-50:  oklch(0.970 0.025 233.41);
+  --blue-100: oklch(0.930 0.050 233.41);
+  --blue-200: oklch(0.870 0.085 233.41);
+  --blue-300: oklch(0.780 0.110 233.41);
+  --blue-400: oklch(0.700 0.134 233.41);
+  --blue-450: oklch(0.760 0.130 233.41);
+  --blue-500: oklch(0.696 0.134 233.41);
+  --blue-600: oklch(0.560 0.134 233.41);
+  --blue-700: oklch(0.440 0.120 233.41);
+  --blue-800: oklch(0.320 0.100 233.41);
+  --blue-900: oklch(0.220 0.080 233.41);
+  --blue-950: oklch(0.150 0.060 233.41);
 
   /* Primitives — Neutral (navy-cool, H=240) */
   --neutral-50:  oklch(0.985 0.008 240);
@@ -51,18 +51,18 @@
   --text-primary:   var(--neutral-50);
   --text-secondary: var(--neutral-400);
   --text-tertiary:  var(--neutral-500);
-  --text-brand:     var(--teal-300);
+  --text-brand:     var(--blue-300);
 
   --border-default: var(--neutral-700);
   --border-subtle:  var(--neutral-800);
 
-  --brand-bg-default: var(--teal-400);
-  --brand-bg-hover:   var(--teal-500);
+  --brand-bg-default: var(--blue-400);
+  --brand-bg-hover:   var(--blue-500);
   --brand-fg:         var(--base-white);
 
   /* White ring matches the field's focused border (solid white) for a
-     cohesive "snow-edge" look on the emerald aura, instead of the
-     brand-emerald halo we use elsewhere. */
+     cohesive "snow-edge" look on the blue aura, instead of the
+     brand-blue halo we use elsewhere. */
   --focus-ring: 0 0 0 4px rgba(255, 255, 255, 0.18);
 
   --surface-hover:  rgba(255,255,255,.04);
@@ -88,13 +88,13 @@
   --text-primary:   var(--neutral-900);
   --text-secondary: var(--neutral-500);
   --text-tertiary:  var(--neutral-500);
-  --text-brand:     var(--teal-500);
+  --text-brand:     var(--blue-500);
 
   --border-default: var(--neutral-300);
   --border-subtle:  var(--neutral-200);
 
-  --brand-bg-default: var(--teal-400);
-  --brand-bg-hover:   var(--teal-500);
+  --brand-bg-default: var(--blue-400);
+  --brand-bg-hover:   var(--blue-500);
 
   --surface-hover:  rgba(0,0,0,.03);
   --surface-active: rgba(0,0,0,.06);
@@ -115,7 +115,7 @@ body {
   min-height: 100vh;
   padding: var(--s4);
 }
-/* Animated emerald aura: pseudo-element pinned to viewport (position
+/* Animated blue aura: pseudo-element pinned to viewport (position
    fixed) so it doesn't disturb body's flex centering. transform is
    GPU-accelerated and clip-path keeps the scaled gradient within
    viewport bounds without needing overflow:hidden on body. */
@@ -125,14 +125,14 @@ body::before {
   inset: 0;
   background:
     radial-gradient(90% 100% at 50% 0%,
-                    var(--teal-500) 5%,
+                    var(--blue-500) 5%,
                     var(--neutral-900) 100%);
   pointer-events: none;
 }
 [data-theme="light"] body {
   background:
     radial-gradient(109.02% 100% at 50% 100%,
-                    var(--teal-400) 10%,
+                    var(--blue-400) 10%,
                     var(--neutral-100) 100%);
 }
 .ph { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
@@ -143,7 +143,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  /* Keep the field looking transparent over the emerald aura by stalling
+  /* Keep the field looking transparent over the blue aura by stalling
      Chrome's autofill background-color transition for an effectively
      infinite duration. The known 600000s hack is the only reliable way
      to bypass UA-paint without a solid inset overlay (which can't match
@@ -211,11 +211,11 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   line-height: 1;
   padding: 12px;
   border-radius: var(--r-xl);
-  background: linear-gradient(to bottom, var(--teal-500), var(--teal-400));
-  box-shadow: 0 20px 24px color-mix(in srgb, var(--teal-900) 15%, transparent);
+  background: linear-gradient(to bottom, var(--blue-500), var(--blue-400));
+  box-shadow: 0 20px 24px color-mix(in srgb, var(--blue-900) 15%, transparent);
 }
 /* White 100%→20% gradient border via masked pseudo, plus-lighter blend
-   so the ring glows additively over the emerald aura. Same pattern as
+   so the ring glows additively over the blue aura. Same pattern as
    the field border previously had. */
 .brand-mark::after {
   content: "";
@@ -237,13 +237,13 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
    off its tinted plate. */
 .brand-mark i {
   background: linear-gradient(to bottom,
-                              var(--teal-50),
-                              var(--teal-300));
+                              var(--blue-50),
+                              var(--blue-300));
   -webkit-background-clip: text;
           background-clip: text;
   -webkit-text-fill-color: transparent;
           color: transparent;
-  filter: drop-shadow(0 4px 2px color-mix(in srgb, var(--teal-800) 25%, transparent));
+  filter: drop-shadow(0 4px 2px color-mix(in srgb, var(--blue-800) 25%, transparent));
   mix-blend-mode: normal;
 }
 .wordmark {
@@ -277,7 +277,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Gradient border via a masked pseudo-element so the overlay blend
    mode is scoped to JUST the border, leaving the field surface and
    inner content unaffected. Top: 50% white, bottom: 10% — gives a
-   subtle "lit edge" feel against the emerald aura. The focus rule
+   subtle "lit edge" feel against the blue aura. The focus rule
    below sets a solid white border by overriding border-color on the
    field itself (which paints over the masked gradient). */
 .field::before {
@@ -306,7 +306,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   background: rgba(255, 61, 61, 0.16);
 }
 /* Hide the brand-gradient pseudo border so the red error border isn't
-   visually competing with an overlay of emerald. */
+   visually competing with an overlay of blue. */
 .field.is-invalid::before { opacity: 0; }
 .field.is-invalid .field-label { color: #ff3d3d; opacity: 1; mix-blend-mode: normal; }
 /* When the user re-focuses an invalid field, switch the whole shell
@@ -468,7 +468,7 @@ input::placeholder {
 }
 @keyframes btn-spin { to { transform: rotate(360deg); } }
 
-/* Disabled: a frosted white surface blended over the emerald aura,
+/* Disabled: a frosted white surface blended over the blue aura,
    echoing the same translucent-white-with-overlay treatment used on
    labels, placeholders, eye-toggle and forgot. Reads clearly as
    "inactive" without dropping the design's tonal language. */
@@ -541,8 +541,8 @@ body.keyboard-nav .field:has(:focus-visible) {
   padding: 0 var(--s1);
   transition: opacity .12s, color .12s;
 }
-.forgot:hover  { color: var(--teal-450); opacity: 1; text-decoration: none; }
-.forgot:active { color: var(--teal-500); opacity: 1; text-decoration: none; }
+.forgot:hover  { color: var(--blue-450); opacity: 1; text-decoration: none; }
+.forgot:active { color: var(--blue-500); opacity: 1; text-decoration: none; }
 /* Page-level footer: pinned to the bottom of the viewport, outside
    the login card. Uses --text-tertiary (most muted text colour) plus
    ~70% opacity so it sits subtly above the radial-gradient backdrop
