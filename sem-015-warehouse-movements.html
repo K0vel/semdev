@@ -2077,6 +2077,8 @@ body {
 }
 
 </style>
+<!-- Shared theme controller: pre-paint + toggle wiring (must stay non-defer). -->
+<script src="theme.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 </head>
 <body>
@@ -2164,6 +2166,9 @@ body {
       <button type="button" class="btn-icon notif-btn" aria-label="Notifications (3 new)">
         <span class="notif-badge" aria-hidden="true"></span>
         <i class="ph ph-bell" style="font-size:20px" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="btn-icon" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">
+        <i class="ph ph-sun" style="font-size:20px" aria-hidden="true"></i>
       </button>
       <button type="button" class="btn-icon" aria-label="Settings">
         <i class="ph ph-gear" style="font-size:20px" aria-hidden="true"></i>

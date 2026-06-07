@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEM: Login</title>
+<title>SEM: Sign in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -83,11 +83,13 @@
 [data-theme="light"] {
   --bg-page:     var(--neutral-50);
   --bg-surface:  var(--neutral-100);
-  --bg-elevated: var(--base-white);
+  /* Barely-tinted near-white (navy-cool H=240) instead of pure #fff, so
+     the elevated/focused surface stays in the neutral ramp. */
+  --bg-elevated: oklch(0.995 0.006 240);
 
   --text-primary:   var(--neutral-900);
   --text-secondary: var(--neutral-500);
-  --text-tertiary:  var(--neutral-500);
+  --text-tertiary:  var(--neutral-400);
   --text-brand:     var(--blue-500);
 
   --border-default: var(--neutral-300);
@@ -96,8 +98,13 @@
   --brand-bg-default: var(--blue-400);
   --brand-bg-hover:   var(--blue-500);
 
-  --surface-hover:  rgba(0,0,0,.03);
-  --surface-active: rgba(0,0,0,.06);
+  /* Navy-cool tinted overlays instead of pure black. */
+  --surface-hover:  color-mix(in srgb, var(--neutral-900) 4%, transparent);
+  --surface-active: color-mix(in srgb, var(--neutral-900) 7%, transparent);
+
+  /* Dark uses a white focus glow; on a light page that is invisible, so
+     swap to a tinted brand-blue ring. */
+  --focus-ring: 0 0 0 4px color-mix(in srgb, var(--blue-500) 28%, transparent);
 }
 
 /* ─── Reset ───────────────────────────────────────────── */
@@ -129,12 +136,95 @@ body::before {
                     var(--neutral-900) 100%);
   pointer-events: none;
 }
-[data-theme="light"] body {
-  background:
-    radial-gradient(109.02% 100% at 50% 100%,
-                    var(--blue-400) 10%,
-                    var(--neutral-100) 100%);
+[data-theme="light"] body { background: var(--neutral-50); }
+/* Light theme is deliberately flatter than dark: a solid page (no
+   aura), solid surfaces, hairline borders, and none of the gradient
+   edges / additive-blend tricks the dark theme leans on. */
+[data-theme="light"] body::before { background: none; }
+
+/* Brand mark: solid plate, no white ring, no gradient-clipped glyph. */
+[data-theme="light"] .brand-mark {
+  background: var(--blue-400);
+  box-shadow: none;
 }
+[data-theme="light"] .brand-mark::after { display: none; }
+[data-theme="light"] .brand-mark i {
+  background: none;
+  -webkit-text-fill-color: var(--base-white);
+  color: var(--base-white);
+  filter: none;
+}
+
+/* Fields: borderless filled surface; the only edge is the blue focus
+   ring. Drop the dark theme's gradient edge entirely. */
+[data-theme="light"] .field { background: var(--neutral-100); }
+[data-theme="light"] .field::before { display: none; }
+[data-theme="light"] .field:hover { background: var(--neutral-200); }
+[data-theme="light"] .field:focus-within { border-color: var(--blue-500); background: var(--bg-elevated); }
+[data-theme="light"] .field-label { color: var(--text-secondary); opacity: 1; mix-blend-mode: normal; }
+[data-theme="light"] .field:focus-within .field-label { color: var(--blue-600); }
+[data-theme="light"] .field-row { color: var(--text-primary); }
+[data-theme="light"] .field-row input { color: var(--text-primary); }
+[data-theme="light"] .field-row > i:not(.field-affix) { color: var(--text-tertiary); opacity: 1; mix-blend-mode: normal; }
+[data-theme="light"] input::placeholder { color: var(--neutral-400); mix-blend-mode: normal; }
+[data-theme="light"] .field-affix { color: var(--text-tertiary); opacity: 1; mix-blend-mode: normal; }
+[data-theme="light"] .field-affix:hover { background: var(--surface-active); color: var(--text-secondary); opacity: 1; }
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus,
+[data-theme="light"] input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary);
+  caret-color: var(--text-primary);
+}
+[data-theme="light"] .forgot { color: var(--neutral-600); opacity: 1; mix-blend-mode: normal; }
+[data-theme="light"] .forgot:hover  { color: var(--blue-600); }
+[data-theme="light"] .forgot:active { color: var(--blue-700); }
+[data-theme="light"] .forgot-note { color: var(--neutral-600); opacity: 1; mix-blend-mode: normal; }
+[data-theme="light"] .page-footer { color: var(--neutral-600); opacity: 1; mix-blend-mode: normal; }
+[data-theme="light"] .footer-dot { background: var(--neutral-400); opacity: .5; mix-blend-mode: normal; }
+/* Flat CTA: drop the white additive ring; solid blue plate. */
+[data-theme="light"] .btn-primary::after { display: none; }
+[data-theme="light"] .btn-primary:disabled,
+[data-theme="light"] .btn-primary[disabled] {
+  background: var(--neutral-200);
+  color: var(--neutral-400);
+  mix-blend-mode: normal;
+}
+
+/* Light-theme focus visibility: base styles paint focus rings and active
+   field borders in white (great on the dark aura, invisible on a light
+   page). Repaint them with brand blue. */
+[data-theme="light"] button:focus-visible,
+[data-theme="light"] .field-affix:focus-visible,
+[data-theme="light"] a:focus-visible { outline-color: var(--blue-600); }
+[data-theme="light"] body.keyboard-nav .field:has(:focus-visible) { border-color: var(--blue-500); }
+[data-theme="light"] .field.is-invalid:focus-within { border-color: var(--blue-500); background: var(--bg-elevated); }
+[data-theme="light"] .field.is-invalid:focus-within .field-label { color: var(--blue-600); }
+
+/* ─── Theme toggle (floating, top-right) ──────────────────
+   No header exists on this minimal login screen, so the switcher sits
+   as a fixed icon button in the top-right corner. */
+.theme-toggle {
+  position: fixed;
+  top: var(--s4);
+  right: var(--s4);
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  opacity: 0.5;
+  mix-blend-mode: plus-lighter;
+  border-radius: var(--r-lg);
+  transition: opacity .12s, background .12s, color .12s;
+}
+.theme-toggle:hover { opacity: 1; background: var(--surface-hover); }
+[data-theme="light"] .theme-toggle { color: var(--text-secondary); opacity: 0.8; mix-blend-mode: normal; }
+[data-theme="light"] .theme-toggle:hover { opacity: 1; background: var(--surface-active); color: var(--text-primary); }
+@media (min-width: 600px) { .theme-toggle { top: var(--s5); right: var(--s5); } }
 .ph { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
 
 button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
@@ -543,6 +633,18 @@ body.keyboard-nav .field:has(:focus-visible) {
 }
 .forgot:hover  { color: var(--blue-450); opacity: 1; text-decoration: none; }
 .forgot:active { color: var(--blue-500); opacity: 1; text-decoration: none; }
+/* Inline reply to the Forgot-password click, in place of a native
+   alert() dialog so the message stays inside the design language. */
+.forgot-note {
+  align-self: center;
+  margin-top: var(--s2);
+  font-size: 12px;
+  text-align: center;
+  color: #fff;
+  opacity: 0.45;
+  mix-blend-mode: plus-lighter;
+}
+.forgot-note[hidden] { display: none; }
 /* Page-level footer: pinned to the bottom of the viewport, outside
    the login card. Uses --text-tertiary (most muted text colour) plus
    ~70% opacity so it sits subtly above the radial-gradient backdrop
@@ -589,10 +691,17 @@ body.keyboard-nav .field:has(:focus-visible) {
 }
 
 </style>
+
+<!-- Shared theme controller: pre-paint + toggle wiring (must stay non-defer). -->
+<script src="theme.js"></script>
 </head>
 <body>
 
 <a class="skip-link" href="#login-form">Skip to login form</a>
+
+<button type="button" class="theme-toggle" id="theme-toggle" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">
+  <i class="ph ph-sun" id="theme-glyph" aria-hidden="true"></i>
+</button>
 
 <main class="login-card" role="main">
   <div class="brand-lockup">
@@ -610,7 +719,7 @@ body.keyboard-nav .field:has(:focus-visible) {
           <input type="email" id="email" name="email" autocomplete="username" required placeholder="you@company.com" aria-describedby="email-hint">
         </div>
       </label>
-      <p class="field-hint" id="email-hint" role="alert">Enter a valid email like name@example.com</p>
+      <p class="field-hint" id="email-hint" role="alert"></p>
     </div>
 
     <label class="field" for="password">
@@ -624,10 +733,11 @@ body.keyboard-nav .field:has(:focus-visible) {
     </label>
 
     <div class="form-actions">
-      <button type="submit" class="btn-primary" id="login-btn" disabled>Login</button>
+      <button type="submit" class="btn-primary" id="login-btn" disabled>Sign in</button>
     </div>
 
-    <a class="forgot" href="#" onclick="event.preventDefault();alert('Forgot password not wired in this prototype')">Forgot password</a>
+    <a class="forgot" href="#" onclick="event.preventDefault();showForgotNote()">Forgot password</a>
+    <p class="forgot-note" id="forgot-note" role="status" hidden>Password recovery isn't available in this prototype.</p>
   </form>
 </main>
 
@@ -645,6 +755,14 @@ document.addEventListener('keydown', function(e) {
 document.addEventListener('mousedown', function() {
   document.body.classList.remove('keyboard-nav');
 });
+
+/* Theme toggling lives in the shared theme.js (wired via [data-theme-toggle]). */
+
+/* Inline reply to the Forgot-password link (replaces a native alert). */
+function showForgotNote() {
+  const note = document.getElementById('forgot-note');
+  if (note) note.hidden = false;
+}
 
 function togglePassword() {
   const pw = document.getElementById('password');
@@ -694,14 +812,21 @@ function togglePassword() {
   const sync = () => {
     btn.disabled = !(isValidEmail(email.value) && pw.value.trim());
   };
+  const hint = document.getElementById('email-hint');
   email.addEventListener('input', () => {
     /* Clear error mark as soon as the user edits — gives immediate relief. */
     email.closest('.field').classList.remove('is-invalid');
+    /* Empty the live region so the next error re-announces. */
+    hint.textContent = '';
     sync();
   });
   email.addEventListener('blur', () => {
     const v = email.value.trim();
-    email.closest('.field').classList.toggle('is-invalid', v.length > 0 && !isValidEmail(v));
+    const invalid = v.length > 0 && !isValidEmail(v);
+    email.closest('.field').classList.toggle('is-invalid', invalid);
+    /* Writing into the role="alert" region triggers a screen-reader
+       announcement; clearing it on valid keeps things quiet. */
+    hint.textContent = invalid ? 'Enter a valid email like name@example.com' : '';
   });
   pw.addEventListener('input', sync);
   sync();
