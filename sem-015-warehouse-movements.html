@@ -624,13 +624,15 @@ body.keyboard-nav th.sortable:focus-visible {
 
 .nav-divider {
   height: 1px;
-  /* border-default (neutral-200) ≈ the canvas in light, so the line vanished
-     on the now-surfaceless sidebar — step to border-strong so it reads. */
-  background: var(--border-strong);
+  /* Dark: a soft divider (border-strong read as too contrasty on the dark
+     sidebar). Light gets border-strong via the override below, because there
+     border-default (neutral-200) ≈ the canvas and the line would vanish. */
+  background: var(--border-default);
   /* Span the content width (aligned with the nav-item boxes), not edge-to-
      edge: drop the negative side margin so the ends line up with the items. */
   margin: var(--s2) 0;
 }
+[data-theme="light"] .nav-divider { background: var(--border-strong); }
 
 .sidebar-collapse {
   flex-shrink: 0;
@@ -2390,7 +2392,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
       <i class="ph ph-package" style="font-size:20px" aria-hidden="true"></i>
       <span class="nav-label">Raw Materials</span>
     </button>
-    <div class="nav-divider" role="presentation"></div>
+    <div class="nav-divider" role="presentation" style="background:transparent"></div>
 
     <div class="nav-section is-group" role="presentation">
       <span class="nav-label">Operations</span>
