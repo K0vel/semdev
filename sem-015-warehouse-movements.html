@@ -237,8 +237,11 @@
      so every one of those accents reads at ~6:1 on its tint. */
   --blue-450: var(--blue-700);
 
-  --surface-hover:           rgba(0,0,0,.03);
-  --surface-active:          rgba(0,0,0,.06);
+  /* Surface overlays re-based from flat black onto blue-900 (brand navy,
+     H233) at the same darkness — so input/control backgrounds carry a
+     faint brand tint instead of a dead grey. */
+  --surface-hover:           color-mix(in oklch, var(--blue-900) 4%, transparent);
+  --surface-active:          color-mix(in oklch, var(--blue-900) 7%, transparent);
   --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
   --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
 
@@ -259,6 +262,10 @@
   --table-header-bg:     var(--bg-elevated);
   --table-header-fg:     var(--text-primary);
   --table-header-border: var(--border-default);
+  /* Row hover: a brand-navy overlay (~0.93) that darkens the row past
+     both zebra tones, instead of the default light-blue tint that barely
+     registered on the light rows. */
+  --table-row-bg-hover:  color-mix(in oklch, var(--blue-900) 9%, transparent);
 }
 
 /* Light-mode date input uses the light color-scheme so its text reads. */
@@ -1538,7 +1545,7 @@ tbody tr.selected:nth-child(even) td { background: var(--surface-selected-strong
    is overridden to white so it doesn't double up.) :not(:hover):not(.selected)
    lets hover/selection rules keep winning; the selected "strong" tint
    follows onto the tinted odd rows. */
-[data-theme="light"] tbody tr:nth-child(odd):not(:hover):not(.selected) td  { background: color-mix(in oklch, var(--neutral-500) 5%, transparent); }
+[data-theme="light"] tbody tr:nth-child(odd):not(:hover):not(.selected) td  { background: color-mix(in oklch, var(--blue-900) 5%, transparent); }
 [data-theme="light"] tbody tr:nth-child(even):not(:hover):not(.selected) td { background: transparent; }
 [data-theme="light"] tbody tr.selected:nth-child(odd) td  { background: var(--surface-selected-strong); }
 [data-theme="light"] tbody tr.selected:nth-child(even) td { background: var(--table-row-bg-selected); }
@@ -1635,6 +1642,9 @@ thead .checkbox {
 }
 .checkbox.checked > .ph-check { display: inline-flex; }
 .checkbox.indeterminate > .ph-minus { display: inline-flex; }
+/* Light: resting row checkboxes (~0.87 border) were hard to spot on the
+   light rows — darken the unchecked border so they read clearly. */
+[data-theme="light"] tbody .checkbox:not(.checked):not(.indeterminate) { border-color: var(--neutral-400); }
 
 /* ─── Movement type icons (type + transport) ─────────── */
 .move-cell { padding: 0 var(--s4); text-align: center; }
@@ -1642,7 +1652,7 @@ thead .checkbox {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  font-size: 16px;
+  font-size: 20px;
   color: var(--text-secondary);
 }
 
@@ -1785,6 +1795,9 @@ thead .checkbox {
 }
 .act-btn > i { font-size: 16px; }
 .act-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
+/* Light: the neutral-500 fill reads heavy on white rows — soften to a
+   lighter grey so the action cluster stays calm until hovered. */
+[data-theme="light"] .act-btn { color: var(--neutral-400); }
 /* Action row hover semantics: flag (3rd) reveals warning hue, delete
    (4th, last) reveals destructive hue. Default color stays neutral
    so the row reads calmly until the user reaches for a destructive
