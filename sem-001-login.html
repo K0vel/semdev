@@ -81,7 +81,7 @@
 
 /* Light theme parity */
 [data-theme="light"] {
-  --bg-page:     var(--neutral-50);
+  --bg-page:     var(--base-white);
   --bg-surface:  var(--neutral-100);
   /* Barely-tinted near-white (navy-cool H=240) instead of pure #fff, so
      the elevated/focused surface stays in the neutral ramp. */
@@ -140,7 +140,7 @@ body::before {
                     var(--neutral-900) 100%);
   pointer-events: none;
 }
-[data-theme="light"] body { background: var(--neutral-50); }
+[data-theme="light"] body { background: var(--base-white); }
 /* Light theme is deliberately flatter than dark: a solid page (no
    aura), solid surfaces, hairline borders, and none of the gradient
    edges / additive-blend tricks the dark theme leans on. */
@@ -162,19 +162,28 @@ body::before {
 }
 
 /* Fields: borderless filled surface; the only edge is the blue focus
-   ring. Drop the dark theme's gradient edge entirely. */
-[data-theme="light"] .field { background: var(--neutral-100); }
+   ring. Drop the dark theme's gradient edge entirely.
+   Fill is a near-grey with only a whisper of cool tint — oklch L .945 /
+   C 0.005 / H 240. Same lightness as the old neutral-100/200 mixes, but
+   ~half the chroma so the field reads close to neutral grey (not blue),
+   while never going fully achromatic. (Project field-fill standard — see
+   snippets/field-light.css.) */
+[data-theme="light"] .field { background: oklch(0.945 0.005 240); }
 [data-theme="light"] .field::before { display: none; }
-/* Gentle hover: a ~40% step from neutral-100 toward neutral-200 instead
-   of the full jump (ΔL 0.05 read too strong). */
-[data-theme="light"] .field:hover { background: color-mix(in srgb, var(--neutral-200) 40%, var(--neutral-100)); }
+/* Hover steps darker than the resting fill (light-theme rule: hover moves
+   away from the white page → darker), a gentle ~ΔL 0.02 step. */
+[data-theme="light"] .field:hover { background: oklch(0.925 0.005 240); }
 /* 2px active edge without a layout shift: the 1px border plus a 1px
-   inset ring of the same blue read as one solid 2px line. */
-[data-theme="light"] .field:focus-within { border-color: var(--blue-500); box-shadow: inset 0 0 0 1px var(--blue-500); background: var(--bg-elevated); }
-/* Soften the error fill on light: the shared rgba(255,61,61,.16) is far
-   too saturated over a near-white surface. ~7% red over neutral-100 reads
-   as a calm tint while the 1px red border still carries the error signal. */
-[data-theme="light"] .field.is-invalid { background: color-mix(in srgb, #ff3d3d 7%, var(--neutral-100)); box-shadow: inset 0 0 0 1px #ff3d3d; }
+   inset ring of the same blue read as one solid 2px line. Focus keeps the
+   same fill as hover (not the white --bg-elevated) so clicking in doesn't
+   flip the surface colour — only the blue edge signals "active". */
+[data-theme="light"] .field:focus-within { border-color: var(--blue-500); box-shadow: inset 0 0 0 1px var(--blue-500); background: oklch(0.925 0.005 240); }
+/* Error fill on light. Mixing the warm red into the cool navy-tinted
+   neutral-100 (hue 240) in sRGB produced a muddy grey-pink. Instead use
+   a clean pale red in OKLCH on the red hue (25, matching --red-500): a
+   light, lightly-saturated surface that reads unmistakably as "error"
+   while the 1px red border carries the hard signal. */
+[data-theme="light"] .field.is-invalid { background: oklch(0.95 0.038 25); box-shadow: inset 0 0 0 1px #ff3d3d; }
 [data-theme="light"] .field-label { color: var(--text-secondary); opacity: 1; mix-blend-mode: normal; }
 [data-theme="light"] .field:focus-within .field-label { color: var(--blue-600); }
 [data-theme="light"] .field-row { color: var(--text-primary); }
@@ -749,7 +758,7 @@ body.keyboard-nav .field:has(:focus-visible) {
     </label>
 
     <div class="form-actions">
-      <button type="submit" class="btn-primary" id="login-btn" disabled>Sign in</button>
+      <button type="submit" class="btn-primary" id="login-btn">Sign in</button>
     </div>
 
     <a class="forgot" href="#" onclick="event.preventDefault();showForgotNote()">Forgot password</a>
@@ -814,27 +823,22 @@ function togglePassword() {
   window.addEventListener('load', place);
 })();
 
-/* Enable the Login button only when email matches a basic format
-   (local@domain.tld) and password is non-empty. Invalid email gets
-   a soft error border once the user has tabbed/clicked away — we
-   don't nag while they're still typing. */
-(function wireSubmitGate() {
+/* The Sign-in button stays in its default (enabled) state — validation
+   now happens on submit (see onSubmit), not by disabling the button.
+   These handlers just give live error feedback: clear an error the
+   moment the user edits a field, and flag a malformed email on blur
+   (we don't nag while they're still typing). */
+(function wireFieldFeedback() {
   const email = document.getElementById('email');
   const pw    = document.getElementById('password');
-  const btn   = document.getElementById('login-btn');
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isValidEmail = v => emailRe.test(v.trim());
-
-  const sync = () => {
-    btn.disabled = !(isValidEmail(email.value) && pw.value.trim());
-  };
   const hint = document.getElementById('email-hint');
+
   email.addEventListener('input', () => {
-    /* Clear error mark as soon as the user edits — gives immediate relief. */
     email.closest('.field').classList.remove('is-invalid');
     /* Empty the live region so the next error re-announces. */
     hint.textContent = '';
-    sync();
   });
   email.addEventListener('blur', () => {
     const v = email.value.trim();
@@ -844,14 +848,38 @@ function togglePassword() {
        announcement; clearing it on valid keeps things quiet. */
     hint.textContent = invalid ? 'Enter a valid email like name@example.com' : '';
   });
-  pw.addEventListener('input', sync);
-  sync();
+  pw.addEventListener('input', () => {
+    pw.closest('.field').classList.remove('is-invalid');
+  });
 })();
 
 function onSubmit(e) {
   e.preventDefault();
-  const btn = document.getElementById('login-btn');
+  const email = document.getElementById('email');
+  const pw    = document.getElementById('password');
+  const btn   = document.getElementById('login-btn');
+  const hint  = document.getElementById('email-hint');
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  /* Already submitting — ignore repeat clicks. */
   if (btn.disabled) return;
+
+  const emailVal = email.value.trim();
+  const emailOk  = emailRe.test(emailVal);
+  const pwOk     = pw.value.trim().length > 0;
+
+  /* Flag each field that isn't ready. The email gets a contextual hint
+     ("missing" vs "malformed"); the password just carries the red mark. */
+  email.closest('.field').classList.toggle('is-invalid', !emailOk);
+  hint.textContent = emailOk ? '' : (emailVal ? 'Enter a valid email like name@example.com' : 'Enter your email');
+  pw.closest('.field').classList.toggle('is-invalid', !pwOk);
+
+  if (!emailOk || !pwOk) {
+    /* Send focus to the first field needing attention. */
+    (!emailOk ? email : pw).focus();
+    return;
+  }
+
   btn.innerHTML = '<i class="ph-bold ph-circle-notch btn-spinner" aria-hidden="true"></i><span>Signing in…</span>';
   btn.disabled = true;
   setTimeout(() => {

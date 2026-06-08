@@ -1,28 +1,40 @@
 /* ─── Light-theme field polish ───────────────────────────────────────
    Reusable snippet. Paste these rules into a page's <style> block to give
-   its .field inputs the same light-theme treatment as sem-001-login.
+   its .field inputs the same light-theme treatment as sem-001 / sem-015.
 
    Requires on the page:
      - the .field component (structure + dark-theme base styles)
-     - tokens: --blue-500, --neutral-100, --neutral-200, --bg-elevated
+     - tokens: --blue-500, --neutral-100
    Dark theme is intentionally untouched (every rule is [data-theme="light"]).
 
-   Note: sem-001 uses blue-500 as the light brand blue; sem-015 uses
-   blue-600. This snippet follows sem-001 (blue-500). Pick one as the
-   project standard before sharing widely.
+   FILL COLOUR (project standard): a near-grey with only a whisper of cool
+   tint — oklch(L  0.005  240). Same lightness as the old neutral-100/200
+   mixes, but ~half the chroma so the field reads close to neutral grey
+   (not blue), while never going fully achromatic.
+     · resting   L 0.945
+     · hover/focus L 0.925   (one gentle ~ΔL 0.02 step DARKER — light-theme
+                              rule: hover moves AWAY from the white page)
+   Focus keeps the hover fill (no flip to white); the blue edge alone
+   signals "active". Brand blue is blue-500 (the project light standard).
    ──────────────────────────────────────────────────────────────────── */
 
-/* Gentle hover — ~40% step toward neutral-200 (the full jump read too strong) */
-[data-theme="light"] .field:hover {
-  background: color-mix(in srgb, var(--neutral-200) 40%, var(--neutral-100));
+/* Resting fill: soft near-grey, clearly separated from the near-white page. */
+[data-theme="light"] .field {
+  background: oklch(0.945 0.005 240);
 }
 
-/* Active (focus): solid 2px blue edge with no layout shift
-   (1px border + 1px inset ring of the same blue). */
+/* Hover: one gentle step darker. */
+[data-theme="light"] .field:hover {
+  background: oklch(0.925 0.005 240);
+}
+
+/* Active (focus): solid 2px blue edge with no layout shift (1px border +
+   1px inset ring of the same blue). Keeps the hover fill — does NOT flip to
+   white — so clicking in only adds the blue edge. */
 [data-theme="light"] .field:focus-within {
   border-color: var(--blue-500);
   box-shadow: inset 0 0 0 1px var(--blue-500);
-  background: var(--bg-elevated);
+  background: oklch(0.925 0.005 240);
 }
 
 /* Error: calm 7% red fill + matching 2px red edge (the shared
@@ -36,5 +48,5 @@
 [data-theme="light"] .field.is-invalid:focus-within {
   border-color: var(--blue-500);
   box-shadow: inset 0 0 0 1px var(--blue-500);
-  background: var(--bg-elevated);
+  background: oklch(0.925 0.005 240);
 }

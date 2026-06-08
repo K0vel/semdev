@@ -88,8 +88,10 @@
   --bg-overlay:  var(--neutral-700);
 
   --text-primary:   var(--neutral-50);
-  --text-secondary: var(--neutral-400);
-  --text-tertiary:  var(--neutral-500);
+  /* Three text tiers evenly spaced (~ΔL 0.20) so secondary and tertiary read
+     as distinct levels — they used to sit only 0.12 apart (n400/n500). */
+  --text-secondary: oklch(0.780 0.014 240);
+  --text-tertiary:  oklch(0.600 0.014 240);
   --text-disabled:  var(--neutral-600);
   --text-inverse:   var(--neutral-900);
   --text-brand:     var(--blue-300);
@@ -157,7 +159,7 @@
   --table-row-bg-hover:     color-mix(in oklch, oklch(0.75 0.06 240) 10%, transparent);
   --table-row-bg-selected:  var(--surface-selected);
   --table-row-border:       var(--border-subtle);
-  --table-row-zebra:        rgba(255, 255, 255, 0.04);
+  --table-row-zebra:        color-mix(in oklch, color-mix(in oklch, var(--blue-400) 30%, var(--neutral-400)) 5%, transparent);
 
   --badge-success-bg: var(--status-success-bg);
   --badge-success-fg: var(--status-success-fg);
@@ -200,17 +202,18 @@
      header/table panels (which carry no border or shadow) were invisible
      against the page; this cool grey lets them read as raised while
      anchoring the table tonal ladder (canvas → header → zebra → rows). */
-  --bg-page:     oklch(0.945 0.011 240);
+  --bg-page:     oklch(0.910 0.012 240);
   --bg-surface:  var(--neutral-100);
   --bg-elevated: var(--base-white);
   --bg-overlay:  var(--neutral-200);
 
   --text-primary:   var(--neutral-900);
-  /* secondary→600 (7.1:1) and tertiary→500 (4.3:1) restore the two-tier
-     text hierarchy; both were neutral-500 before, and 500 alone fell
-     under AA for body-weight secondary text. */
-  --text-secondary: var(--neutral-600);
-  --text-tertiary:  var(--neutral-500);
+  /* Three text tiers evenly spaced (~ΔL 0.18): primary 0.16 / secondary 0.36
+     / tertiary 0.52. Mirror of the dark scale — secondary and tertiary now
+     read as distinct levels, and tertiary clears AA (4.68:1) on bg-page
+     instead of the old n500's 3.6:1. */
+  --text-secondary: oklch(0.360 0.014 240);
+  --text-tertiary:  oklch(0.520 0.014 240);
   --text-disabled:  var(--neutral-400);
   --text-inverse:   var(--neutral-50);
   /* blue-500 was 2.65:1 on white; blue-700 (7.35:1) makes brand text
@@ -253,10 +256,11 @@
   --status-warning-fg: var(--orange-700);
   --status-info-bg:    var(--blue-100);
   --status-info-fg:    var(--blue-700);
-  /* Zebra (darker tone, odd rows): cool navy-tinted wash (~0.937). Paired
-     with the ~0.975 even tone, the ~3.8% lightness gap keeps row
-     boundaries readable. */
-  --table-row-zebra:   color-mix(in oklch, var(--neutral-500) 15%, transparent);
+  /* NOTE: in light theme the actual zebra is painted by the
+     `tr:nth-child(odd/even)` rules further down (higher specificity), not by
+     this token — it's kept only as a fallback. The real light stripe colour
+     lives there. */
+  --table-row-zebra:   color-mix(in oklch, var(--blue-500) 14%, transparent);
   /* Header inverted to white: white surface, dark ink text, separated
      from the rows by a soft underline (bold uppercase text carries it). */
   --table-header-bg:     var(--bg-elevated);
@@ -296,16 +300,26 @@
 }
 
 /* ─── field-light: light-theme filter-control polish ───────
-   Ported from snippets/field-light.css (origin: sem-001-login). Gentle
-   hover, a solid 2px blue focus edge (1px border + 1px inset ring, no
-   layout shift), and a white focused surface. Extended from the snippet's
-   .field scope to .date-range and .tag-chip so the whole filter row reads
-   as one control family. blue-500 matches the page's main accent. Dark
-   theme is untouched. */
+   Ported from snippets/field-light.css (origin: sem-001-login). Soft grey
+   resting fill clearly separated from the near-white page, gentle darker
+   hover, and a solid 2px blue focus edge (1px border + 1px inset ring, no
+   layout shift) — with the focused surface KEEPING the hover fill (no white
+   flip), exactly as on sem-001-login. Extended from the snippet's .field
+   scope to .date-range and .tag-chip so the whole filter row reads as one
+   control family. blue-500 matches the page's main accent. Dark theme is
+   untouched.
+   Fills are written as explicit oklch with a low chroma (0.005, hue 240):
+   same lightness as the old neutral-100/200 mixes, but only a whisper of
+   cool tint so the fields read closer to neutral grey (not fully grey). */
+[data-theme="light"] .field,
+[data-theme="light"] .date-range,
+[data-theme="light"] .tag-chip {
+  background: oklch(0.945 0.005 240);
+}
 [data-theme="light"] .field:hover,
 [data-theme="light"] .date-range:hover,
 [data-theme="light"] .tag-chip:hover {
-  background: color-mix(in srgb, var(--neutral-200) 40%, var(--neutral-100));
+  background: oklch(0.925 0.005 240);
 }
 [data-theme="light"] .field:focus-within,
 [data-theme="light"] .date-range:focus-within,
@@ -315,7 +329,7 @@
 [data-theme="light"] .tag-chip.open {
   border-color: var(--blue-500);
   box-shadow: inset 0 0 0 1px var(--blue-500);
-  background: var(--bg-elevated);
+  background: oklch(0.925 0.005 240);
 }
 /* Tag-pill remove hover used a white overlay (invisible on the pale
    blue-50 pill in light mode); flip it to a dark overlay. */
@@ -462,7 +476,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .sidebar {
   width: 220px;
   min-width: 220px;
-  background: var(--sidebar-bg);
+  background: transparent; /* TEST: was var(--sidebar-bg) — flat, no surface */
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -536,8 +550,12 @@ body.keyboard-nav th.sortable:focus-visible {
 .nav-section.active,
 .nav-item.active {
   position: relative;
-  color: var(--blue-450);
-  background: color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
+  /* A brand-blue tint mixed into the canvas: darker than the (flat) canvas in
+     light, lighter in dark — always more contrast than the bg — and clearly
+     blue. text-brand (blue-700 light / blue-300 dark) stays readable on it;
+     the ::before accent bar reinforces the brand cue. */
+  color: var(--text-brand);
+  background: color-mix(in oklch, var(--brand-bg-default) 24%, var(--bg-page));
   font-weight: 600;
 }
 .nav-section.active::before,
@@ -598,16 +616,20 @@ body.keyboard-nav th.sortable:focus-visible {
    and the active item visually reverts to white-on-dim. */
 .nav-section.active:hover,
 .nav-item.active:hover {
-  color: var(--blue-450);
-  background: color-mix(in oklch, var(--brand-bg-default) 22%, transparent);
+  color: var(--text-brand);
+  background: color-mix(in oklch, var(--brand-bg-default) 32%, var(--bg-page));
 }
 
 .nav-subitem { /* same padding as nav-section */ }
 
 .nav-divider {
   height: 1px;
-  background: var(--border-default);
-  margin: var(--s2) calc(-1 * var(--s2));
+  /* border-default (neutral-200) ≈ the canvas in light, so the line vanished
+     on the now-surfaceless sidebar — step to border-strong so it reads. */
+  background: var(--border-strong);
+  /* Span the content width (aligned with the nav-item boxes), not edge-to-
+     edge: drop the negative side margin so the ends line up with the items. */
+  margin: var(--s2) 0;
 }
 
 .sidebar-collapse {
@@ -658,7 +680,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--s1) var(--s4);
+  padding: var(--s1) 0;
   height: 56px;
   min-height: 56px;
   border-bottom: 1px solid var(--border-default);
@@ -680,7 +702,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .results-count {
   font-size: 14px;
   font-weight: 600;
-  color: var(--blue-450);
+  color: var(--blue-300);
   text-transform: uppercase;
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
@@ -1254,7 +1276,8 @@ label.field:has(input[type=text]) { cursor: text; }
 /* ─── View tabs (segmented control) ──────────────────── */
 .view-tabs {
   display: inline-flex;
-  background: var(--neutral-850);
+  /* Slight blue cast on the dark track, matching the zebra tint. */
+  background: color-mix(in oklch, var(--blue-500) 8%, var(--neutral-850));
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-md);
   padding: 3px;
@@ -1301,6 +1324,9 @@ label.field:has(input[type=text]) { cursor: text; }
 .toggle-label > span { transform: translateY(-1px); }
 .toggle-switch {
   width: 44px; height: 26px;
+  /* Off-state track styled like a field surface. Dark keeps the neutral-700
+     track (reads fine on the dark card); light gets the soft near-grey field
+     fill via the override below. */
   background: var(--border-default);
   border-radius: 13px;
   position: relative;
@@ -1314,8 +1340,14 @@ label.field:has(input[type=text]) { cursor: text; }
   width: 16px; height: 16px;
   border-radius: 50%;
   background: var(--base-white);
+  /* Lift the white knob off the light field-grey off-track. */
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
   transition: transform .15s;
 }
+/* Off track keeps the fields' low-chroma cool-grey character, but darker than
+   the field fill so the white knob has real contrast and the switch reads as
+   an active off-state, not disabled. On stays brand. */
+[data-theme="light"] .toggle-switch { background: oklch(0.898 0.006 240); }
 .toggle-switch.on { background: var(--brand-bg-default); }
 .toggle-switch.on::after { transform: translateX(18px); }
 
@@ -1333,6 +1365,9 @@ label.field:has(input[type=text]) { cursor: text; }
 .btn-icon:hover { background: var(--button-ghost-bg-hover); color: var(--text-primary); }
 .btn-icon.active { background: var(--brand-bg-subtle); color: var(--text-brand); }
 .header-right .btn-icon { width: 36px; height: 36px; border-radius: var(--r-md); }
+/* Legend (i) is a tertiary affordance — keep it visibly smaller than the
+   36px-tall Update / Add buttons it sits beside. */
+.legend-wrap .btn-icon { width: 28px; height: 28px; }
 
 .btn-icon-sm {
   width: 24px; height: 24px;
@@ -1379,6 +1414,18 @@ label.field:has(input[type=text]) { cursor: text; }
   line-height: 1.15;
 }
 .btn-secondary:hover { background: var(--bg-overlay); }
+/* Toolbar Update: styled like the active sidebar tab — a low brand-blue tint
+   laid over the surface — but ~35% less saturated. The brand is first mixed
+   65/35 with a same-lightness neutral (neutral-400 and blue-400/500 share
+   L≈0.70, so only chroma drops, not brightness), then laid at a low % like
+   the tab's 15%. Stays clearly subordinate to the solid-blue Add CTA. */
+.toolbar-right .btn-secondary {
+  background: color-mix(in oklch, color-mix(in oklch, var(--brand-bg-default) 65%, var(--neutral-400)) 16%, transparent);
+  color: var(--text-brand);
+}
+.toolbar-right .btn-secondary:hover {
+  background: color-mix(in oklch, color-mix(in oklch, var(--brand-bg-default) 65%, var(--neutral-400)) 24%, transparent);
+}
 
 /* ─── Table ──────────────────────────────────────────── */
 .table-head-wrap {
@@ -1481,6 +1528,8 @@ th.sortable.center .sort-preview {
   margin: 0;
 }
 .sort-icon    { color: var(--text-tertiary); }
+/* Active sort arrow goes brand blue so the ordered column is unmistakable. */
+th.col-sorted .sort-icon { color: var(--blue-500); }
 .sort-preview { color: var(--text-disabled); opacity: 0; transition: opacity .12s; }
 th.col-sorted .sort-preview { display: none; }
 th.sortable:hover .sort-preview { opacity: 0.7; }
@@ -1498,7 +1547,10 @@ th.sortable:hover .sort-preview { opacity: 0.7; }
 .table-zone:has(.table-head-wrap th:nth-child(8):hover) .table-wrap td:nth-child(8),
 .table-zone:has(.table-head-wrap th:nth-child(9):hover) .table-wrap td:nth-child(9),
 .table-zone:has(.table-head-wrap th:nth-child(10):hover) .table-wrap td:nth-child(10) {
-  box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.02);
+  /* Hover preview of the whole column before clicking to sort. Neutral wash
+     (text-primary auto-adapts per theme) so it reads as "hover", distinct from
+     the sorted column's faint blue. The old white-2% was invisible in light. */
+  box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 2%, transparent);
 }
 th.center { text-align: center; }
 
@@ -1540,12 +1592,15 @@ tbody tr.selected td { background: var(--table-row-bg-selected); }
    "strong" selected tint (30% brand vs 20%), so the existing
    nth-child(even) zebra rhythm carries through into selection. */
 tbody tr.selected:nth-child(even) td { background: var(--surface-selected-strong); }
-/* Light theme: single subtle zebra — ODD rows a faint ~0.975 tint, EVEN
+/* Light theme: single subtle zebra — ODD rows a faint blue-tinted wash, EVEN
    rows white. (Swapped from even-tinted on request; the global even rule
-   is overridden to white so it doesn't double up.) :not(:hover):not(.selected)
-   lets hover/selection rules keep winning; the selected "strong" tint
-   follows onto the tinted odd rows. */
-[data-theme="light"] tbody tr:nth-child(odd):not(:hover):not(.selected) td  { background: color-mix(in oklch, var(--blue-900) 5%, transparent); }
+   is overridden to white so it doesn't double up.) The stripe is a cool
+   neutral (neutral-500) shifted 20% toward blue-500, then laid at 11% →
+   ~0.96: an off-white grey that sits clearly between the darkened canvas
+   (~0.91) and the white rows (1.0), with only a hint of blue.
+   :not(:hover):not(.selected) lets hover/selection rules keep winning; the
+   selected "strong" tint follows onto the tinted odd rows. */
+[data-theme="light"] tbody tr:nth-child(odd):not(:hover):not(.selected) td  { background: color-mix(in oklch, color-mix(in oklch, var(--blue-500) 20%, var(--neutral-500)) 11%, transparent); }
 [data-theme="light"] tbody tr:nth-child(even):not(:hover):not(.selected) td { background: transparent; }
 [data-theme="light"] tbody tr.selected:nth-child(odd) td  { background: var(--surface-selected-strong); }
 [data-theme="light"] tbody tr.selected:nth-child(even) td { background: var(--table-row-bg-selected); }
@@ -1570,8 +1625,11 @@ tbody tr.selected .progress-filled     { color: var(--text-primary); }
 /* Active-sort column: semi-transparent tint layered ON TOP of zebra /
    hover / selected via inset box-shadow (background untouched, so the
    stripes underneath still read). Plus primary text in body. */
-tbody td.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); }
-thead th.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); }
+/* A faint, clean cool-blue wash down the sorted column — enough hue that it
+   doesn't read as muddy grey, but far lighter than the active selection (~24%)
+   so it doesn't look "selected". */
+tbody td.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--blue-500) 3%, transparent); }
+thead th.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--blue-500) 4.5%, transparent); }
 /* On a selected row the brand tint is already the dominant signal —
    stacking the sort-column highlight on top of it just muddies the
    colour without adding info. Strip it for selected rows. */
@@ -1615,7 +1673,9 @@ col.col-act     { width: 1px; }
   vertical-align: middle;
 }
 thead .checkbox {
-  border-color: var(--text-secondary);
+  /* Only a hair stronger than the body checkboxes — text-secondary read as
+     a hard, over-contrasty outline (more so now secondary is darker). */
+  border-color: var(--border-strong);
 }
 .checkbox:hover {
   border-color: var(--text-primary);
@@ -1653,7 +1713,9 @@ thead .checkbox {
   align-items: center;
   gap: 12px;
   font-size: 20px;
-  color: var(--text-secondary);
+  /* Type glyphs are a quiet categorical cue, not data — drop to tertiary so
+     they read lighter / less contrasty than the row text. */
+  color: var(--text-tertiary);
 }
 
 /* ─── Vessel cell ────────────────────────────────────── */
@@ -1676,7 +1738,7 @@ thead .checkbox {
   overflow: hidden;
 }
 .cust-name {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -1693,7 +1755,7 @@ thead .checkbox {
   text-overflow: ellipsis;
 }
 .vessel-name {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -1716,6 +1778,11 @@ thead .checkbox {
 .qty-cell {
   text-align: right;
   font-variant-numeric: tabular-nums;
+  /* Quantity is the row's key metric — lift to primary ink so it anchors the
+     right edge. Weight stays at the row default (500); the 600 here read as
+     an odd, heavier-than-everything-else style. The .qty-sign (+/−) stays
+     tertiary. */
+  color: var(--text-primary);
 }
 .contract-cell {
   display: flex;
@@ -1798,10 +1865,15 @@ thead .checkbox {
 /* Light: the neutral-500 fill reads heavy on white rows — soften to a
    lighter grey so the action cluster stays calm until hovered. */
 [data-theme="light"] .act-btn { color: var(--neutral-400); }
-/* Action row hover semantics: flag (3rd) reveals warning hue, delete
-   (4th, last) reveals destructive hue. Default color stays neutral
-   so the row reads calmly until the user reaches for a destructive
-   action. */
+/* Action row hover semantics: open-doc (1st) and view (2nd) are the safe,
+   primary actions → reveal the brand blue. flag (3rd) reveals warning hue,
+   delete (4th, last) reveals destructive hue. Default color stays neutral
+   so the row reads calmly until the user reaches for an action. */
+.row-actions .act-btn:nth-child(1):hover,
+.row-actions .act-btn:nth-child(2):hover {
+  background: color-mix(in oklch, var(--blue-500) 12%, transparent);
+  color: var(--blue-500);
+}
 .row-actions .act-btn:nth-child(3):hover {
   background: color-mix(in oklch, var(--orange-500) 12%, transparent);
   color: var(--orange-500);
@@ -1907,7 +1979,9 @@ svg { flex-shrink: 0; }
   position: absolute;
   top: 3px; right: 3px;
   width: 7px; height: 7px;
-  background: var(--blue-450);
+  /* Vivid electric blue so the dot reads as a live notification — blue-450
+     was too muted/light to pop against the bell. */
+  background: oklch(0.62 0.20 252);
   border-radius: 50%;
   border: 1.5px solid var(--bg-elevated);
 }
@@ -1939,14 +2013,21 @@ body {
 .header-zone {
   display: flex;
   flex-direction: column;
-}
-.header-zone .header,
-.header-zone .toolbar {
+  /* Flat zone: the header rides bare on the canvas, the toolbar is its own
+     card below it. The gap visually detaches the toolbar from the header. */
+  gap: var(--s2);
   background: transparent;
-  border-radius: 0;
 }
 .header-zone .header {
-  border-bottom: 1px solid var(--border-default);
+  background: transparent;
+  border-radius: 0;
+  border-bottom: none; /* gap separates header from the toolbar card now */
+}
+.header-zone .toolbar {
+  /* Toolbar keeps its surface (podkladka), as a card distinct from the
+     flat header above and the table card below. */
+  background: var(--bg-elevated);
+  border-radius: var(--r-md);
 }
 .toolbar { overflow: visible; }
 .toolbar .filters {
@@ -2154,8 +2235,8 @@ body {
 }
 @keyframes skel-pulse { 0%, 100% { opacity: .4; } 50% { opacity: .8; } }
 
-/* ─── Quantity direction (outflow) ───────────────────── */
-.qty-cell .qty-dir { font-size: 12px; margin-right: 2px; color: var(--text-tertiary); vertical-align: -1px; }
+/* ─── Quantity direction sign (+ inbound / − outbound) ─── */
+.qty-cell .qty-sign { margin-right: 1px; color: var(--text-tertiary); font-weight: 600; }
 
 /* ─── Contract progress thresholds ───────────────────────
    Ring + filled count shift hue as the contract nears (≥75%) or
@@ -2261,7 +2342,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   /* Header right: keep notifications, hide settings/logout to free
      space for the page title. The hidden controls live in the avatar
      menu in the production app. */
-  .header { padding: var(--s2) var(--s3); height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--s2); }
+  .header { padding: var(--s2) 0; height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--s2); }
   .header-right .btn-icon:nth-child(n+2) { display: none; }
 
   /* Bulk-bar buttons shrink labels to icon-only at this width to fit. */
@@ -2562,7 +2643,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
     <div class="toolbar-right">
       <div class="legend-wrap">
         <button type="button" class="btn-icon" id="legend-btn" aria-label="Movement type legend" aria-haspopup="dialog" aria-expanded="false" onclick="toggleLegend(event)">
-          <i class="ph ph-info" style="font-size:20px" aria-hidden="true"></i>
+          <i class="ph ph-info" style="font-size:18px" aria-hidden="true"></i>
         </button>
         <div class="legend-pop" id="legend-pop" role="dialog" aria-label="Movement type legend">
           <div class="legend-title">Movement types</div>
@@ -2707,8 +2788,8 @@ function titleCase(s) {
 }
 
 function formatQty(n) {
-  /* Absolute value — direction (in/out) is conveyed by the arrow glyph,
-     not a leading minus. European decimal (comma) to match dd/mm/yyyy. */
+  /* Absolute value — direction (in/out) is conveyed by the leading +/−
+     sign in .qty-sign. European decimal (comma) to match dd/mm/yyyy. */
   return (Math.abs(n) / 1000).toFixed(3).replace('.', ',') + ' Mt';
 }
 
@@ -2858,7 +2939,8 @@ function renderRows() {
       + '<td class="num-cell">' + escAttr(r.date) + '</td>'
       + '<td class="num-cell" style="text-align:right;">' + escAttr(r.xab) + '</td>'
       + '<td class="qty-cell' + (r.qty < 0 ? ' qty-out' : '') + '">'
-        + (r.qty < 0 ? '<i class="ph-bold ph-arrow-down qty-dir" aria-hidden="true"></i><span class="sr-only">outbound </span>' : '')
+        + '<span class="qty-sign" aria-hidden="true">' + (r.qty < 0 ? '−' : '+') + '</span>'
+        + '<span class="sr-only">' + (r.qty < 0 ? 'outbound ' : 'inbound ') + '</span>'
         + formatQty(r.qty) + '</td>'
       + (function() {
           var C = 2 * Math.PI * 6;
@@ -2890,6 +2972,10 @@ function renderRows() {
         })()
       + '</tr>';
   }).join('');
+  // Rebuilding tbody wipes col-sorted off the body cells (the header th keeps
+  // it, so the column looked "covered by the rows"). Re-apply it to the fresh
+  // cells every render. Safe when nothing is sorted (idx null → no-op).
+  applySortedCol(sortedColIdx);
   updateResultsCount();
   updateBulkBar();
   _queueSync();
