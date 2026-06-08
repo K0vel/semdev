@@ -90,13 +90,17 @@
   --text-primary:   var(--neutral-900);
   --text-secondary: var(--neutral-500);
   --text-tertiary:  var(--neutral-400);
+  /* Vivid brand blue, chosen for look over strict contrast (blue-500 on
+     the light page ≈ 2.5:1, below AA — acceptable for this prototype). */
   --text-brand:     var(--blue-500);
 
   --border-default: var(--neutral-300);
   --border-subtle:  var(--neutral-200);
 
-  --brand-bg-default: var(--blue-400);
-  --brand-bg-hover:   var(--blue-500);
+  /* blue-500 base; hover sits ~halfway to blue-600 (full blue-600 read as
+     too big a jump). Perceptible but gentle darkening. */
+  --brand-bg-default: var(--blue-500);
+  --brand-bg-hover:   color-mix(in srgb, var(--blue-600) 50%, var(--blue-500));
 
   /* Navy-cool tinted overlays instead of pure black. */
   --surface-hover:  color-mix(in srgb, var(--neutral-900) 4%, transparent);
@@ -144,7 +148,9 @@ body::before {
 
 /* Brand mark: solid plate, no white ring, no gradient-clipped glyph. */
 [data-theme="light"] .brand-mark {
-  background: var(--blue-400);
+  /* Match the CTA's blue-500 so the logo plate and Sign-in button read
+     as one brand colour (not two different blues). */
+  background: var(--blue-500);
   box-shadow: none;
 }
 [data-theme="light"] .brand-mark::after { display: none; }
@@ -159,8 +165,16 @@ body::before {
    ring. Drop the dark theme's gradient edge entirely. */
 [data-theme="light"] .field { background: var(--neutral-100); }
 [data-theme="light"] .field::before { display: none; }
-[data-theme="light"] .field:hover { background: var(--neutral-200); }
-[data-theme="light"] .field:focus-within { border-color: var(--blue-500); background: var(--bg-elevated); }
+/* Gentle hover: a ~40% step from neutral-100 toward neutral-200 instead
+   of the full jump (ΔL 0.05 read too strong). */
+[data-theme="light"] .field:hover { background: color-mix(in srgb, var(--neutral-200) 40%, var(--neutral-100)); }
+/* 2px active edge without a layout shift: the 1px border plus a 1px
+   inset ring of the same blue read as one solid 2px line. */
+[data-theme="light"] .field:focus-within { border-color: var(--blue-500); box-shadow: inset 0 0 0 1px var(--blue-500); background: var(--bg-elevated); }
+/* Soften the error fill on light: the shared rgba(255,61,61,.16) is far
+   too saturated over a near-white surface. ~7% red over neutral-100 reads
+   as a calm tint while the 1px red border still carries the error signal. */
+[data-theme="light"] .field.is-invalid { background: color-mix(in srgb, #ff3d3d 7%, var(--neutral-100)); box-shadow: inset 0 0 0 1px #ff3d3d; }
 [data-theme="light"] .field-label { color: var(--text-secondary); opacity: 1; mix-blend-mode: normal; }
 [data-theme="light"] .field:focus-within .field-label { color: var(--blue-600); }
 [data-theme="light"] .field-row { color: var(--text-primary); }
@@ -176,7 +190,9 @@ body::before {
   -webkit-text-fill-color: var(--text-primary);
   caret-color: var(--text-primary);
 }
-[data-theme="light"] .forgot { color: var(--neutral-600); opacity: 1; mix-blend-mode: normal; }
+/* Was neutral-600 (a grey that read as a label, not a link). Brand blue
+   at rest signals "interactive"; hover/active deepen it. */
+[data-theme="light"] .forgot { color: var(--blue-500); opacity: 1; mix-blend-mode: normal; }
 [data-theme="light"] .forgot:hover  { color: var(--blue-600); }
 [data-theme="light"] .forgot:active { color: var(--blue-700); }
 [data-theme="light"] .forgot-note { color: var(--neutral-600); opacity: 1; mix-blend-mode: normal; }
@@ -198,7 +214,7 @@ body::before {
 [data-theme="light"] .field-affix:focus-visible,
 [data-theme="light"] a:focus-visible { outline-color: var(--blue-600); }
 [data-theme="light"] body.keyboard-nav .field:has(:focus-visible) { border-color: var(--blue-500); }
-[data-theme="light"] .field.is-invalid:focus-within { border-color: var(--blue-500); background: var(--bg-elevated); }
+[data-theme="light"] .field.is-invalid:focus-within { border-color: var(--blue-500); box-shadow: inset 0 0 0 1px var(--blue-500); background: var(--bg-elevated); }
 [data-theme="light"] .field.is-invalid:focus-within .field-label { color: var(--blue-600); }
 
 /* ─── Theme toggle (floating, top-right) ──────────────────

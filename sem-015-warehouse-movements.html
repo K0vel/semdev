@@ -196,27 +196,46 @@
 
 /* ─── Semantic — Light ────────────────────────────────── */
 [data-theme="light"] {
-  --bg-page:     var(--neutral-50);
+  /* Canvas a clear step greyer than the white islands. At neutral-50 the
+     header/table panels (which carry no border or shadow) were invisible
+     against the page; this cool grey lets them read as raised while
+     anchoring the table tonal ladder (canvas → header → zebra → rows). */
+  --bg-page:     oklch(0.945 0.011 240);
   --bg-surface:  var(--neutral-100);
   --bg-elevated: var(--base-white);
   --bg-overlay:  var(--neutral-200);
 
   --text-primary:   var(--neutral-900);
-  --text-secondary: var(--neutral-500);
+  /* secondary→600 (7.1:1) and tertiary→500 (4.3:1) restore the two-tier
+     text hierarchy; both were neutral-500 before, and 500 alone fell
+     under AA for body-weight secondary text. */
+  --text-secondary: var(--neutral-600);
   --text-tertiary:  var(--neutral-500);
-  --text-disabled:  var(--neutral-300);
+  --text-disabled:  var(--neutral-400);
   --text-inverse:   var(--neutral-50);
-  --text-brand:     var(--blue-500);
+  /* blue-500 was 2.65:1 on white; blue-700 (7.35:1) makes brand text
+     (tag pills, "clear all", active icons) actually legible. */
+  --text-brand:     var(--blue-700);
 
-  --border-default: var(--neutral-300);
-  --border-subtle:  var(--neutral-200);
-  --border-strong:  var(--neutral-400);
-  --border-focus:   var(--neutral-400);
+  /* Dividers softened one step each so the lines read as quiet
+     separators rather than hard rules. */
+  --border-default: var(--neutral-200);
+  --border-subtle:  var(--neutral-100);
+  --border-strong:  var(--neutral-300);
+  --border-focus:   var(--blue-500);
 
-  --brand-bg-default: var(--blue-400);
-  --brand-bg-hover:   var(--blue-500);
+  /* Main accent is blue-500 (vibrant brand base), hover deepens to 600.
+     Drives the CTA, brand header, tints, focus and active states. */
+  --brand-bg-default: var(--blue-500);
+  --brand-bg-hover:   var(--blue-600);
   --brand-bg-subtle:  var(--blue-50);
   --brand-fg:         var(--base-white);
+
+  /* blue-450 (L0.76) is hardcoded across active nav, view-tabs, results
+     count and focused field labels — fine on dark surfaces, but 2.1:1 on
+     light ones. Retarget the primitive to blue-700 within the light theme
+     so every one of those accents reads at ~6:1 on its tint. */
+  --blue-450: var(--blue-700);
 
   --surface-hover:           rgba(0,0,0,.03);
   --surface-active:          rgba(0,0,0,.06);
@@ -231,13 +250,92 @@
   --status-warning-fg: var(--orange-700);
   --status-info-bg:    var(--blue-100);
   --status-info-fg:    var(--blue-700);
-  --table-row-zebra:   rgba(0, 0, 0, 0.04);
-  --table-header-bg:   var(--bg-surface);
+  /* Zebra (darker tone, odd rows): cool navy-tinted wash (~0.937). Paired
+     with the ~0.975 even tone, the ~3.8% lightness gap keeps row
+     boundaries readable. */
+  --table-row-zebra:   color-mix(in oklch, var(--neutral-500) 15%, transparent);
+  /* Header inverted to white: white surface, dark ink text, separated
+     from the rows by a soft underline (bold uppercase text carries it). */
+  --table-header-bg:     var(--bg-elevated);
+  --table-header-fg:     var(--text-primary);
+  --table-header-border: var(--border-default);
 }
 
 /* Light-mode date input uses the light color-scheme so its text reads. */
 [data-theme="light"] .date-range input[type=date] {
   color-scheme: light;
+}
+/* The logo mark is a ring drawn with a white border — invisible on the
+   white sidebar in light mode. Give it the brand colour so the symbol
+   actually shows. */
+[data-theme="light"] .sidebar-logo-mark { border-color: var(--brand-bg-default); }
+
+/* The view-tabs track is hardcoded to neutral-850 (near-black) for dark
+   mode; in light mode that's a dark pill marooned in a white toolbar.
+   Give it a light track so the segmented control belongs to the surface. */
+[data-theme="light"] .view-tabs {
+  background: var(--surface-active);
+  border-color: transparent;
+}
+/* Active tab: the dark-mode style is a semi-transparent brand tint, which
+   muddies against the light track (the "weird colour / overlap"). Swap to
+   a solid white pill that lifts off the track with a soft shadow, brand
+   text on top. No transparency, so nothing layers. */
+[data-theme="light"] .view-tab.active,
+[data-theme="light"] .view-tab.active:hover {
+  background: var(--bg-elevated);
+  color: var(--blue-600);
+  box-shadow: 0 1px 3px rgba(17,24,39,.12), 0 1px 1px rgba(17,24,39,.05);
+}
+
+/* ─── field-light: light-theme filter-control polish ───────
+   Ported from snippets/field-light.css (origin: sem-001-login). Gentle
+   hover, a solid 2px blue focus edge (1px border + 1px inset ring, no
+   layout shift), and a white focused surface. Extended from the snippet's
+   .field scope to .date-range and .tag-chip so the whole filter row reads
+   as one control family. blue-500 matches the page's main accent. Dark
+   theme is untouched. */
+[data-theme="light"] .field:hover,
+[data-theme="light"] .date-range:hover,
+[data-theme="light"] .tag-chip:hover {
+  background: color-mix(in srgb, var(--neutral-200) 40%, var(--neutral-100));
+}
+[data-theme="light"] .field:focus-within,
+[data-theme="light"] .date-range:focus-within,
+[data-theme="light"] .tag-chip:focus-within,
+[data-theme="light"] .field.is-select.open,
+[data-theme="light"] .field.is-combo.open,
+[data-theme="light"] .tag-chip.open {
+  border-color: var(--blue-500);
+  box-shadow: inset 0 0 0 1px var(--blue-500);
+  background: var(--bg-elevated);
+}
+/* Tag-pill remove hover used a white overlay (invisible on the pale
+   blue-50 pill in light mode); flip it to a dark overlay. */
+[data-theme="light"] .tag-pill-remove:hover { background: rgba(0,0,0,.08); }
+/* Popover/dropdown elevation: the shared 0 8px 24px rgba(0,0,0,.4) is
+   tuned for dark surfaces and reads as a muddy black smudge on white.
+   Swap in a softer two-layer navy-tinted shadow for light mode. */
+[data-theme="light"] .tag-dropdown,
+[data-theme="light"] .custom-select-dropdown,
+[data-theme="light"] .legend-pop,
+[data-theme="light"] .toast {
+  box-shadow: 0 16px 40px rgba(17, 24, 39, .14), 0 4px 12px rgba(17, 24, 39, .08);
+}
+[data-theme="light"] .flatpickr-calendar {
+  box-shadow: 0 16px 40px rgba(17, 24, 39, .14), 0 4px 12px rgba(17, 24, 39, .08) !important;
+}
+/* The 1px border-default (neutral-300) reads as a hard grey outline on
+   white. The soft shadow already separates the popover from the surface,
+   so drop the border entirely in light mode. */
+[data-theme="light"] .tag-dropdown,
+[data-theme="light"] .custom-select-dropdown,
+[data-theme="light"] .legend-pop,
+[data-theme="light"] .toast {
+  border: none;
+}
+[data-theme="light"] .flatpickr-calendar {
+  border: none !important;
 }
 
 /* ─── Icons ──────────────────────────────────────────── */
@@ -1435,6 +1533,15 @@ tbody tr.selected td { background: var(--table-row-bg-selected); }
    "strong" selected tint (30% brand vs 20%), so the existing
    nth-child(even) zebra rhythm carries through into selection. */
 tbody tr.selected:nth-child(even) td { background: var(--surface-selected-strong); }
+/* Light theme: single subtle zebra — ODD rows a faint ~0.975 tint, EVEN
+   rows white. (Swapped from even-tinted on request; the global even rule
+   is overridden to white so it doesn't double up.) :not(:hover):not(.selected)
+   lets hover/selection rules keep winning; the selected "strong" tint
+   follows onto the tinted odd rows. */
+[data-theme="light"] tbody tr:nth-child(odd):not(:hover):not(.selected) td  { background: color-mix(in oklch, var(--neutral-500) 5%, transparent); }
+[data-theme="light"] tbody tr:nth-child(even):not(:hover):not(.selected) td { background: transparent; }
+[data-theme="light"] tbody tr.selected:nth-child(odd) td  { background: var(--surface-selected-strong); }
+[data-theme="light"] tbody tr.selected:nth-child(even) td { background: var(--table-row-bg-selected); }
 /* Selected row: everything inside (text + icons + action buttons)
    adopts the brand colour so the selection state reads as a
    committed visual. Overriding the text tier vars cascades to
