@@ -12,265 +12,12 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
 
 
+<link rel="stylesheet" href="tokens.css">
 <style>
 /* ─── Design Tokens ──────────────────────────────────────────── */
 /* OKLCH primitives: brand H=50, neutral H=50 C=0.006     */
-:root {
-  /* ── Primitives — Brand (blue, H=233.41) ───────────────────
-     Mapped from user palette: 600→blue-100, 500→blue-200,
-     400→blue-300, 300→blue-400, primary→blue-500,
-     200→blue-600, 100→blue-800. Missing rungs (50/700/900/950)
-     are interpolated to keep the ramp continuous. */
-  --blue-50:  oklch(0.970 0.025 233.41);
-  --blue-100: oklch(0.930 0.050 233.41);
-  --blue-200: oklch(0.870 0.085 233.41);
-  --blue-300: oklch(0.780 0.110 233.41);
-  --blue-400: oklch(0.700 0.134 233.41);
-  /* Sits in the 400→300 lightness gap so it actually reads as
-     "lighter" rather than a duplicate of 400/500. ~L 0.70, kept
-     saturated (not pastel like blue-300). */
-  --blue-450: oklch(0.760 0.130 233.41);
-  --blue-500: oklch(0.696 0.134 233.41); /* brand base — CTA */
-  --blue-600: oklch(0.560 0.134 233.41);
-  --blue-700: oklch(0.440 0.120 233.41);
-  --blue-800: oklch(0.320 0.100 233.41);
-  --blue-900: oklch(0.220 0.080 233.41);
-  --blue-950: oklch(0.150 0.060 233.41);
-
-  /* ── Primitives — Neutral (navy-cool, H=240 C=0.014) ─ */
-  --neutral-50:  oklch(0.985 0.008 240);
-  --neutral-100: oklch(0.960 0.010 240);
-  --neutral-200: oklch(0.910 0.012 240);
-  --neutral-300: oklch(0.830 0.014 240);
-  --neutral-400: oklch(0.700 0.014 240);
-  --neutral-500: oklch(0.580 0.014 240);
-  --neutral-600: oklch(0.460 0.014 240);
-  --neutral-700: oklch(0.330 0.020 240);
-  --neutral-750: oklch(0.270 0.022 240);
-  --neutral-800: oklch(0.220 0.025 240);
-  --neutral-850: oklch(0.190 0.025 240);
-  --neutral-900: oklch(0.160 0.025 240);
-  --neutral-950: oklch(0.110 0.020 240);
-
-  /* ── Primitives — Status (5 steps each) ───────────── */
-  --green-100: oklch(0.930 0.060 145);
-  --green-400: oklch(0.680 0.160 145);
-  --green-500: oklch(0.600 0.180 145);
-  --green-700: oklch(0.420 0.130 145);
-  --green-900: oklch(0.220 0.060 145);
-
-  --red-100: oklch(0.930 0.050 25);
-  --red-400: oklch(0.650 0.200 25);
-  --red-500: oklch(0.580 0.220 25);
-  --red-700: oklch(0.420 0.160 25);
-  --red-900: oklch(0.220 0.070 25);
-
-  --orange-100: oklch(0.950 0.050 60);
-  --orange-400: oklch(0.750 0.150 60);
-  --orange-500: oklch(0.680 0.170 60);
-  --orange-700: oklch(0.480 0.120 60);
-  --orange-900: oklch(0.250 0.050 60);
-
-  --yellow-100: oklch(0.960 0.050 90);
-  --yellow-400: oklch(0.850 0.150 90);
-  --yellow-500: oklch(0.820 0.160 90);
-  --yellow-700: oklch(0.550 0.130 90);
-  --yellow-900: oklch(0.300 0.060 90);
-
-  /* ── Primitives — Base ─────────────────────────────── */
-  --base-white: oklch(1 0 0);
-  --base-black: oklch(0 0 0);
-
-  /* ── Semantic — Dark (default) ─────────────────────── */
-  --bg-page:     var(--neutral-950);
-  --bg-surface:  var(--neutral-900);
-  --bg-elevated: var(--neutral-800);
-  --bg-overlay:  var(--neutral-700);
-
-  --text-primary:   var(--neutral-50);
-  /* Three text tiers evenly spaced (~ΔL 0.20) so secondary and tertiary read
-     as distinct levels — they used to sit only 0.12 apart (n400/n500). */
-  --text-secondary: oklch(0.780 0.014 240);
-  --text-tertiary:  oklch(0.600 0.014 240);
-  --text-disabled:  var(--neutral-600);
-  --text-inverse:   var(--neutral-900);
-  --text-brand:     var(--blue-300);
-
-  --border-default: var(--neutral-700);
-  --border-subtle:  var(--neutral-750);
-  --border-strong:  var(--neutral-600);
-  --border-focus:   var(--neutral-400);
-
-  --brand-bg-default: var(--blue-400);
-  --brand-bg-hover:   var(--blue-500);
-  --brand-bg-subtle:  var(--blue-900);
-  --brand-fg:         var(--base-white);
-
-  /* Unified focus ring: 1px CTA border + 4px CTA-15% halo */
-  --focus-ring: 0 0 0 4px color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
-
-  --surface-hover:           rgba(255,255,255,.04);
-  --surface-active:          rgba(255,255,255,.06);
-  --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
-  --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
-
-  --status-success-bg:    var(--green-900);
-  --status-success-fg:    var(--green-400);
-  --status-success-solid: var(--green-500);
-  --status-error-bg:      var(--red-900);
-  --status-error-fg:      var(--red-400);
-  --status-error-solid:   var(--red-500);
-  --status-warning-bg:    var(--orange-900);
-  --status-warning-fg:    var(--orange-400);
-  --status-warning-solid: var(--orange-500);
-  --status-info-bg:       var(--blue-900);
-  --status-info-fg:       var(--blue-400);
-  --status-info-solid:    var(--blue-500);
-
-  /* ── Components ────────────────────────────────────── */
-  --button-primary-bg:         var(--brand-bg-default);
-  --button-primary-bg-hover:   var(--brand-bg-hover);
-  --button-primary-fg:         var(--brand-fg);
-  --button-secondary-bg:       transparent;
-  --button-secondary-bg-hover: var(--surface-hover);
-  --button-secondary-fg:       var(--text-primary);
-  --button-secondary-border:   var(--border-default);
-  --button-ghost-bg:           transparent;
-  --button-ghost-bg-hover:     var(--surface-hover);
-  --button-ghost-fg:           var(--text-secondary);
-  --button-destructive-bg:     var(--status-error-solid);
-  --button-destructive-fg:     var(--base-white);
-
-  --input-bg:             var(--bg-elevated);
-  --input-fg:             var(--text-primary);
-  --input-placeholder:    var(--text-secondary);
-  --input-border-default: var(--border-default);
-  --input-border-focus:   var(--brand-bg-default);
-  --input-border-error:   var(--status-error-solid);
-  --input-label:          var(--text-secondary);
-  --input-helper:         var(--text-tertiary);
-
-  --table-header-bg:        var(--neutral-700);
-  --table-header-fg:        var(--text-primary);
-  --table-header-border:    var(--border-default);
-  --table-row-bg:           transparent;
-  --table-row-fg:           var(--text-secondary);
-  --table-row-fg-secondary: var(--text-tertiary);
-  --table-row-bg-hover:     color-mix(in oklch, oklch(0.75 0.06 240) 10%, transparent);
-  --table-row-bg-selected:  var(--surface-selected);
-  --table-row-border:       var(--border-subtle);
-  --table-row-zebra:        color-mix(in oklch, color-mix(in oklch, var(--blue-400) 30%, var(--neutral-400)) 5%, transparent);
-
-  --badge-success-bg: var(--status-success-bg);
-  --badge-success-fg: var(--status-success-fg);
-  --badge-error-bg:   var(--status-error-bg);
-  --badge-error-fg:   var(--status-error-fg);
-  --badge-warning-bg: var(--status-warning-bg);
-  --badge-warning-fg: var(--status-warning-fg);
-  --badge-info-bg:    var(--status-info-bg);
-  --badge-info-fg:    var(--status-info-fg);
-  --badge-neutral-bg: var(--bg-elevated);
-  --badge-neutral-fg: var(--text-secondary);
-
-  --sidebar-bg:             var(--bg-elevated);
-  --sidebar-border:         transparent;
-  --sidebar-item-fg:        var(--text-secondary);
-  --sidebar-item-fg-active: var(--text-primary);
-  --sidebar-item-bg-hover:  var(--surface-hover);
-  --sidebar-item-bg-active: var(--surface-active);
-  --sidebar-group-fg:       var(--text-secondary);
-
-  /* ── Typography ────────────────────────────────────── */
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'Roboto Mono', 'Courier New', monospace;
-
-  /* ── Spacing (4px grid) ────────────────────────────── */
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
-  --s5: 20px; --s6: 24px; --s8: 32px;
-  --s10: 40px; --s12: 48px; --s16: 64px;
-
-  /* ── Radius ────────────────────────────────────────── */
-  --r-none: 0;
-  --r-sm: 2px; --r-md: 4px; --r-lg: 6px; --r-xl: 8px;
-  --r-2xl: 12px; --r-3xl: 16px;
-  --r-full: 9999px;
-}
 
 /* ─── Semantic — Light ────────────────────────────────── */
-[data-theme="light"] {
-  /* Canvas a clear step greyer than the white islands. At neutral-50 the
-     header/table panels (which carry no border or shadow) were invisible
-     against the page; this cool grey lets them read as raised while
-     anchoring the table tonal ladder (canvas → header → zebra → rows). */
-  --bg-page:     oklch(0.910 0.012 240);
-  --bg-surface:  var(--neutral-100);
-  --bg-elevated: var(--base-white);
-  --bg-overlay:  var(--neutral-200);
-
-  --text-primary:   var(--neutral-900);
-  /* Three text tiers evenly spaced (~ΔL 0.18): primary 0.16 / secondary 0.36
-     / tertiary 0.52. Mirror of the dark scale — secondary and tertiary now
-     read as distinct levels, and tertiary clears AA (4.68:1) on bg-page
-     instead of the old n500's 3.6:1. */
-  --text-secondary: oklch(0.360 0.014 240);
-  --text-tertiary:  oklch(0.520 0.014 240);
-  --text-disabled:  var(--neutral-400);
-  --text-inverse:   var(--neutral-50);
-  /* blue-500 was 2.65:1 on white; blue-700 (7.35:1) makes brand text
-     (tag pills, "clear all", active icons) actually legible. */
-  --text-brand:     var(--blue-700);
-
-  /* Dividers softened one step each so the lines read as quiet
-     separators rather than hard rules. */
-  --border-default: var(--neutral-200);
-  --border-subtle:  var(--neutral-100);
-  --border-strong:  var(--neutral-300);
-  --border-focus:   var(--blue-500);
-
-  /* Main accent is blue-500 (vibrant brand base), hover deepens to 600.
-     Drives the CTA, brand header, tints, focus and active states. */
-  --brand-bg-default: var(--blue-500);
-  --brand-bg-hover:   var(--blue-600);
-  --brand-bg-subtle:  var(--blue-50);
-  --brand-fg:         var(--base-white);
-
-  /* blue-450 (L0.76) is hardcoded across active nav, view-tabs, results
-     count and focused field labels — fine on dark surfaces, but 2.1:1 on
-     light ones. Retarget the primitive to blue-700 within the light theme
-     so every one of those accents reads at ~6:1 on its tint. */
-  --blue-450: var(--blue-700);
-
-  /* Surface overlays re-based from flat black onto blue-900 (brand navy,
-     H233) at the same darkness — so input/control backgrounds carry a
-     faint brand tint instead of a dead grey. */
-  --surface-hover:           color-mix(in oklch, var(--blue-900) 4%, transparent);
-  --surface-active:          color-mix(in oklch, var(--blue-900) 7%, transparent);
-  --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
-  --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
-
-  --status-success-bg: var(--green-100);
-  --status-success-fg: var(--green-700);
-  --status-error-bg:   var(--red-100);
-  --status-error-fg:   var(--red-700);
-  --status-warning-bg: var(--orange-100);
-  --status-warning-fg: var(--orange-700);
-  --status-info-bg:    var(--blue-100);
-  --status-info-fg:    var(--blue-700);
-  /* NOTE: in light theme the actual zebra is painted by the
-     `tr:nth-child(odd/even)` rules further down (higher specificity), not by
-     this token — it's kept only as a fallback. The real light stripe colour
-     lives there. */
-  --table-row-zebra:   color-mix(in oklch, var(--blue-500) 14%, transparent);
-  /* Header inverted to white: white surface, dark ink text, separated
-     from the rows by a soft underline (bold uppercase text carries it). */
-  --table-header-bg:     var(--bg-elevated);
-  --table-header-fg:     var(--text-primary);
-  --table-header-border: var(--border-default);
-  /* Row hover: a brand-navy overlay (~0.93) that darkens the row past
-     both zebra tones, instead of the default light-blue tint that barely
-     registered on the light rows. */
-  --table-row-bg-hover:  color-mix(in oklch, var(--blue-900) 9%, transparent);
-}
 
 /* Light-mode date input uses the light color-scheme so its text reads. */
 [data-theme="light"] .date-range input[type=date] {
@@ -366,7 +113,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; }
 body {
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   background: var(--bg-page);
   color: var(--text-primary);
@@ -405,7 +152,7 @@ button {
   padding: 8px 12px;
   background: var(--brand-bg-default);
   color: var(--brand-fg);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -482,7 +229,7 @@ body.keyboard-nav th.sortable:focus-visible {
   height: 100vh;
   overflow-y: auto;
   scrollbar-width: none;
-  padding: 0 var(--s2) var(--s2);
+  padding: 0 var(--spacing-2) var(--spacing-2);
   /* Smooth the collapsed ↔ expanded swap so the layout doesn't snap. */
   transition: width .18s ease, min-width .18s ease;
 }
@@ -496,18 +243,18 @@ body.keyboard-nav th.sortable:focus-visible {
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   /* Clip the wordmark text when the sidebar is mid-transition so it
      doesn't bleed past the narrowing sidebar's right edge — that
      instantaneous overflow is what reads as a logo "jump". */
   overflow: hidden;
-  margin: 0 calc(-1 * var(--s2));
+  margin: 0 calc(-1 * var(--spacing-2));
   /* 22px left-pad puts the 24px mark's CENTER at the same x as the
      20px nav-item icon center (x=34 from sidebar outer). When the
      sidebar collapses, justify-content:center re-centres the mark
      in the 60px sidebar, also at icon-centre — so the mark shifts
      the same 4px as the icons rather than 6px. */
-  padding: var(--s1) 22px;
+  padding: var(--spacing-1) 22px;
   min-height: 56px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-default);
@@ -515,7 +262,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .sidebar-logo-mark {
   width: 24px;
   height: 24px;
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   background: transparent;
   border: 3px solid var(--base-white);
   flex-shrink: 0;
@@ -529,20 +276,20 @@ body.keyboard-nav th.sortable:focus-visible {
   letter-spacing: -.01em;
 }
 
-.nav { padding: var(--s2) 0; flex: 1; display: flex; flex-direction: column; gap: var(--s1); }
+.nav { padding: var(--spacing-2) 0; flex: 1; display: flex; flex-direction: column; gap: var(--spacing-1); }
 
 .nav-section {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s3) var(--s4);
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
   min-height: 40px;
   font-size: 14px;
   font-weight: 600;
   color: var(--sidebar-item-fg);
   cursor: pointer;
   user-select: none;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   transition: background .12s, color .12s;
   white-space: nowrap;
 }
@@ -568,7 +315,7 @@ body.keyboard-nav th.sortable:focus-visible {
   width: 2px;
   height: 12px;
   background: var(--brand-bg-default);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 .nav-section.is-group {
   font-size: 12px;
@@ -579,7 +326,7 @@ body.keyboard-nav th.sortable:focus-visible {
   color: var(--text-tertiary);
   opacity: 0.8;
   min-height: 28px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   cursor: default;
   pointer-events: none;
 }
@@ -595,19 +342,19 @@ body.keyboard-nav th.sortable:focus-visible {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s3) var(--s4);
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
   min-height: 40px;
   font-size: 14px;
   font-weight: 600;
   color: var(--sidebar-item-fg);
   cursor: pointer;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   transition: background .12s, color .12s;
   user-select: none;
   white-space: nowrap;
 }
-.nav-item:has(> i:first-child) { padding-right: calc(var(--s4) + 4px); }
+.nav-item:has(> i:first-child) { padding-right: calc(var(--spacing-4) + 4px); }
 .nav-item:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
 
 /* Hover-over-active: keep the brand styling, with a slightly stronger
@@ -630,13 +377,13 @@ body.keyboard-nav th.sortable:focus-visible {
   background: var(--border-default);
   /* Span the content width (aligned with the nav-item boxes), not edge-to-
      edge: drop the negative side margin so the ends line up with the items. */
-  margin: var(--s2) 0;
+  margin: var(--spacing-2) 0;
 }
 [data-theme="light"] .nav-divider { background: var(--border-strong); }
 
 .sidebar-collapse {
   flex-shrink: 0;
-  padding-top: var(--s1);
+  padding-top: var(--spacing-1);
 }
 .collapse-btn {
   width: 40px;
@@ -644,7 +391,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   color: var(--sidebar-item-fg);
   cursor: pointer;
   user-select: none;
@@ -663,9 +410,9 @@ body.keyboard-nav th.sortable:focus-visible {
    jump like justify-content would cause, so no flicker. The mark also
    shifts the SAME 4px as the icons do (24→20), keeping the motion
    coherent. */
-.sidebar.collapsed .sidebar-logo { padding: var(--s1) 18px; }
+.sidebar.collapsed .sidebar-logo { padding: var(--spacing-1) 18px; }
 .sidebar.collapsed .nav-section,
-.sidebar.collapsed .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
+.sidebar.collapsed .nav-item { justify-content: center; padding: var(--spacing-3) 0; gap: 0; }
 
 /* ─── Main ───────────────────────────────────────────── */
 .main {
@@ -682,7 +429,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--s1) 0;
+  padding: var(--spacing-1) 0;
   height: 56px;
   min-height: 56px;
   border-bottom: 1px solid var(--border-default);
@@ -698,7 +445,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .header-left {
   display: flex;
   align-items: baseline;
-  gap: var(--s3);
+  gap: var(--spacing-3);
   min-width: 0;
 }
 .results-count {
@@ -714,24 +461,24 @@ body.keyboard-nav th.sortable:focus-visible {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--s1);
+  gap: var(--spacing-1);
 }
 
 /* ─── Filters ────────────────────────────────────────── */
 .filters {
-  padding: calc(var(--s4) + 2px) var(--s4) calc(var(--s4) + 2px);
+  padding: calc(var(--spacing-4) + 2px) var(--spacing-4) calc(var(--spacing-4) + 2px);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   flex-shrink: 0;
 }
 .filter-row-primary,
 .filter-row-secondary {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--s2);
+  gap: var(--spacing-2);
   align-items: stretch;
 }
 .field-wide { grid-column: span 2; }
@@ -743,10 +490,10 @@ body.keyboard-nav th.sortable:focus-visible {
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  padding: 6px var(--s3);
+  padding: 6px var(--spacing-3);
   background: var(--surface-active);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   color: var(--input-fg);
   min-width: 0;
   position: relative;
@@ -761,7 +508,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .field-row {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   min-width: 0;
   min-height: 20px;
 }
@@ -797,7 +544,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .field-caret,
 .field-clear {
   position: absolute;
-  right: var(--s3);
+  right: var(--spacing-3);
   top: 50%;
   transform: translateY(-50%);
   width: 22px;
@@ -807,7 +554,7 @@ label.field:has(input[type=text]) { cursor: text; }
   justify-content: center;
   color: var(--text-tertiary);
   font-size: 14px;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   pointer-events: none;
 }
 .field-clear {
@@ -836,9 +583,9 @@ label.field:has(input[type=text]) { cursor: text; }
   left: 0; right: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  padding: var(--s1);
+  padding: var(--spacing-1);
   z-index: 50;
   cursor: default;
 }
@@ -846,9 +593,9 @@ label.field:has(input[type=text]) { cursor: text; }
 .tag-option {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s2) var(--s3);
-  border-radius: var(--r-sm);
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
@@ -876,7 +623,7 @@ label.field:has(input[type=text]) { cursor: text; }
   flex: 1;
   min-width: 0;
   color: var(--input-fg);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -897,9 +644,9 @@ label.field:has(input[type=text]) { cursor: text; }
   left: 0; right: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  padding: var(--s1);
+  padding: var(--spacing-1);
   z-index: 50;
   max-height: 280px;
   overflow-y: auto;
@@ -911,9 +658,9 @@ label.field:has(input[type=text]) { cursor: text; }
 .field.is-select.open .field-caret,
 .tag-chip.open .field-caret { transform: translateY(-50%) rotate(180deg); }
 .custom-option {
-  padding: var(--s2) var(--s3);
-  border-radius: var(--r-sm);
-  font-family: var(--font);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
@@ -931,7 +678,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .field.is-combo.open .custom-select-dropdown { display: block; }
 .custom-option.combo-active { background: var(--surface-hover); }
 .combo-empty {
-  padding: var(--s2) var(--s3);
+  padding: var(--spacing-2) var(--spacing-3);
   font-size: 14px; font-weight: 500;
   color: var(--text-tertiary); user-select: none;
 }
@@ -945,7 +692,7 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .tag-counter {
   position: absolute;
-  right: calc(var(--s3) + 22px + 6px);
+  right: calc(var(--spacing-3) + 22px + 6px);
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
@@ -988,10 +735,10 @@ label.field:has(input[type=text]) { cursor: text; }
   align-items: center;
   gap: 2px;
   height: 22px;
-  padding: 0 var(--s1) 0 var(--s2);
+  padding: 0 var(--spacing-1) 0 var(--spacing-2);
   background: var(--brand-bg-subtle);
   border: 1px solid var(--status-info-fg);
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   font-size: 12px;
   font-weight: 600;
   color: var(--text-brand);
@@ -1003,7 +750,7 @@ label.field:has(input[type=text]) { cursor: text; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -1020,7 +767,7 @@ label.field:has(input[type=text]) { cursor: text; }
   background: transparent;
   border: none;
   color: var(--input-fg);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   outline: none;
@@ -1036,7 +783,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .field-row > select {
   appearance: none;
   cursor: pointer;
-  padding-right: var(--s5);
+  padding-right: var(--spacing-5);
   background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0 center;
@@ -1054,15 +801,15 @@ label.field:has(input[type=text]) { cursor: text; }
   gap: 2px;
   background: var(--surface-active);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   min-height: 48px;
-  padding: 8px var(--s3);
+  padding: 8px var(--spacing-3);
   position: relative;
   min-width: 0;
   transition: background .15s, border-color .15s;
 }
 .date-range:hover { background: var(--bg-overlay); }
-.date-range .field-row { gap: var(--s2); }
+.date-range .field-row { gap: var(--spacing-2); }
 .date-range .field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
 .date-range-inline-label {
   font-size: 14px;
@@ -1103,7 +850,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .date-range-value-start,
 .date-range-value-end {
   color: var(--input-fg);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -1111,7 +858,7 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .date-range-sep {
   color: var(--input-placeholder);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   pointer-events: none;
@@ -1120,10 +867,10 @@ label.field:has(input[type=text]) { cursor: text; }
   background: transparent;
   border: none;
   color: var(--input-placeholder);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
-  padding: 0 var(--s2) 0 var(--s2);
+  padding: 0 var(--spacing-2) 0 var(--spacing-2);
   outline: none;
   height: 38px;
   width: 110px;
@@ -1137,7 +884,7 @@ label.field:has(input[type=text]) { cursor: text; }
   padding: 0 2px;
 }
 .date-range .btn-icon-sm {
-  padding: 0 var(--s2);
+  padding: 0 var(--spacing-2);
   border-left: 1px solid var(--input-border-default);
   height: 38px;
   display: flex; align-items: center;
@@ -1149,10 +896,10 @@ label.field:has(input[type=text]) { cursor: text; }
   justify-content: center;
   gap: 2px;
   min-height: 48px;
-  padding: 8px var(--s3);
+  padding: 8px var(--spacing-3);
   background: var(--surface-active);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   color: var(--input-placeholder);
@@ -1163,7 +910,7 @@ label.field:has(input[type=text]) { cursor: text; }
   transition: border-color .15s, background .15s;
 }
 .tag-chip:hover { background: var(--bg-overlay); }
-.tag-chip .field-row { gap: var(--s2); min-height: 20px; }
+.tag-chip .field-row { gap: var(--spacing-2); min-height: 20px; }
 .tag-chip .field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
 .tag-chip-remove { margin-left: auto; }
 .tag-chip-remove {
@@ -1181,8 +928,8 @@ label.field:has(input[type=text]) { cursor: text; }
   display: none;
   grid-template-columns: 1fr auto;
   align-items: start;
-  gap: var(--s2);
-  margin-top: var(--s2);
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
 }
 .filters.has-chips .filter-chips-bar { display: grid; }
 .filter-chips-bar .chips-label { display: none; }
@@ -1220,7 +967,7 @@ label.field:has(input[type=text]) { cursor: text; }
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   color: var(--text-tertiary);
   cursor: pointer;
   flex-shrink: 0;
@@ -1236,17 +983,17 @@ label.field:has(input[type=text]) { cursor: text; }
   background: transparent;
   border: none;
   color: var(--text-brand);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   white-space: nowrap;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
-  padding: 0 0 0 var(--s3);
+  padding: 0 0 0 var(--spacing-3);
   display: inline-flex;
   align-items: center;
-  gap: var(--s3);
+  gap: var(--spacing-3);
   text-decoration: none;
   text-underline-offset: 3px;
 }
@@ -1264,7 +1011,7 @@ label.field:has(input[type=text]) { cursor: text; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--s4);
+  padding: var(--spacing-4);
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
 }
@@ -1272,8 +1019,8 @@ label.field:has(input[type=text]) { cursor: text; }
   display: flex;
   align-items: center;
 }
-.toolbar-left { gap: var(--s6); }
-.toolbar-right { gap: var(--s2); }
+.toolbar-left { gap: var(--spacing-6); }
+.toolbar-right { gap: var(--spacing-2); }
 
 /* ─── View tabs (segmented control) ──────────────────── */
 .view-tabs {
@@ -1281,26 +1028,26 @@ label.field:has(input[type=text]) { cursor: text; }
   /* Slight blue cast on the dark track, matching the zebra tint. */
   background: color-mix(in oklch, var(--blue-500) 8%, var(--neutral-850));
   border: 1px solid var(--border-subtle);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   padding: 3px;
   gap: 0;
 }
 .view-tab {
   display: inline-flex;
   align-items: center;
-  gap: var(--s2);
-  padding: 0 var(--s4);
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-4);
   height: 40px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .04em;
   cursor: pointer;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   transition: background .12s, color .12s;
 }
 .view-tab:hover { color: var(--text-primary); }
@@ -1315,7 +1062,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .toggle-label {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -1357,7 +1104,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .btn-icon {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   border: none;
   background: var(--button-ghost-bg);
   color: var(--button-ghost-fg);
@@ -1366,7 +1113,7 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .btn-icon:hover { background: var(--button-ghost-bg-hover); color: var(--text-primary); }
 .btn-icon.active { background: var(--brand-bg-subtle); color: var(--text-brand); }
-.header-right .btn-icon { width: 36px; height: 36px; border-radius: var(--r-md); }
+.header-right .btn-icon { width: 36px; height: 36px; border-radius: var(--radius-md); }
 /* Legend (i) is a tertiary affordance — keep it visibly smaller than the
    36px-tall Update / Add buttons it sits beside. */
 .legend-wrap .btn-icon { width: 28px; height: 28px; }
@@ -1374,7 +1121,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .btn-icon-sm {
   width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   background: var(--button-ghost-bg);
   border: none;
   color: var(--text-tertiary);
@@ -1386,16 +1133,16 @@ label.field:has(input[type=text]) { cursor: text; }
 .btn-primary,
 .btn-secondary {
   height: 36px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   border: none;
-  border-radius: var(--r-md);
-  font-family: var(--font);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
   cursor: pointer;
-  display: flex; align-items: center; gap: var(--s2);
+  display: flex; align-items: center; gap: var(--spacing-2);
   transition: background .12s;
 }
 .btn-primary {
@@ -1407,7 +1154,7 @@ label.field:has(input[type=text]) { cursor: text; }
    for the gap distance the icon contributes on the left side. */
 .btn-primary:has(> i:first-child),
 .btn-secondary:has(> i:first-child) {
-  padding-right: calc(var(--s4) + 4px);
+  padding-right: calc(var(--spacing-4) + 4px);
 }
 .btn-primary:hover { background: var(--button-primary-bg-hover); }
 .btn-secondary {
@@ -1495,7 +1242,7 @@ th {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   height: 44px;
   text-align: left;
   border-bottom: 1px solid var(--table-header-border);
@@ -1557,7 +1304,7 @@ th.sortable:hover .sort-preview { opacity: 0.7; }
 th.center { text-align: center; }
 
 td {
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   height: 56px;
   vertical-align: middle;
   color: var(--table-row-fg);
@@ -1709,7 +1456,7 @@ thead .checkbox {
 [data-theme="light"] tbody .checkbox:not(.checked):not(.indeterminate) { border-color: var(--neutral-400); }
 
 /* ─── Movement type icons (type + transport) ─────────── */
-.move-cell { padding: 0 var(--s4); text-align: center; }
+.move-cell { padding: 0 var(--spacing-4); text-align: center; }
 .move-icons {
   display: inline-flex;
   align-items: center;
@@ -1802,7 +1549,7 @@ thead .checkbox {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--s1);
+  gap: var(--spacing-1);
   min-width: 0;
 }
 .progress-ring {
@@ -1854,7 +1601,7 @@ thead .checkbox {
 .act-btn {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -1901,7 +1648,7 @@ thead .checkbox {
      the count. .bulk-actions is pinned right via margin-left: auto,
      so a gap here would only push the count away from the checkbox. */
   gap: 0;
-  padding: 0 var(--s4) 0 0;
+  padding: 0 var(--spacing-4) 0 0;
   z-index: 5;
 }
 .bulk-bar.visible { display: flex; }
@@ -1916,8 +1663,8 @@ thead .checkbox {
   justify-content: center;
   /* Mirror td.checkbox-cell padding exactly so the inner 16px box
      sits at the same x as the row + header checkboxes. The td uses
-     the global `td { padding: 0 var(--s4) }` rule. */
-  padding: 0 var(--s4);
+     the global `td { padding: 0 var(--spacing-4) }` rule. */
+  padding: 0 var(--spacing-4);
 }
 .bulk-count {
   display: inline-flex;
@@ -1931,12 +1678,12 @@ thead .checkbox {
 }
 .bulk-actions {
   /* Pinned next to .bulk-count (which sits right after the checkbox).
-     var(--s3) separates "N selected" from the first action button so
+     var(--spacing-3) separates "N selected" from the first action button so
      they read as related but distinct. */
-  margin-left: var(--s3);
+  margin-left: var(--spacing-3);
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
 }
 /* Bulk-bar buttons: ghost white (transparent bg, white text). Delete
    shares the same hover bg as Export — destructive intent via the
@@ -1975,7 +1722,7 @@ thead .checkbox {
 svg { flex-shrink: 0; }
 
 /* ─── Scrollbar top-right actions ────────────────────── */
-.header-right { display: flex; align-items: center; gap: var(--s2); }
+.header-right { display: flex; align-items: center; gap: var(--spacing-2); }
 .notif-btn { position: relative; }
 .notif-badge {
   position: absolute;
@@ -1983,41 +1730,41 @@ svg { flex-shrink: 0; }
   width: 7px; height: 7px;
   /* Vivid electric blue so the dot reads as a live notification — blue-450
      was too muted/light to pop against the bell. */
-  background: oklch(0.62 0.20 252);
+  background: var(--status-notification);
   border-radius: 50%;
   border: 1.5px solid var(--bg-elevated);
 }
 
 /* ─── Zones (islands layout) ─────────────────────────── */
 body {
-  padding: var(--s2);
-  gap: var(--s2);
+  padding: var(--spacing-2);
+  gap: var(--spacing-2);
   background: var(--bg-page);
 }
 .sidebar {
   height: auto;
   border: none;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 .sidebar .nav { overflow: visible; }
 .main {
   height: auto;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   background: transparent;
 }
 .header-zone,
 .table-zone {
   background: var(--bg-elevated);
   border: none;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
 }
 .header-zone {
   display: flex;
   flex-direction: column;
   /* Flat zone: the header rides bare on the canvas, the toolbar is its own
      card below it. The gap visually detaches the toolbar from the header. */
-  gap: var(--s2);
+  gap: var(--spacing-2);
   background: transparent;
 }
 .header-zone .header {
@@ -2029,7 +1776,7 @@ body {
   /* Toolbar keeps its surface (podkladka), as a card distinct from the
      flat header above and the table card below. */
   background: var(--bg-elevated);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
 }
 .toolbar { overflow: visible; }
 .toolbar .filters {
@@ -2054,10 +1801,10 @@ body {
 .flatpickr-calendar {
   background: var(--bg-elevated) !important;
   border: 1px solid var(--border-default) !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--radius-md) !important;
   box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
-  font-family: var(--font) !important;
-  padding: var(--s2) !important;
+  font-family: var(--font-family-sans) !important;
+  padding: var(--spacing-2) !important;
   width: auto !important;
 }
 .flatpickr-calendar.arrowTop:before,
@@ -2065,7 +1812,7 @@ body {
 .flatpickr-calendar.arrowBottom:before,
 .flatpickr-calendar.arrowBottom:after { display: none !important; }
 
-.flatpickr-months { padding-bottom: var(--s2); }
+.flatpickr-months { padding-bottom: var(--spacing-2); }
 .flatpickr-month {
   background: transparent !important;
   color: var(--text-primary) !important;
@@ -2088,7 +1835,7 @@ body {
   padding: 8px !important;
   height: 36px !important;
   width: 36px !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--radius-md) !important;
   transition: background .12s !important;
 }
 .flatpickr-prev-month:hover,
@@ -2103,7 +1850,7 @@ body {
 .flatpickr-weekdays {
   background: transparent !important;
   height: 28px !important;
-  margin-bottom: var(--s1);
+  margin-bottom: var(--spacing-1);
 }
 .flatpickr-weekday {
   background: transparent !important;
@@ -2117,10 +1864,10 @@ body {
 .dayContainer { padding: 0 !important; }
 .flatpickr-day {
   color: var(--text-primary) !important;
-  font-family: var(--font) !important;
+  font-family: var(--font-family-sans) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--radius-md) !important;
   border: none !important;
   height: 34px !important;
   line-height: 34px !important;
@@ -2152,9 +1899,9 @@ body {
   border: none !important;
   box-shadow: none !important;
 }
-.flatpickr-day.startRange { border-radius: var(--r-md) 0 0 var(--r-md) !important; }
-.flatpickr-day.endRange { border-radius: 0 var(--r-md) var(--r-md) 0 !important; }
-.flatpickr-day.startRange.endRange { border-radius: var(--r-md) !important; }
+.flatpickr-day.startRange { border-radius: var(--radius-md) 0 0 var(--radius-md) !important; }
+.flatpickr-day.endRange { border-radius: 0 var(--radius-md) var(--radius-md) 0 !important; }
+.flatpickr-day.startRange.endRange { border-radius: var(--radius-md) !important; }
 
 /* ─── Movement-type legend popover ───────────────────── */
 .legend-wrap { position: relative; display: inline-flex; }
@@ -2167,9 +1914,9 @@ body {
   min-width: 210px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  padding: var(--s2);
+  padding: var(--spacing-2);
   z-index: 60;
 }
 .legend-wrap.open .legend-pop { display: block; }
@@ -2179,13 +1926,13 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-tertiary);
-  padding: var(--s1) var(--s2) var(--s2);
+  padding: var(--spacing-1) var(--spacing-2) var(--spacing-2);
 }
 .legend-item {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s2);
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
@@ -2199,7 +1946,7 @@ body {
   color: var(--text-secondary);
   flex-shrink: 0;
 }
-.legend-sep { height: 1px; background: var(--border-subtle); margin: var(--s1) 0; }
+.legend-sep { height: 1px; background: var(--border-subtle); margin: var(--spacing-1) 0; }
 
 /* ─── Empty state ────────────────────────────────────── */
 .empty-row td { height: auto; border: none; }
@@ -2209,8 +1956,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--s3);
-  padding: var(--s16) var(--s4);
+  gap: var(--spacing-3);
+  padding: var(--spacing-16) var(--spacing-4);
   text-align: center;
 }
 .empty-icon { font-size: 40px; color: var(--text-disabled); }
@@ -2231,7 +1978,7 @@ body {
   display: inline-block;
   height: 12px;
   width: 60%;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   background: var(--bg-overlay);
   animation: skel-pulse 1.2s ease-in-out infinite;
 }
@@ -2253,22 +2000,22 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
 .toast-stack {
   position: fixed;
   left: 50%;
-  bottom: var(--s6);
+  bottom: var(--spacing-6);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   z-index: 200;
 }
 .toast {
   display: flex;
   align-items: center;
-  gap: var(--s4);
+  gap: var(--spacing-4);
   background: var(--bg-overlay);
   color: var(--text-primary);
   border: 1px solid var(--border-default);
-  border-radius: var(--r-lg);
-  padding: 10px 10px 10px var(--s4);
+  border-radius: var(--radius-lg);
+  padding: 10px 10px 10px var(--spacing-4);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
   font-size: 14px;
   font-weight: 500;
@@ -2277,16 +2024,16 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
 @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .toast-undo {
   height: 28px;
-  padding: 0 var(--s3);
+  padding: 0 var(--spacing-3);
   background: transparent;
   border: none;
   color: var(--text-brand);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background .12s;
 }
@@ -2325,7 +2072,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   .sidebar .nav-section.is-group,
   .sidebar .nav-divider { display: none; }
   .sidebar .nav-section,
-  .sidebar .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
+  .sidebar .nav-item { justify-content: center; padding: var(--spacing-3) 0; gap: 0; }
 
   .filter-row-primary,
   .filter-row-secondary {
@@ -2344,11 +2091,11 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   /* Header right: keep notifications, hide settings/logout to free
      space for the page title. The hidden controls live in the avatar
      menu in the production app. */
-  .header { padding: var(--s2) 0; height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--s2); }
+  .header { padding: var(--spacing-2) 0; height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--spacing-2); }
   .header-right .btn-icon:nth-child(n+2) { display: none; }
 
   /* Bulk-bar buttons shrink labels to icon-only at this width to fit. */
-  .bulk-bar .btn-secondary { padding-left: var(--s2); padding-right: var(--s2); }
+  .bulk-bar .btn-secondary { padding-left: var(--spacing-2); padding-right: var(--spacing-2); }
   .bulk-bar .btn-secondary > :not(i) { display: none; }
 }
 
@@ -2709,7 +2456,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
           <th scope="col" class="sortable sort-icon-left" tabindex="0" aria-sort="none" onclick="sortCol(this)" style="text-align:right;">XAB</th>
           <th scope="col" class="sortable sort-icon-left" tabindex="0" aria-sort="none" onclick="sortCol(this)" style="text-align:right;">Quantity</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Contract</th>
-          <th scope="col" style="padding-left:var(--s4);">Actions</th>
+          <th scope="col" style="padding-left:var(--spacing-4);">Actions</th>
         </tr>
       </thead>
     </table>
@@ -3036,7 +2783,7 @@ function syncHeadColumnWidths() {
   // Range on the text node only; body width is the cell boundingRect
   // (already includes its own 32px padding, so subtract before
   // comparing with the header text).
-  var PAD = 32;        // var(--s4) * 2
+  var PAD = 32;        // var(--spacing-4) * 2
   var ICON_SPACE = 22; // 14px sort icon + 8px gap
   var widths = new Array(_tHeadCells.length);
   var _range = document.createRange();

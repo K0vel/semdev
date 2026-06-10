@@ -9,113 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
+<link rel="stylesheet" href="tokens.css">
 <style>
 /* ─── Design Tokens (shared with sem-015) ─────────────── */
-:root {
-  /* Primitives — Brand (blue, H=233.41) */
-  --blue-50:  oklch(0.970 0.025 233.41);
-  --blue-100: oklch(0.930 0.050 233.41);
-  --blue-200: oklch(0.870 0.085 233.41);
-  --blue-300: oklch(0.780 0.110 233.41);
-  --blue-400: oklch(0.700 0.134 233.41);
-  --blue-450: oklch(0.760 0.130 233.41);
-  --blue-500: oklch(0.696 0.134 233.41);
-  --blue-600: oklch(0.560 0.134 233.41);
-  --blue-700: oklch(0.440 0.120 233.41);
-  --blue-800: oklch(0.320 0.100 233.41);
-  --blue-900: oklch(0.220 0.080 233.41);
-  --blue-950: oklch(0.150 0.060 233.41);
-
-  /* Primitives — Neutral (navy-cool, H=240) */
-  --neutral-50:  oklch(0.985 0.008 240);
-  --neutral-100: oklch(0.960 0.010 240);
-  --neutral-200: oklch(0.910 0.012 240);
-  --neutral-300: oklch(0.830 0.014 240);
-  --neutral-400: oklch(0.700 0.014 240);
-  --neutral-500: oklch(0.580 0.014 240);
-  --neutral-600: oklch(0.460 0.014 240);
-  --neutral-700: oklch(0.330 0.020 240);
-  --neutral-800: oklch(0.220 0.025 240);
-  --neutral-850: oklch(0.190 0.025 240);
-  --neutral-900: oklch(0.160 0.025 240);
-  --neutral-950: oklch(0.110 0.020 240);
-
-  --red-500: oklch(0.580 0.220 25);
-  --base-white: oklch(1 0 0);
-
-  /* Semantic — Dark (default) */
-  --bg-page:     var(--neutral-950);
-  --bg-surface:  var(--neutral-900);
-  --bg-elevated: var(--neutral-800);
-
-  --text-primary:   var(--neutral-50);
-  --text-secondary: var(--neutral-400);
-  --text-tertiary:  var(--neutral-500);
-  --text-brand:     var(--blue-300);
-
-  --border-default: var(--neutral-700);
-  --border-subtle:  var(--neutral-800);
-
-  --brand-bg-default: var(--blue-400);
-  --brand-bg-hover:   var(--blue-500);
-  --brand-fg:         var(--base-white);
-
-  /* White ring matches the field's focused border (solid white) for a
-     cohesive "snow-edge" look on the blue aura, instead of the
-     brand-blue halo we use elsewhere. */
-  --focus-ring: 0 0 0 4px rgba(255, 255, 255, 0.18);
-
-  --surface-hover:  rgba(255,255,255,.04);
-  --surface-active: rgba(255,255,255,.06);
-
-  --input-fg:          var(--text-primary);
-  --input-placeholder: var(--text-secondary);
-  --input-border-focus: var(--brand-bg-default);
-  --input-border-error: var(--red-500);
-
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
-  --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
-  --r-sm: 2px; --r-md: 4px; --r-lg: 6px; --r-xl: 8px; --r-2xl: 12px;
-}
 
 /* Light theme parity */
-[data-theme="light"] {
-  --bg-page:     var(--base-white);
-  --bg-surface:  var(--neutral-100);
-  /* Barely-tinted near-white (navy-cool H=240) instead of pure #fff, so
-     the elevated/focused surface stays in the neutral ramp. */
-  --bg-elevated: oklch(0.995 0.006 240);
-
-  --text-primary:   var(--neutral-900);
-  --text-secondary: var(--neutral-500);
-  --text-tertiary:  var(--neutral-400);
-  /* Vivid brand blue, chosen for look over strict contrast (blue-500 on
-     the light page ≈ 2.5:1, below AA — acceptable for this prototype). */
-  --text-brand:     var(--blue-500);
-
-  --border-default: var(--neutral-300);
-  --border-subtle:  var(--neutral-200);
-
-  /* blue-500 base; hover sits ~halfway to blue-600 (full blue-600 read as
-     too big a jump). Perceptible but gentle darkening. */
-  --brand-bg-default: var(--blue-500);
-  --brand-bg-hover:   color-mix(in srgb, var(--blue-600) 50%, var(--blue-500));
-
-  /* Navy-cool tinted overlays instead of pure black. */
-  --surface-hover:  color-mix(in srgb, var(--neutral-900) 4%, transparent);
-  --surface-active: color-mix(in srgb, var(--neutral-900) 7%, transparent);
-
-  /* Dark uses a white focus glow; on a light page that is invisible, so
-     swap to a tinted brand-blue ring. */
-  --focus-ring: 0 0 0 4px color-mix(in srgb, var(--blue-500) 28%, transparent);
-}
 
 /* ─── Reset ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 body {
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   background: var(--neutral-900);
   color: var(--text-primary);
@@ -124,7 +28,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: var(--s4);
+  padding: var(--spacing-4);
 }
 /* Animated blue aura: pseudo-element pinned to viewport (position
    fixed) so it doesn't disturb body's flex centering. transform is
@@ -231,8 +135,8 @@ body::before {
    as a fixed icon button in the top-right corner. */
 .theme-toggle {
   position: fixed;
-  top: var(--s4);
-  right: var(--s4);
+  top: var(--spacing-4);
+  right: var(--spacing-4);
   z-index: 100;
   width: 40px;
   height: 40px;
@@ -243,13 +147,13 @@ body::before {
   color: #fff;
   opacity: 0.5;
   mix-blend-mode: plus-lighter;
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-lg);
   transition: opacity .12s, background .12s, color .12s;
 }
 .theme-toggle:hover { opacity: 1; background: var(--surface-hover); }
 [data-theme="light"] .theme-toggle { color: var(--text-secondary); opacity: 0.8; mix-blend-mode: normal; }
 [data-theme="light"] .theme-toggle:hover { opacity: 1; background: var(--surface-active); color: var(--text-primary); }
-@media (min-width: 600px) { .theme-toggle { top: var(--s5); right: var(--s5); } }
+@media (min-width: 600px) { .theme-toggle { top: var(--spacing-5); right: var(--spacing-5); } }
 .ph { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
 
 button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
@@ -280,7 +184,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   padding: 8px 12px;
   background: var(--brand-bg-default);
   color: var(--brand-fg);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   transition: top 120ms ease-out;
@@ -299,7 +203,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
      scale, field/button heights) are unchanged — only the card's
      horizontal footprint contracts. */
   max-width: 404px;
-  border-radius: var(--r-2xl);
+  border-radius: var(--radius-2xl);
   padding: 48px 0 44px;
   display: flex;
   flex-direction: column;
@@ -325,7 +229,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   font-size: 48px;
   line-height: 1;
   padding: 12px;
-  border-radius: var(--r-xl);
+  border-radius: var(--radius-xl);
   background: linear-gradient(to bottom, var(--blue-500), var(--blue-400));
   box-shadow: 0 20px 24px color-mix(in srgb, var(--blue-900) 15%, transparent);
 }
@@ -377,10 +281,10 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   flex-direction: column;
   justify-content: center;
   gap: 4px;
-  padding: 8px var(--s4);
+  padding: 8px var(--spacing-4);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid transparent;
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-lg);
   color: var(--input-fg);
   min-width: 0;
   position: relative;
@@ -443,7 +347,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   opacity: 0.4;
   mix-blend-mode: plus-lighter;
   text-transform: uppercase;
-  letter-spacing: 0.75px;
+  letter-spacing: 0.5px;
   line-height: 12px;
   pointer-events: none;
   user-select: none;
@@ -458,7 +362,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .field-row {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   min-height: 20px;
   color: #fff;
 }
@@ -486,7 +390,7 @@ input::placeholder {
 /* Trailing affix (e.g. eye toggle for password) */
 .field-affix {
   position: absolute;
-  right: var(--s3);
+  right: var(--spacing-3);
   top: 50%;
   transform: translateY(-50%);
   width: 28px;
@@ -497,7 +401,7 @@ input::placeholder {
   color: #fff;
   opacity: 0.5;
   mix-blend-mode: overlay;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   font-size: 16px;
   cursor: pointer;
   background: transparent;
@@ -521,19 +425,19 @@ input::placeholder {
   flex-direction: column;
   /* X = 8px gap between fields. Items needing 2X/3X visual distance
      add an explicit margin-top on top of the gap. */
-  gap: var(--s2);
+  gap: var(--spacing-2);
   align-items: stretch;
 }
 .form-actions {
   display: flex;
   flex-direction: column;
   /* gap (s2=8) + margin-top (s8=32) → 40px = 5X password→button. */
-  margin-top: var(--s8);
+  margin-top: var(--spacing-8);
 }
 .login-form .forgot {
   align-self: center;
   /* gap (s2=8) + margin-top (s6=24) → 32px = 4X button→forgot. */
-  margin-top: var(--s6);
+  margin-top: var(--spacing-6);
 }
 
 /* ─── Buttons (matches sem-015 .btn-primary) ──────────── */
@@ -542,17 +446,17 @@ input::placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   width: 100%;
   height: 56px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   background: var(--brand-bg-default);
   color: var(--base-white);
   font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-lg);
   transition: background .12s, color .12s;
 }
 /* Same masked-pseudo gradient border as the icon plate. */
@@ -610,7 +514,7 @@ a:focus-visible {
   outline: 1px solid var(--base-white);
   outline-offset: 0;
   box-shadow: var(--focus-ring);
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
 }
 body.keyboard-nav .field:has(:focus-visible) {
   border-color: var(--base-white);
@@ -625,7 +529,7 @@ body.keyboard-nav .field:has(:focus-visible) {
 .email-block {
   display: flex;
   flex-direction: column;
-  gap: var(--s2);
+  gap: var(--spacing-2);
 }
 /* Inline hint below an invalid field. Hidden by default; revealed
    only while the field carries .is-invalid. Animated height/opacity
@@ -634,7 +538,7 @@ body.keyboard-nav .field:has(:focus-visible) {
   font-size: 13px;
   font-weight: 500;
   color: #ff3d3d;
-  padding: 0 var(--s3);
+  padding: 0 var(--spacing-3);
   max-height: 0;
   opacity: 0;
   overflow: hidden;
@@ -653,7 +557,7 @@ body.keyboard-nav .field:has(:focus-visible) {
   color: #fff;
   opacity: 0.3;
   mix-blend-mode: plus-lighter;
-  padding: 0 var(--s1);
+  padding: 0 var(--spacing-1);
   transition: opacity .12s, color .12s;
 }
 .forgot:hover  { color: var(--blue-450); opacity: 1; text-decoration: none; }
@@ -662,7 +566,7 @@ body.keyboard-nav .field:has(:focus-visible) {
    alert() dialog so the message stays inside the design language. */
 .forgot-note {
   align-self: center;
-  margin-top: var(--s2);
+  margin-top: var(--spacing-2);
   font-size: 12px;
   text-align: center;
   color: #fff;
@@ -711,7 +615,7 @@ body.keyboard-nav .field:has(:focus-visible) {
 
 /* ─── Responsive ──────────────────────────────────────── */
 @media (max-width: 420px) {
-  .login-card { padding: var(--s5) var(--s4); }
+  .login-card { padding: var(--spacing-5) var(--spacing-4); }
   .wordmark { font-size: 19px; }
 }
 
