@@ -10,243 +10,109 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
 
 
+<link rel="stylesheet" href="tokens.css">
 <style>
 /* ─── Design Tokens ──────────────────────────────────────────── */
 /* OKLCH primitives: brand H=50, neutral H=50 C=0.006     */
-:root {
-  /* ── Primitives — Brand (emerald) ───────────────────
-     Mapped from user palette: 600→teal-100, 500→teal-200,
-     400→teal-300, 300→teal-400, primary→teal-500,
-     200→teal-600, 100→teal-800. Missing rungs (50/700/900/950)
-     are interpolated to keep the ramp continuous. */
-  --teal-50:  #f0f9f5;
-  --teal-100: #e0f1eb;
-  --teal-200: #cce7de;
-  --teal-300: #99cfbd;
-  --teal-400: #149167;
-  /* Sits in the 400→300 lightness gap so it actually reads as
-     "lighter" rather than a duplicate of 400/500. ~L 0.70, kept
-     saturated (not pastel like teal-300). */
-  --teal-450: #2bb27f;
-  --teal-500: #00875a; /* brand base — CTA */
-  --teal-600: #006946;
-  --teal-700: #00553a;
-  --teal-800: #003d28;
-  --teal-900: #002b1c;
-  --teal-950: #001a10;
-
-  /* ── Primitives — Neutral (navy-cool, H=240 C=0.014) ─ */
-  --neutral-50:  oklch(0.985 0.008 240);
-  --neutral-100: oklch(0.960 0.010 240);
-  --neutral-200: oklch(0.910 0.012 240);
-  --neutral-300: oklch(0.830 0.014 240);
-  --neutral-400: oklch(0.700 0.014 240);
-  --neutral-500: oklch(0.580 0.014 240);
-  --neutral-600: oklch(0.460 0.014 240);
-  --neutral-700: oklch(0.330 0.020 240);
-  --neutral-750: oklch(0.270 0.022 240);
-  --neutral-800: oklch(0.220 0.025 240);
-  --neutral-850: oklch(0.190 0.025 240);
-  --neutral-900: oklch(0.160 0.025 240);
-  --neutral-950: oklch(0.110 0.020 240);
-
-  /* ── Primitives — Status (5 steps each) ───────────── */
-  --green-100: oklch(0.930 0.060 145);
-  --green-400: oklch(0.680 0.160 145);
-  --green-500: oklch(0.600 0.180 145);
-  --green-700: oklch(0.420 0.130 145);
-  --green-900: oklch(0.220 0.060 145);
-
-  --red-100: oklch(0.930 0.050 25);
-  --red-400: oklch(0.650 0.200 25);
-  --red-500: oklch(0.580 0.220 25);
-  --red-700: oklch(0.420 0.160 25);
-  --red-900: oklch(0.220 0.070 25);
-
-  --orange-100: oklch(0.950 0.050 60);
-  --orange-400: oklch(0.750 0.150 60);
-  --orange-500: oklch(0.680 0.170 60);
-  --orange-700: oklch(0.480 0.120 60);
-  --orange-900: oklch(0.250 0.050 60);
-
-  --yellow-100: oklch(0.960 0.050 90);
-  --yellow-400: oklch(0.850 0.150 90);
-  --yellow-500: oklch(0.820 0.160 90);
-  --yellow-700: oklch(0.550 0.130 90);
-  --yellow-900: oklch(0.300 0.060 90);
-
-  /* ── Primitives — Base ─────────────────────────────── */
-  --base-white: oklch(1 0 0);
-  --base-black: oklch(0 0 0);
-
-  /* ── Semantic — Dark (default) ─────────────────────── */
-  --bg-page:     var(--neutral-950);
-  --bg-surface:  var(--neutral-900);
-  --bg-elevated: var(--neutral-800);
-  --bg-overlay:  var(--neutral-700);
-
-  --text-primary:   var(--neutral-50);
-  --text-secondary: var(--neutral-400);
-  --text-tertiary:  var(--neutral-500);
-  --text-disabled:  var(--neutral-600);
-  --text-inverse:   var(--neutral-900);
-  --text-brand:     var(--teal-300);
-
-  --border-default: var(--neutral-700);
-  --border-subtle:  var(--neutral-750);
-  --border-strong:  var(--neutral-600);
-  --border-focus:   var(--neutral-400);
-
-  --brand-bg-default: var(--teal-400);
-  --brand-bg-hover:   var(--teal-500);
-  --brand-bg-subtle:  var(--teal-900);
-  --brand-fg:         var(--base-white);
-
-  /* Unified focus ring: 1px CTA border + 4px CTA-15% halo */
-  --focus-ring: 0 0 0 4px color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
-
-  --surface-hover:           rgba(255,255,255,.04);
-  --surface-active:          rgba(255,255,255,.06);
-  --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
-  --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
-
-  --status-success-bg:    var(--green-900);
-  --status-success-fg:    var(--green-400);
-  --status-success-solid: var(--green-500);
-  --status-error-bg:      var(--red-900);
-  --status-error-fg:      var(--red-400);
-  --status-error-solid:   var(--red-500);
-  --status-warning-bg:    var(--orange-900);
-  --status-warning-fg:    var(--orange-400);
-  --status-warning-solid: var(--orange-500);
-  --status-info-bg:       var(--teal-900);
-  --status-info-fg:       var(--teal-400);
-  --status-info-solid:    var(--teal-500);
-
-  /* ── Components ────────────────────────────────────── */
-  --button-primary-bg:         var(--brand-bg-default);
-  --button-primary-bg-hover:   var(--brand-bg-hover);
-  --button-primary-fg:         var(--brand-fg);
-  --button-secondary-bg:       transparent;
-  --button-secondary-bg-hover: var(--surface-hover);
-  --button-secondary-fg:       var(--text-primary);
-  --button-secondary-border:   var(--border-default);
-  --button-ghost-bg:           transparent;
-  --button-ghost-bg-hover:     var(--surface-hover);
-  --button-ghost-fg:           var(--text-secondary);
-  --button-destructive-bg:     var(--status-error-solid);
-  --button-destructive-fg:     var(--base-white);
-
-  --input-bg:             var(--bg-elevated);
-  --input-fg:             var(--text-primary);
-  --input-placeholder:    var(--text-secondary);
-  --input-border-default: var(--border-default);
-  --input-border-focus:   var(--brand-bg-default);
-  --input-border-error:   var(--status-error-solid);
-  --input-label:          var(--text-secondary);
-  --input-helper:         var(--text-tertiary);
-
-  --table-header-bg:        var(--neutral-700);
-  --table-header-fg:        var(--text-primary);
-  --table-header-border:    var(--border-default);
-  --table-row-bg:           transparent;
-  --table-row-fg:           var(--text-secondary);
-  --table-row-fg-secondary: var(--text-tertiary);
-  --table-row-bg-hover:     color-mix(in oklch, oklch(0.75 0.06 240) 10%, transparent);
-  --table-row-bg-selected:  var(--surface-selected);
-  --table-row-border:       var(--border-subtle);
-  --table-row-zebra:        rgba(255, 255, 255, 0.04);
-
-  --badge-success-bg: var(--status-success-bg);
-  --badge-success-fg: var(--status-success-fg);
-  --badge-error-bg:   var(--status-error-bg);
-  --badge-error-fg:   var(--status-error-fg);
-  --badge-warning-bg: var(--status-warning-bg);
-  --badge-warning-fg: var(--status-warning-fg);
-  --badge-info-bg:    var(--status-info-bg);
-  --badge-info-fg:    var(--status-info-fg);
-  --badge-neutral-bg: var(--bg-elevated);
-  --badge-neutral-fg: var(--text-secondary);
-
-  --sidebar-bg:             var(--bg-elevated);
-  --sidebar-border:         transparent;
-  --sidebar-item-fg:        var(--text-secondary);
-  --sidebar-item-fg-active: var(--text-primary);
-  --sidebar-item-bg-hover:  var(--surface-hover);
-  --sidebar-item-bg-active: var(--surface-active);
-  --sidebar-group-fg:       var(--text-secondary);
-
-  /* ── Typography ────────────────────────────────────── */
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'Roboto Mono', 'Courier New', monospace;
-
-  /* ── Spacing (4px grid) ────────────────────────────── */
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
-  --s5: 20px; --s6: 24px; --s8: 32px;
-  --s10: 40px; --s12: 48px; --s16: 64px;
-
-  /* ── Radius ────────────────────────────────────────── */
-  --r-none: 0;
-  --r-sm: 2px; --r-md: 4px; --r-lg: 6px; --r-xl: 8px;
-  --r-2xl: 12px; --r-3xl: 16px;
-  --r-full: 9999px;
-}
 
 /* ─── Semantic — Light ────────────────────────────────── */
-[data-theme="light"] {
-  --bg-page:     var(--neutral-50);
-  --bg-surface:  var(--neutral-100);
-  --bg-elevated: var(--base-white);
-  --bg-overlay:  var(--neutral-200);
 
-  --text-primary:   var(--neutral-900);
-  --text-secondary: var(--neutral-500);
-  --text-tertiary:  var(--neutral-500);
-  --text-disabled:  var(--neutral-300);
-  --text-inverse:   var(--neutral-50);
-  --text-brand:     var(--teal-500);
-
-  --border-default: var(--neutral-300);
-  --border-subtle:  var(--neutral-200);
-  --border-strong:  var(--neutral-400);
-  --border-focus:   var(--neutral-400);
-
-  --brand-bg-default: var(--teal-400);
-  --brand-bg-hover:   var(--teal-500);
-  --brand-bg-subtle:  var(--teal-50);
-  --brand-fg:         var(--base-white);
-
-  --surface-hover:           rgba(0,0,0,.03);
-  --surface-active:          rgba(0,0,0,.06);
-  --surface-selected:        color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
-  --surface-selected-strong: color-mix(in oklch, var(--brand-bg-default) 30%, transparent);
-
-  --status-success-bg: var(--green-100);
-  --status-success-fg: var(--green-700);
-  --status-error-bg:   var(--red-100);
-  --status-error-fg:   var(--red-700);
-  --status-warning-bg: var(--orange-100);
-  --status-warning-fg: var(--orange-700);
-  --status-info-bg:    var(--teal-100);
-  --status-info-fg:    var(--teal-700);
-  --table-row-zebra:   rgba(0, 0, 0, 0.04);
-  --table-header-bg:   var(--bg-surface);
-}
-
-/* Restore filter-select bg in light */
-[data-theme="light"] .filter-select,
-[data-theme="light"] input.filter-input,
+/* Light-mode date input uses the light color-scheme so its text reads. */
 [data-theme="light"] .date-range input[type=date] {
   color-scheme: light;
 }
-[data-theme="light"] .filter-select {
-  background-color: var(--bg-elevated);
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
+/* The logo mark is a ring drawn with a white border — invisible on the
+   white sidebar in light mode. Give it the brand colour so the symbol
+   actually shows. */
+[data-theme="light"] .sidebar-logo-mark { border-color: var(--brand-bg-default); }
+
+/* The view-tabs track is hardcoded to neutral-850 (near-black) for dark
+   mode; in light mode that's a dark pill marooned in a white toolbar.
+   Give it a light track so the segmented control belongs to the surface. */
+[data-theme="light"] .view-tabs {
+  background: var(--surface-active);
+  border-color: transparent;
 }
+/* Active tab: the dark-mode style is a semi-transparent brand tint, which
+   muddies against the light track (the "weird colour / overlap"). Swap to
+   a solid white pill that lifts off the track with a soft shadow, brand
+   text on top. No transparency, so nothing layers. */
+[data-theme="light"] .view-tab.active,
+[data-theme="light"] .view-tab.active:hover {
+  background: var(--bg-elevated);
+  color: var(--blue-600);
+  box-shadow: 0 1px 3px rgba(17,24,39,.12), 0 1px 1px rgba(17,24,39,.05);
+}
+
+/* ─── field-light: light-theme filter-control polish ───────
+   Ported from snippets/field-light.css (origin: sem-001-login). Soft grey
+   resting fill clearly separated from the near-white page, gentle darker
+   hover, and a solid 2px blue focus edge (1px border + 1px inset ring, no
+   layout shift) — with the focused surface KEEPING the hover fill (no white
+   flip), exactly as on sem-001-login. Extended from the snippet's .field
+   scope to .date-range and .tag-chip so the whole filter row reads as one
+   control family. blue-500 matches the page's main accent. Dark theme is
+   untouched.
+   Fills are written as explicit oklch with a low chroma (0.005, hue 240):
+   same lightness as the old neutral-100/200 mixes, but only a whisper of
+   cool tint so the fields read closer to neutral grey (not fully grey). */
+[data-theme="light"] .field,
+[data-theme="light"] .date-range,
+[data-theme="light"] .tag-chip {
+  background: oklch(0.945 0.005 240);
+}
+[data-theme="light"] .field:hover,
+[data-theme="light"] .date-range:hover,
+[data-theme="light"] .tag-chip:hover {
+  background: oklch(0.925 0.005 240);
+}
+[data-theme="light"] .field:focus-within,
+[data-theme="light"] .date-range:focus-within,
+[data-theme="light"] .tag-chip:focus-within,
+[data-theme="light"] .field.is-select.open,
+[data-theme="light"] .field.is-combo.open,
+[data-theme="light"] .tag-chip.open {
+  border-color: var(--blue-500);
+  box-shadow: inset 0 0 0 1px var(--blue-500);
+  background: oklch(0.925 0.005 240);
+}
+/* Tag-pill remove hover used a white overlay (invisible on the pale
+   blue-50 pill in light mode); flip it to a dark overlay. */
+[data-theme="light"] .tag-pill-remove:hover { background: rgba(0,0,0,.08); }
+/* Popover/dropdown elevation: the shared 0 8px 24px rgba(0,0,0,.4) is
+   tuned for dark surfaces and reads as a muddy black smudge on white.
+   Swap in a softer two-layer navy-tinted shadow for light mode. */
+[data-theme="light"] .tag-dropdown,
+[data-theme="light"] .custom-select-dropdown,
+[data-theme="light"] .legend-pop,
+[data-theme="light"] .context-menu,
+[data-theme="light"] .header-menu,
+[data-theme="light"] .toast {
+  box-shadow: 0 16px 40px rgba(17, 24, 39, .14), 0 4px 12px rgba(17, 24, 39, .08);
+}
+[data-theme="light"] .flatpickr-calendar {
+  box-shadow: 0 16px 40px rgba(17, 24, 39, .14), 0 4px 12px rgba(17, 24, 39, .08) !important;
+}
+/* The 1px border-default (neutral-300) reads as a hard grey outline on
+   white. The soft shadow already separates the popover from the surface,
+   so drop the border entirely in light mode. */
+[data-theme="light"] .tag-dropdown,
+[data-theme="light"] .custom-select-dropdown,
+[data-theme="light"] .legend-pop,
+[data-theme="light"] .context-menu,
+[data-theme="light"] .header-menu,
+[data-theme="light"] .toast {
+  border: none;
+}
+[data-theme="light"] .flatpickr-calendar {
+  border: none !important;
+}
+/* Toast on the white elevated surface in light theme (matches the menus /
+   popovers), not the grey neutral-200 overlay. */
+[data-theme="light"] .toast { background: var(--bg-elevated); }
 
 /* ─── Icons ──────────────────────────────────────────── */
 .ph { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; line-height: 1; }
@@ -255,7 +121,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; }
 body {
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   background: var(--bg-page);
   color: var(--text-primary);
@@ -294,7 +160,7 @@ button {
   padding: 8px 12px;
   background: var(--brand-bg-default);
   color: var(--brand-fg);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -365,13 +231,13 @@ body.keyboard-nav th.sortable:focus-visible {
 .sidebar {
   width: 220px;
   min-width: 220px;
-  background: var(--sidebar-bg);
+  background: transparent; /* TEST: was var(--sidebar-bg) — flat, no surface */
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow-y: auto;
   scrollbar-width: none;
-  padding: 0 var(--s2) var(--s2);
+  padding: 0 var(--spacing-2) var(--spacing-2);
   /* Smooth the collapsed ↔ expanded swap so the layout doesn't snap. */
   transition: width .18s ease, min-width .18s ease;
 }
@@ -385,18 +251,18 @@ body.keyboard-nav th.sortable:focus-visible {
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   /* Clip the wordmark text when the sidebar is mid-transition so it
      doesn't bleed past the narrowing sidebar's right edge — that
      instantaneous overflow is what reads as a logo "jump". */
   overflow: hidden;
-  margin: 0 calc(-1 * var(--s2));
+  margin: 0 calc(-1 * var(--spacing-2));
   /* 22px left-pad puts the 24px mark's CENTER at the same x as the
      20px nav-item icon center (x=34 from sidebar outer). When the
      sidebar collapses, justify-content:center re-centres the mark
      in the 60px sidebar, also at icon-centre — so the mark shifts
      the same 4px as the icons rather than 6px. */
-  padding: var(--s1) 22px;
+  padding: var(--spacing-1) 22px;
   min-height: 56px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border-default);
@@ -404,7 +270,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .sidebar-logo-mark {
   width: 24px;
   height: 24px;
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   background: transparent;
   border: 3px solid var(--base-white);
   flex-shrink: 0;
@@ -418,20 +284,20 @@ body.keyboard-nav th.sortable:focus-visible {
   letter-spacing: -.01em;
 }
 
-.nav { padding: var(--s2) 0; flex: 1; display: flex; flex-direction: column; gap: var(--s1); }
+.nav { padding: var(--spacing-2) 0; flex: 1; display: flex; flex-direction: column; gap: var(--spacing-1); }
 
 .nav-section {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s3) var(--s4);
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
   min-height: 40px;
   font-size: 14px;
   font-weight: 600;
   color: var(--sidebar-item-fg);
   cursor: pointer;
   user-select: none;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   transition: background .12s, color .12s;
   white-space: nowrap;
 }
@@ -439,8 +305,12 @@ body.keyboard-nav th.sortable:focus-visible {
 .nav-section.active,
 .nav-item.active {
   position: relative;
-  color: var(--teal-450);
-  background: color-mix(in oklch, var(--brand-bg-default) 15%, transparent);
+  /* A brand-blue tint mixed into the canvas: darker than the (flat) canvas in
+     light, lighter in dark — always more contrast than the bg — and clearly
+     blue. text-brand (blue-700 light / blue-300 dark) stays readable on it;
+     the ::before accent bar reinforces the brand cue. */
+  color: var(--text-brand);
+  background: color-mix(in oklch, var(--brand-bg-default) 16%, var(--bg-page));
   font-weight: 600;
 }
 .nav-section.active::before,
@@ -453,7 +323,7 @@ body.keyboard-nav th.sortable:focus-visible {
   width: 2px;
   height: 12px;
   background: var(--brand-bg-default);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 .nav-section.is-group {
   font-size: 12px;
@@ -464,7 +334,7 @@ body.keyboard-nav th.sortable:focus-visible {
   color: var(--text-tertiary);
   opacity: 0.8;
   min-height: 28px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   cursor: default;
   pointer-events: none;
 }
@@ -480,19 +350,19 @@ body.keyboard-nav th.sortable:focus-visible {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s3) var(--s4);
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
   min-height: 40px;
   font-size: 14px;
   font-weight: 600;
   color: var(--sidebar-item-fg);
   cursor: pointer;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   transition: background .12s, color .12s;
   user-select: none;
   white-space: nowrap;
 }
-.nav-item:has(> i:first-child) { padding-right: calc(var(--s4) + 4px); }
+.nav-item:has(> i:first-child) { padding-right: calc(var(--spacing-4) + 4px); }
 .nav-item:hover { background: var(--sidebar-item-bg-hover); color: var(--text-primary); }
 
 /* Hover-over-active: keep the brand styling, with a slightly stronger
@@ -501,21 +371,31 @@ body.keyboard-nav th.sortable:focus-visible {
    and the active item visually reverts to white-on-dim. */
 .nav-section.active:hover,
 .nav-item.active:hover {
-  color: var(--teal-450);
-  background: color-mix(in oklch, var(--brand-bg-default) 22%, transparent);
+  color: var(--text-brand);
+  background: color-mix(in oklch, var(--brand-bg-default) 22%, var(--bg-page));
 }
 
 .nav-subitem { /* same padding as nav-section */ }
 
 .nav-divider {
   height: 1px;
+  /* Dark: a soft divider (border-strong read as too contrasty on the dark
+     sidebar). Light gets border-strong via the override below, because there
+     border-default (neutral-200) ≈ the canvas and the line would vanish. */
   background: var(--border-default);
-  margin: var(--s2) calc(-1 * var(--s2));
+  /* Span the content width (aligned with the nav-item boxes), not edge-to-
+     edge: drop the negative side margin so the ends line up with the items. */
+  margin: var(--spacing-2) 0;
 }
+[data-theme="light"] .nav-divider { background: var(--border-strong); }
+/* The logo's bottom border is the separator above the first group
+   (Contracts). border-default (neutral-200) is near-invisible on the light
+   sidebar, so lift it to border-strong to match the nav dividers. */
+[data-theme="light"] .sidebar-logo { border-bottom-color: var(--border-strong); }
 
 .sidebar-collapse {
   flex-shrink: 0;
-  padding-top: var(--s1);
+  padding-top: var(--spacing-1);
 }
 .collapse-btn {
   width: 40px;
@@ -523,7 +403,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   color: var(--sidebar-item-fg);
   cursor: pointer;
   user-select: none;
@@ -542,13 +422,21 @@ body.keyboard-nav th.sortable:focus-visible {
    jump like justify-content would cause, so no flicker. The mark also
    shifts the SAME 4px as the icons do (24→20), keeping the motion
    coherent. */
-.sidebar.collapsed .sidebar-logo { padding: var(--s1) 18px; }
+.sidebar.collapsed .sidebar-logo { padding: var(--spacing-1) 18px; }
 .sidebar.collapsed .nav-section,
-.sidebar.collapsed .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
+.sidebar.collapsed .nav-item { justify-content: center; padding: var(--spacing-3) 0; gap: 0; }
 
 /* ─── Main ───────────────────────────────────────────── */
 .main {
   flex: 1;
+  /* Flex children default to min-width:auto (= content size), which lets the
+     wide data table push .main past the viewport — the filter grid then
+     inherits that over-wide width and its right columns spill off-screen.
+     Pin min-width:0 so .main always shrinks to the available row space and
+     the grid's minmax(0,1fr) columns can do their job. On desktop the
+     overflow:hidden below already implied this; the ≤1024 override flips it
+     to overflow:visible, so the explicit min-width:0 is what holds there. */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -561,7 +449,7 @@ body.keyboard-nav th.sortable:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--s1) var(--s4);
+  padding: var(--spacing-1) 0;
   height: 56px;
   min-height: 56px;
   border-bottom: 1px solid var(--border-default);
@@ -577,13 +465,13 @@ body.keyboard-nav th.sortable:focus-visible {
 .header-left {
   display: flex;
   align-items: baseline;
-  gap: var(--s3);
+  gap: var(--spacing-3);
   min-width: 0;
 }
 .results-count {
   font-size: 14px;
   font-weight: 600;
-  color: var(--teal-450);
+  color: var(--blue-300);
   text-transform: uppercase;
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
@@ -593,24 +481,27 @@ body.keyboard-nav th.sortable:focus-visible {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--s1);
+  gap: var(--spacing-1);
 }
 
 /* ─── Filters ────────────────────────────────────────── */
 .filters {
-  padding: calc(var(--s4) + 2px) var(--s4) calc(var(--s4) + 2px);
+  padding: calc(var(--spacing-4) + 2px) var(--spacing-4) calc(var(--spacing-4) + 2px);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   flex-shrink: 0;
 }
-.filter-row-primary,
-.filter-row-secondary {
+/* All filters live in ONE grid so the nine fields flow continuously and
+   pack without holes (Search spans 2 → 10 column-units → exactly two rows
+   of 5 on the widest layout). The secondary fields carry .filter-secondary
+   so the narrow-screen disclosure can fold just them away. */
+.filter-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--s2);
+  gap: var(--spacing-2);
   align-items: stretch;
 }
 .field-wide { grid-column: span 2; }
@@ -622,10 +513,10 @@ body.keyboard-nav th.sortable:focus-visible {
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  padding: 6px var(--s3);
+  padding: 6px var(--spacing-3);
   background: var(--surface-active);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   color: var(--input-fg);
   min-width: 0;
   position: relative;
@@ -640,7 +531,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .field-row {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   min-width: 0;
   min-height: 20px;
 }
@@ -663,7 +554,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .date-range:focus-within .field-label,
 .tag-chip:focus-within .field-label,
 .field.is-select.open .field-label,
-.tag-chip.open .field-label { color: var(--teal-450); opacity: 1; }
+.tag-chip.open .field-label { color: var(--blue-450); opacity: 1; }
 /* Leading icon (search magnifier, calendar) brightens to the primary
    text colour (white in dark / ink in light) on focus, so the whole
    field reads as "active" without competing with the brand-coloured
@@ -676,7 +567,7 @@ label.field:has(input[type=text]) { cursor: text; }
 .field-caret,
 .field-clear {
   position: absolute;
-  right: var(--s3);
+  right: var(--spacing-3);
   top: 50%;
   transform: translateY(-50%);
   width: 22px;
@@ -686,7 +577,7 @@ label.field:has(input[type=text]) { cursor: text; }
   justify-content: center;
   color: var(--text-tertiary);
   font-size: 14px;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   pointer-events: none;
 }
 .field-clear {
@@ -715,9 +606,9 @@ label.field:has(input[type=text]) { cursor: text; }
   left: 0; right: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  padding: var(--s1);
+  padding: var(--spacing-1);
   z-index: 50;
   cursor: default;
 }
@@ -725,9 +616,9 @@ label.field:has(input[type=text]) { cursor: text; }
 .tag-option {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  padding: var(--s2) var(--s3);
-  border-radius: var(--r-sm);
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
@@ -755,7 +646,7 @@ label.field:has(input[type=text]) { cursor: text; }
   flex: 1;
   min-width: 0;
   color: var(--input-fg);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -776,9 +667,9 @@ label.field:has(input[type=text]) { cursor: text; }
   left: 0; right: 0;
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
-  padding: var(--s1);
+  padding: var(--spacing-1);
   z-index: 50;
   max-height: 280px;
   overflow-y: auto;
@@ -786,13 +677,19 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .field.is-select.open .custom-select-dropdown { display: block; }
 .field.is-select .field-caret,
+.field.is-combo .field-caret,
 .tag-chip .field-caret { transition: transform .15s; }
 .field.is-select.open .field-caret,
+.field.is-combo.open .field-caret,
 .tag-chip.open .field-caret { transform: translateY(-50%) rotate(180deg); }
+/* Combo carries both a chevron (dropdown affordance) and a clear button.
+   Show the chevron at rest; once a contract is chosen the clear X takes
+   its place (same right slot), so they never overlap. */
+.field.is-combo.has-value .field-caret { display: none; }
 .custom-option {
-  padding: var(--s2) var(--s3);
-  border-radius: var(--r-sm);
-  font-family: var(--font);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
@@ -803,6 +700,18 @@ label.field:has(input[type=text]) { cursor: text; }
 .custom-option:hover { background: var(--surface-hover); }
 .custom-option.is-selected { background: var(--sidebar-item-bg-active); color: var(--text-primary); font-weight: 600; }
 
+/* ─── Searchable dropdown (Contract combo) ──────────── */
+.field.is-combo { cursor: text; }
+.field.is-combo .field-row { padding-right: 22px; }
+.field.is-combo.has-value .field-clear { display: flex; }
+.field.is-combo.open .custom-select-dropdown { display: block; }
+.custom-option.combo-active { background: var(--surface-hover); }
+.combo-empty {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: 14px; font-weight: 500;
+  color: var(--text-tertiary); user-select: none;
+}
+
 .tag-chip-text {
   flex: 1;
   min-width: 0;
@@ -810,9 +719,14 @@ label.field:has(input[type=text]) { cursor: text; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Committed tag values read at full input-fg, matching the Contract / Vessel
+   value text. (.tag-chip rests at the dimmer placeholder colour, which made
+   the chosen tags look lighter/thinner than the other fields.) The "All"
+   placeholder keeps its muted colour. */
+.tag-chip.has-value .tag-chip-text { color: var(--input-fg); }
 .tag-counter {
   position: absolute;
-  right: calc(var(--s3) + 22px + 6px);
+  right: calc(var(--spacing-3) + 22px + 6px);
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
@@ -855,10 +769,10 @@ label.field:has(input[type=text]) { cursor: text; }
   align-items: center;
   gap: 2px;
   height: 22px;
-  padding: 0 var(--s1) 0 var(--s2);
+  padding: 0 var(--spacing-1) 0 var(--spacing-2);
   background: var(--brand-bg-subtle);
   border: 1px solid var(--status-info-fg);
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   font-size: 12px;
   font-weight: 600;
   color: var(--text-brand);
@@ -870,7 +784,7 @@ label.field:has(input[type=text]) { cursor: text; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -887,7 +801,7 @@ label.field:has(input[type=text]) { cursor: text; }
   background: transparent;
   border: none;
   color: var(--input-fg);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   outline: none;
@@ -903,59 +817,16 @@ label.field:has(input[type=text]) { cursor: text; }
 .field-row > select {
   appearance: none;
   cursor: pointer;
-  padding-right: var(--s5);
+  padding-right: var(--spacing-5);
   background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0 center;
 }
 .field-row > select option { color: var(--input-fg); background: var(--input-bg); }
 
-/* ─── Filter Controls ────────────────────────────────── */
-.filter-input, .filter-select, .filter-date {
-  height: 32px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border-default);
-  border-radius: var(--r-md);
-  color: var(--input-fg);
-  font-family: var(--font);
-  font-size: 12px;
-  padding: 0 var(--s3);
-  outline: none;
-  transition: border-color .15s;
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-}
-.filter-input:focus, .filter-select:focus { border-color: var(--input-border-focus); }
-.filter-input { min-width: 160px; }
-
-input.filter-input { cursor: text; }
-input.filter-input::placeholder { color: var(--input-placeholder); }
-
-.filter-select {
-  cursor: pointer;
-  min-width: 130px;
-  appearance: none;
-  padding-right: var(--s6);
-  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238D94A6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-color: var(--input-bg);
-}
-
-.filter-select-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.filter-icon {
-  position: absolute;
-  left: 9px;
-  color: var(--input-placeholder);
-  pointer-events: none;
-  display: flex;
-}
-.filter-select-wrap .filter-select { padding-left: 28px; }
+/* (Removed unused legacy .filter-input / .filter-select / .filter-date
+   control system — the live filters are built from .field, .date-range
+   and .tag-chip above.) */
 
 .date-range {
   display: flex;
@@ -964,15 +835,15 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   gap: 2px;
   background: var(--surface-active);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   min-height: 48px;
-  padding: 8px var(--s3);
+  padding: 8px var(--spacing-3);
   position: relative;
   min-width: 0;
   transition: background .15s, border-color .15s;
 }
 .date-range:hover { background: var(--bg-overlay); }
-.date-range .field-row { gap: var(--s2); }
+.date-range .field-row { gap: var(--spacing-2); }
 .date-range .field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
 .date-range-inline-label {
   font-size: 14px;
@@ -1013,7 +884,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 .date-range-value-start,
 .date-range-value-end {
   color: var(--input-fg);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
@@ -1021,7 +892,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 }
 .date-range-sep {
   color: var(--input-placeholder);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
   pointer-events: none;
@@ -1030,10 +901,10 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   background: transparent;
   border: none;
   color: var(--input-placeholder);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 14px;
   font-weight: 500;
-  padding: 0 var(--s2) 0 var(--s2);
+  padding: 0 var(--spacing-2) 0 var(--spacing-2);
   outline: none;
   height: 38px;
   width: 110px;
@@ -1047,7 +918,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   padding: 0 2px;
 }
 .date-range .btn-icon-sm {
-  padding: 0 var(--s2);
+  padding: 0 var(--spacing-2);
   border-left: 1px solid var(--input-border-default);
   height: 38px;
   display: flex; align-items: center;
@@ -1059,10 +930,10 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   justify-content: center;
   gap: 2px;
   min-height: 48px;
-  padding: 8px var(--s3);
+  padding: 8px var(--spacing-3);
   background: var(--surface-active);
   border: 1px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   color: var(--input-placeholder);
@@ -1073,7 +944,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   transition: border-color .15s, background .15s;
 }
 .tag-chip:hover { background: var(--bg-overlay); }
-.tag-chip .field-row { gap: var(--s2); min-height: 20px; }
+.tag-chip .field-row { gap: var(--spacing-2); min-height: 20px; }
 .tag-chip .field-row > i:not(.field-caret) { color: var(--input-placeholder); flex-shrink: 0; }
 .tag-chip-remove { margin-left: auto; }
 .tag-chip-remove {
@@ -1091,8 +962,8 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   display: none;
   grid-template-columns: 1fr auto;
   align-items: start;
-  gap: var(--s2);
-  margin-top: var(--s2);
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
 }
 .filters.has-chips .filter-chips-bar { display: grid; }
 .filter-chips-bar .chips-label { display: none; }
@@ -1130,7 +1001,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   color: var(--text-tertiary);
   cursor: pointer;
   flex-shrink: 0;
@@ -1146,17 +1017,17 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   background: transparent;
   border: none;
   color: var(--text-brand);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   white-space: nowrap;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
-  padding: 0 0 0 var(--s3);
+  padding: 0 0 0 var(--spacing-3);
   display: inline-flex;
   align-items: center;
-  gap: var(--s3);
+  gap: var(--spacing-3);
   text-decoration: none;
   text-underline-offset: 3px;
 }
@@ -1174,7 +1045,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--s4);
+  padding: var(--spacing-4);
   border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
 }
@@ -1182,49 +1053,50 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   display: flex;
   align-items: center;
 }
-.toolbar-left { gap: var(--s6); }
-.toolbar-right { gap: var(--s2); }
+.toolbar-left { gap: var(--spacing-6); }
+.toolbar-right { gap: var(--spacing-2); }
 
 /* ─── View tabs (segmented control) ──────────────────── */
 .view-tabs {
   display: inline-flex;
-  background: var(--neutral-850);
+  /* Slight blue cast on the dark track, matching the zebra tint. */
+  background: color-mix(in oklch, var(--blue-500) 8%, var(--neutral-850));
   border: 1px solid var(--border-subtle);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   padding: 3px;
   gap: 0;
 }
 .view-tab {
   display: inline-flex;
   align-items: center;
-  gap: var(--s2);
-  padding: 0 var(--s4);
+  gap: var(--spacing-2);
+  padding: 0 var(--spacing-4);
   height: 40px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-family: var(--font);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .04em;
   cursor: pointer;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   transition: background .12s, color .12s;
 }
 .view-tab:hover { color: var(--text-primary); }
 .view-tab.active {
-  color: var(--teal-450);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 20%, transparent);
 }
 .view-tab.active:hover {
-  color: var(--teal-450);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 27%, transparent);
 }
 .toggle-label {
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -1235,6 +1107,9 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 .toggle-label > span { transform: translateY(-1px); }
 .toggle-switch {
   width: 44px; height: 26px;
+  /* Off-state track styled like a field surface. Dark keeps the neutral-700
+     track (reads fine on the dark card); light gets the soft near-grey field
+     fill via the override below. */
   background: var(--border-default);
   border-radius: 13px;
   position: relative;
@@ -1248,8 +1123,14 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   width: 16px; height: 16px;
   border-radius: 50%;
   background: var(--base-white);
+  /* Lift the white knob off the light field-grey off-track. */
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
   transition: transform .15s;
 }
+/* Off track keeps the fields' low-chroma cool-grey character, but darker than
+   the field fill so the white knob has real contrast and the switch reads as
+   an active off-state, not disabled. On stays brand. */
+[data-theme="light"] .toggle-switch { background: oklch(0.898 0.006 240); }
 .toggle-switch.on { background: var(--brand-bg-default); }
 .toggle-switch.on::after { transform: translateX(18px); }
 
@@ -1257,7 +1138,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 .btn-icon {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   border: none;
   background: var(--button-ghost-bg);
   color: var(--button-ghost-fg);
@@ -1266,12 +1147,15 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 }
 .btn-icon:hover { background: var(--button-ghost-bg-hover); color: var(--text-primary); }
 .btn-icon.active { background: var(--brand-bg-subtle); color: var(--text-brand); }
-.header-right .btn-icon { width: 36px; height: 36px; border-radius: var(--r-md); }
+.header-right .btn-icon { width: 36px; height: 36px; border-radius: var(--radius-md); }
+/* Legend (i) is a tertiary affordance — keep it visibly smaller than the
+   36px-tall Update / Add buttons it sits beside. */
+.legend-wrap .btn-icon { width: 28px; height: 28px; }
 
 .btn-icon-sm {
   width: 24px; height: 24px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   background: var(--button-ghost-bg);
   border: none;
   color: var(--text-tertiary);
@@ -1283,16 +1167,16 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
 .btn-primary,
 .btn-secondary {
   height: 36px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   border: none;
-  border-radius: var(--r-md);
-  font-family: var(--font);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-sans);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
   cursor: pointer;
-  display: flex; align-items: center; gap: var(--s2);
+  display: flex; align-items: center; gap: var(--spacing-2);
   transition: background .12s;
 }
 .btn-primary {
@@ -1304,7 +1188,7 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
    for the gap distance the icon contributes on the left side. */
 .btn-primary:has(> i:first-child),
 .btn-secondary:has(> i:first-child) {
-  padding-right: calc(var(--s4) + 4px);
+  padding-right: calc(var(--spacing-4) + 4px);
 }
 .btn-primary:hover { background: var(--button-primary-bg-hover); }
 .btn-secondary {
@@ -1313,6 +1197,18 @@ input.filter-input::placeholder { color: var(--input-placeholder); }
   line-height: 1.15;
 }
 .btn-secondary:hover { background: var(--bg-overlay); }
+/* Toolbar Update: styled like the active sidebar tab — a low brand-blue tint
+   laid over the surface — but ~35% less saturated. The brand is first mixed
+   65/35 with a same-lightness neutral (neutral-400 and blue-400/500 share
+   L≈0.70, so only chroma drops, not brightness), then laid at a low % like
+   the tab's 15%. Stays clearly subordinate to the solid-blue Add CTA. */
+.toolbar-right .btn-secondary {
+  background: color-mix(in oklch, color-mix(in oklch, var(--brand-bg-default) 65%, var(--neutral-400)) 16%, transparent);
+  color: var(--text-brand);
+}
+.toolbar-right .btn-secondary:hover {
+  background: color-mix(in oklch, color-mix(in oklch, var(--brand-bg-default) 65%, var(--neutral-400)) 24%, transparent);
+}
 
 /* ─── Table ──────────────────────────────────────────── */
 .table-head-wrap {
@@ -1377,10 +1273,10 @@ th {
   background: var(--table-header-bg);
   color: var(--table-header-fg);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   height: 44px;
   text-align: left;
   border-bottom: 1px solid var(--table-header-border);
@@ -1415,6 +1311,8 @@ th.sortable.center .sort-preview {
   margin: 0;
 }
 .sort-icon    { color: var(--text-tertiary); }
+/* Active sort arrow goes brand blue so the ordered column is unmistakable. */
+th.col-sorted .sort-icon { color: var(--blue-500); }
 .sort-preview { color: var(--text-disabled); opacity: 0; transition: opacity .12s; }
 th.col-sorted .sort-preview { display: none; }
 th.sortable:hover .sort-preview { opacity: 0.7; }
@@ -1432,12 +1330,15 @@ th.sortable:hover .sort-preview { opacity: 0.7; }
 .table-zone:has(.table-head-wrap th:nth-child(8):hover) .table-wrap td:nth-child(8),
 .table-zone:has(.table-head-wrap th:nth-child(9):hover) .table-wrap td:nth-child(9),
 .table-zone:has(.table-head-wrap th:nth-child(10):hover) .table-wrap td:nth-child(10) {
-  box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.02);
+  /* Hover preview of the whole column before clicking to sort. Neutral wash
+     (text-primary auto-adapts per theme) so it reads as "hover", distinct from
+     the sorted column's cool-grey tint. Kept light at 1%. */
+  box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 1%, transparent);
 }
 th.center { text-align: center; }
 
 td {
-  padding: 0 var(--s4);
+  padding: 0 var(--spacing-4);
   height: 56px;
   vertical-align: middle;
   color: var(--table-row-fg);
@@ -1449,7 +1350,13 @@ td {
 }
 
 tbody tr:nth-child(even) td { background: var(--table-row-zebra); }
-tbody tr:hover td { background: var(--table-row-bg-hover); }
+/* Row hover: a neutral ink/white wash laid as an inset box-shadow so it
+   LAYERS over the row's resting background (white OR the blue zebra) instead
+   of replacing it. A translucent `background` reset the cell to the card
+   colour, so on the darker zebra rows the hover landed ~equal to the resting
+   tint and vanished. As a shadow the delta is consistent on every row.
+   text-primary adapts per theme: darkens in light, lightens in dark. */
+tbody tr:hover td { box-shadow: inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 35%, var(--text-primary)) 5%, transparent); }
 /* On hover, promote every text tier one step up so the row reads as
    the foreground focus: tertiary → secondary, secondary → primary.
    Brand colour (progress-filled) is left alone — it's already the
@@ -1474,6 +1381,19 @@ tbody tr.selected td { background: var(--table-row-bg-selected); }
    "strong" selected tint (30% brand vs 20%), so the existing
    nth-child(even) zebra rhythm carries through into selection. */
 tbody tr.selected:nth-child(even) td { background: var(--surface-selected-strong); }
+/* Light theme: single subtle zebra — ODD rows a faint blue-tinted wash, EVEN
+   rows white. (Swapped from even-tinted on request; the global even rule
+   is overridden to white so it doesn't double up.) The stripe is a cool
+   neutral (neutral-500) shifted 20% toward blue-500, then laid at 11% →
+   ~0.96: an off-white grey that sits clearly between the darkened canvas
+   (~0.91) and the white rows (1.0), with only a hint of blue.
+   Only :not(.selected) now — the zebra background STAYS on hover so the
+   hover box-shadow can layer over it (otherwise the wash lands on white and
+   vanishes against the zebra). Selection still overrides it. */
+[data-theme="light"] tbody tr:nth-child(odd):not(.selected) td  { background: color-mix(in oklch, color-mix(in oklch, var(--blue-500) 20%, var(--neutral-500)) 11%, transparent); }
+[data-theme="light"] tbody tr:nth-child(even):not(.selected) td { background: transparent; }
+[data-theme="light"] tbody tr.selected:nth-child(odd) td  { background: var(--surface-selected-strong); }
+[data-theme="light"] tbody tr.selected:nth-child(even) td { background: var(--table-row-bg-selected); }
 /* Selected row: everything inside (text + icons + action buttons)
    adopts the brand colour so the selection state reads as a
    committed visual. Overriding the text tier vars cascades to
@@ -1495,18 +1415,35 @@ tbody tr.selected .progress-filled     { color: var(--text-primary); }
 /* Active-sort column: semi-transparent tint layered ON TOP of zebra /
    hover / selected via inset box-shadow (background untouched, so the
    stripes underneath still read). Plus primary text in body. */
-tbody td.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); }
-thead th.col-sorted { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.03); }
+/* A faint cool-GREY wash down the sorted column. The tint is blue-500 mixed
+   ~35% into neutral-400 (same lightness, ~half the chroma) so it reads as a
+   cool grey with only a whisper of blue — not a blue stripe — while the
+   active sort arrow + primary text still mark the column. Grey reads weaker
+   than the old blue at the same opacity, so it's lifted to 7%/9% to stay
+   visible. !important so it wins over the column hover-preview (which has a
+   very high :has() specificity and would otherwise mask the sorted tint the
+   moment the cursor sits on the header — i.e. right after a sort click). */
+tbody td.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 25%, var(--neutral-400)) 5%, transparent) !important; }
+thead th.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 25%, var(--neutral-400)) 7%, transparent) !important; }
+/* Hovered row's sorted cell: stack the row-hover wash ON TOP of the sort tint
+   (two box-shadow layers) so the hover reads THROUGH the column instead of the
+   column looking like a solid block the hover skips over. */
+tbody tr:hover:not(.selected) td.col-sorted {
+  box-shadow:
+    inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 35%, var(--text-primary)) 5%, transparent),
+    inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 25%, var(--neutral-400)) 5%, transparent) !important;
+}
 /* On a selected row the brand tint is already the dominant signal —
    stacking the sort-column highlight on top of it just muddies the
    colour without adding info. Strip it for selected rows. */
-tbody tr.selected td.col-sorted { box-shadow: none; }
+tbody tr.selected td.col-sorted { box-shadow: none !important; }
 /* Once a row is checked, focus shifts from "sorting" to "acting on
    the selection". Drop the column-sort tint everywhere — head + body —
-   so the table reads as one consistent surface under bulk-mode. */
+   so the table reads as one consistent surface under bulk-mode.
+   !important to override the now-!important col-sorted tint above. */
 .table-zone:has(tr.selected) thead th.col-sorted,
 .table-zone:has(tr.selected) tbody td.col-sorted {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 /* (Previously: 5px box-shadow extensions painted into the scrollbar
@@ -1540,7 +1477,9 @@ col.col-act     { width: 1px; }
   vertical-align: middle;
 }
 thead .checkbox {
-  border-color: var(--text-secondary);
+  /* Only a hair stronger than the body checkboxes — text-secondary read as
+     a hard, over-contrasty outline (more so now secondary is darker). */
+  border-color: var(--border-strong);
 }
 .checkbox:hover {
   border-color: var(--text-primary);
@@ -1567,16 +1506,26 @@ thead .checkbox {
 }
 .checkbox.checked > .ph-check { display: inline-flex; }
 .checkbox.indeterminate > .ph-minus { display: inline-flex; }
+/* Light: resting row checkboxes (~0.87 border) were hard to spot on the
+   light rows — darken the unchecked border so they read clearly. */
+[data-theme="light"] tbody .checkbox:not(.checked):not(.indeterminate) { border-color: var(--neutral-400); }
 
 /* ─── Movement type icons (type + transport) ─────────── */
-.move-cell { padding: 0 var(--s4); text-align: center; }
+.move-cell { padding: 0 var(--spacing-4); text-align: center; }
 .move-icons {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  font-size: 16px;
-  color: var(--text-secondary);
+  font-size: 20px;
+  /* Type glyphs are a quiet categorical cue, not data — drop to tertiary so
+     they read lighter / less contrasty than the row text. */
+  color: var(--text-tertiary);
 }
+.move-icons > i { transition: color .12s; }
+/* Each glyph highlights independently: hovering the type icon or the
+   transport icon lifts just that one to the brand hue (each carries its
+   own tooltip too). */
+.move-icons > i:hover { color: var(--brand-bg-default); }
 
 /* ─── Vessel cell ────────────────────────────────────── */
 .vessel-cell {
@@ -1598,7 +1547,7 @@ thead .checkbox {
   overflow: hidden;
 }
 .cust-name {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -1615,7 +1564,7 @@ thead .checkbox {
   text-overflow: ellipsis;
 }
 .vessel-name {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -1638,6 +1587,11 @@ thead .checkbox {
 .qty-cell {
   text-align: right;
   font-variant-numeric: tabular-nums;
+  /* Quantity is the row's key metric — lift to primary ink so it anchors the
+     right edge. Weight stays at the row default (500); the 600 here read as
+     an odd, heavier-than-everything-else style. The .qty-sign (+/−) stays
+     tertiary. */
+  color: var(--text-primary);
 }
 .contract-cell {
   display: flex;
@@ -1655,7 +1609,7 @@ thead .checkbox {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--s1);
+  gap: var(--spacing-1);
   min-width: 0;
 }
 .progress-ring {
@@ -1707,7 +1661,7 @@ thead .checkbox {
 .act-btn {
   width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--radius-sm);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -1717,10 +1671,18 @@ thead .checkbox {
 }
 .act-btn > i { font-size: 16px; }
 .act-btn:hover { background: var(--surface-hover); color: var(--text-primary); }
-/* Action row hover semantics: flag (3rd) reveals warning hue, delete
-   (4th, last) reveals destructive hue. Default color stays neutral
-   so the row reads calmly until the user reaches for a destructive
-   action. */
+/* Light: the neutral-500 fill reads heavy on white rows — soften to a
+   lighter grey so the action cluster stays calm until hovered. */
+[data-theme="light"] .act-btn { color: var(--neutral-400); }
+/* Action row hover semantics: open-doc (1st) and view (2nd) are the safe,
+   primary actions → reveal the brand blue. flag (3rd) reveals warning hue,
+   delete (4th, last) reveals destructive hue. Default color stays neutral
+   so the row reads calmly until the user reaches for an action. */
+.row-actions .act-btn:nth-child(1):hover,
+.row-actions .act-btn:nth-child(2):hover {
+  background: color-mix(in oklch, var(--blue-500) 12%, transparent);
+  color: var(--blue-500);
+}
 .row-actions .act-btn:nth-child(3):hover {
   background: color-mix(in oklch, var(--orange-500) 12%, transparent);
   color: var(--orange-500);
@@ -1746,7 +1708,7 @@ thead .checkbox {
      the count. .bulk-actions is pinned right via margin-left: auto,
      so a gap here would only push the count away from the checkbox. */
   gap: 0;
-  padding: 0 var(--s4) 0 0;
+  padding: 0 var(--spacing-4) 0 0;
   z-index: 5;
 }
 .bulk-bar.visible { display: flex; }
@@ -1761,8 +1723,8 @@ thead .checkbox {
   justify-content: center;
   /* Mirror td.checkbox-cell padding exactly so the inner 16px box
      sits at the same x as the row + header checkboxes. The td uses
-     the global `td { padding: 0 var(--s4) }` rule. */
-  padding: 0 var(--s4);
+     the global `td { padding: 0 var(--spacing-4) }` rule. */
+  padding: 0 var(--spacing-4);
 }
 .bulk-count {
   display: inline-flex;
@@ -1776,12 +1738,12 @@ thead .checkbox {
 }
 .bulk-actions {
   /* Pinned next to .bulk-count (which sits right after the checkbox).
-     var(--s3) separates "N selected" from the first action button so
+     var(--spacing-3) separates "N selected" from the first action button so
      they read as related but distinct. */
-  margin-left: var(--s3);
+  margin-left: var(--spacing-3);
   display: flex;
   align-items: center;
-  gap: var(--s2);
+  gap: var(--spacing-2);
 }
 /* Bulk-bar buttons: ghost white (transparent bg, white text). Delete
    shares the same hover bg as Export — destructive intent via the
@@ -1820,52 +1782,128 @@ thead .checkbox {
 svg { flex-shrink: 0; }
 
 /* ─── Scrollbar top-right actions ────────────────────── */
-.header-right { display: flex; align-items: center; gap: var(--s2); }
+.header-right { display: flex; align-items: center; gap: var(--spacing-2); }
 .notif-btn { position: relative; }
 .notif-badge {
   position: absolute;
   top: 3px; right: 3px;
   width: 7px; height: 7px;
-  background: var(--teal-450);
+  /* Vivid electric blue so the dot reads as a live notification — blue-450
+     was too muted/light to pop against the bell. */
+  background: var(--status-notification);
   border-radius: 50%;
-  border: 1.5px solid var(--bg-elevated);
 }
+
+/* ─── Header account / settings menu ─────────────────── */
+.header-menu-wrap { position: relative; display: inline-flex; }
+/* Pressed (menu open): solid brand fill. */
+.header-menu-wrap.open > .btn-icon { background: var(--brand-bg-default); color: var(--brand-fg); }
+.header-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 224px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  padding: var(--spacing-2);
+  z-index: 80;
+  /* Column with a small gap between rows so the items breathe. */
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+.header-menu-wrap.open .header-menu { display: flex; }
+.header-menu-sep { height: 1px; background: var(--border-subtle); margin: 0; }
+.header-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  /* Taller rows (12px vertical) for a roomier menu. */
+  padding: var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-family: var(--font-family-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+/* Leading glyph slot — icon or a flag emoji — kept the same width so the
+   labels line up. */
+.header-menu-item > i,
+.header-menu-item > .flag {
+  width: 18px;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: color .12s;
+}
+/* Round flag chip (flag-icons square flag, circle-cropped). */
+.header-menu-item .flag {
+  height: 18px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+}
+.header-menu-item:hover { background: color-mix(in oklch, var(--brand-bg-default) 10%, transparent); }
+.header-menu-item:hover > i { color: var(--brand-bg-default); }
+/* Destructive last item (Exit): neutral at rest, reveals the error hue on
+   hover — same treatment as the table's delete row action. */
+.header-menu-item.is-danger:hover { background: color-mix(in oklch, var(--red-500) 12%, transparent); color: var(--status-error-fg); }
+.header-menu-item.is-danger:hover > i { color: var(--status-error-fg); }
 
 /* ─── Zones (islands layout) ─────────────────────────── */
 body {
-  padding: var(--s2);
-  gap: var(--s2);
+  padding: var(--spacing-2);
+  gap: var(--spacing-2);
   background: var(--bg-page);
 }
 .sidebar {
   height: auto;
   border: none;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 .sidebar .nav { overflow: visible; }
 .main {
   height: auto;
-  gap: var(--s2);
+  gap: var(--spacing-2);
   background: transparent;
 }
 .header-zone,
 .table-zone {
   background: var(--bg-elevated);
   border: none;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
 }
 .header-zone {
   display: flex;
   flex-direction: column;
-}
-.header-zone .header,
-.header-zone .toolbar {
+  /* Flat zone: the header rides bare on the canvas, the toolbar is its own
+     card below it. The gap visually detaches the toolbar from the header. */
+  gap: var(--spacing-2);
   background: transparent;
-  border-radius: 0;
 }
 .header-zone .header {
-  border-bottom: 1px solid var(--border-default);
+  background: transparent;
+  border-radius: 0;
+  border-bottom: none; /* gap separates header from the toolbar card now */
+}
+.header-zone .toolbar {
+  /* Toolbar keeps its surface (podkladka), as a card distinct from the
+     flat header above and the table card below. */
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
 }
 .toolbar { overflow: visible; }
 .toolbar .filters {
@@ -1890,10 +1928,10 @@ body {
 .flatpickr-calendar {
   background: var(--bg-elevated) !important;
   border: 1px solid var(--border-default) !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--radius-md) !important;
   box-shadow: 0 8px 24px rgba(0,0,0,.4) !important;
-  font-family: var(--font) !important;
-  padding: var(--s2) !important;
+  font-family: var(--font-family-sans) !important;
+  padding: var(--spacing-2) !important;
   width: auto !important;
 }
 .flatpickr-calendar.arrowTop:before,
@@ -1901,7 +1939,7 @@ body {
 .flatpickr-calendar.arrowBottom:before,
 .flatpickr-calendar.arrowBottom:after { display: none !important; }
 
-.flatpickr-months { padding-bottom: var(--s2); }
+.flatpickr-months { padding-bottom: var(--spacing-2); }
 .flatpickr-month {
   background: transparent !important;
   color: var(--text-primary) !important;
@@ -1924,7 +1962,7 @@ body {
   padding: 8px !important;
   height: 36px !important;
   width: 36px !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--radius-md) !important;
   transition: background .12s !important;
 }
 .flatpickr-prev-month:hover,
@@ -1939,7 +1977,7 @@ body {
 .flatpickr-weekdays {
   background: transparent !important;
   height: 28px !important;
-  margin-bottom: var(--s1);
+  margin-bottom: var(--spacing-1);
 }
 .flatpickr-weekday {
   background: transparent !important;
@@ -1953,10 +1991,10 @@ body {
 .dayContainer { padding: 0 !important; }
 .flatpickr-day {
   color: var(--text-primary) !important;
-  font-family: var(--font) !important;
+  font-family: var(--font-family-sans) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
-  border-radius: var(--r-md) !important;
+  border-radius: var(--radius-md) !important;
   border: none !important;
   height: 34px !important;
   line-height: 34px !important;
@@ -1988,27 +2026,314 @@ body {
   border: none !important;
   box-shadow: none !important;
 }
-.flatpickr-day.startRange { border-radius: var(--r-md) 0 0 var(--r-md) !important; }
-.flatpickr-day.endRange { border-radius: 0 var(--r-md) var(--r-md) 0 !important; }
-.flatpickr-day.startRange.endRange { border-radius: var(--r-md) !important; }
+.flatpickr-day.startRange { border-radius: var(--radius-md) 0 0 var(--radius-md) !important; }
+.flatpickr-day.endRange { border-radius: 0 var(--radius-md) var(--radius-md) 0 !important; }
+.flatpickr-day.startRange.endRange { border-radius: var(--radius-md) !important; }
+
+/* ─── Movement-type legend popover ───────────────────── */
+.legend-wrap { position: relative; display: inline-flex; }
+.legend-wrap.open .btn-icon { background: var(--brand-bg-subtle); color: var(--text-brand); }
+.legend-pop {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 210px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  padding: var(--spacing-2);
+  z-index: 60;
+}
+.legend-wrap.open .legend-pop { display: block; }
+.legend-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  padding: var(--spacing-1) var(--spacing-2) var(--spacing-2);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.legend-icons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  font-size: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.legend-sep { height: 1px; background: var(--border-subtle); margin: var(--spacing-1) 0; }
+
+/* ─── Empty state ────────────────────────────────────── */
+.empty-row td { height: auto; border: none; }
+.empty-row:hover td { background: transparent; }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-16) var(--spacing-4);
+  text-align: center;
+}
+.empty-icon { font-size: 40px; color: var(--text-disabled); }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+.empty-sub { font-size: 13px; font-weight: 500; color: var(--text-tertiary); margin-top: -6px; }
+
+/* Disabled / busy buttons (e.g. Update mid-refresh). */
+.btn-primary:disabled,
+.btn-secondary:disabled { opacity: .6; cursor: not-allowed; }
+/* Spinner: rotate the leading icon while a refresh is in flight. */
+.spin { display: inline-flex; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Skeleton (loading) ─────────────────────────────── */
+.skeleton-row td { height: 56px; }
+.skeleton-row:hover td { background: transparent; }
+.skel {
+  display: inline-block;
+  height: 12px;
+  width: 60%;
+  border-radius: var(--radius-sm);
+  background: var(--bg-overlay);
+  animation: skel-pulse 1.2s ease-in-out infinite;
+}
+@keyframes skel-pulse { 0%, 100% { opacity: .4; } 50% { opacity: .8; } }
+
+/* ─── Quantity direction sign (+ inbound / − outbound) ─── */
+.qty-cell .qty-sign { margin-right: 1px; color: var(--text-tertiary); font-weight: 600; }
+
+/* ─── Contract progress thresholds ───────────────────────
+   Ring + filled count shift hue as the contract nears (≥75%) or
+   exceeds (≥100%) its total. Skipped on selected rows, where the brand
+   tint already owns the row's colour. */
+tbody tr:not(.selected) .progress-wrap.warn .progress-ring-fill { stroke: var(--status-warning-solid); }
+tbody tr:not(.selected) .progress-wrap.warn .progress-filled { color: var(--status-warning-fg); }
+tbody tr:not(.selected) .progress-wrap.overrun .progress-ring-fill { stroke: var(--status-error-solid); }
+tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--status-error-fg); }
+
+/* ─── Undo toast ─────────────────────────────────────── */
+.toast-stack {
+  position: fixed;
+  left: 50%;
+  bottom: var(--spacing-6);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  z-index: 200;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 10px 10px 10px var(--spacing-4);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  font-size: 14px;
+  font-weight: 500;
+  animation: toast-in .2s cubic-bezier(.22,1,.36,1);
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.toast-undo {
+  height: 28px;
+  padding: 0 var(--spacing-3);
+  background: transparent;
+  border: none;
+  color: var(--text-brand);
+  font-family: var(--font-family-sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .12s;
+}
+.toast-undo:hover { background: var(--surface-hover); }
+
+/* ─── Tooltip ─────────────────────────────────────────
+   One shared floating chip, JS-positioned. A dark chip with WHITE text in
+   both themes: dark uses the lifted bg-overlay, light uses a dark slate
+   (neutral-800) so it reads as the classic dark tooltip on the white card.
+   Shown on hover (delayed) and on focus; a truncated cell only gets a
+   tooltip when its text is actually clipped. */
+.tooltip {
+  position: fixed;
+  z-index: 300;
+  max-width: 320px;
+  padding: 6px var(--spacing-2);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 20px rgba(0,0,0,.38);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity .12s ease-out, transform .12s ease-out;
+}
+.tooltip.visible { opacity: 1; transform: translateY(0); }
+/* Light: white elevated chip (from --bg-elevated) with the soft navy popover
+   shadow, so the tooltip lifts off the white card without a hard border. */
+[data-theme="light"] .tooltip {
+  box-shadow: 0 10px 28px rgba(17,24,39,.16), 0 3px 10px rgba(17,24,39,.09);
+}
+
+/* ─── Row context menu (right-click) ──────────────────
+   Same elevated-menu family as the filter dropdowns. Opens at the
+   pointer, clamped to the viewport, arrow-key navigable. Destructive
+   items take the error hue on hover, matching the row action buttons. */
+.context-menu {
+  position: fixed;
+  z-index: 250;
+  min-width: 212px;
+  max-width: 280px;
+  padding: var(--spacing-1);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  opacity: 0;
+  transform: scale(.97);
+  transform-origin: top left;
+  transition: opacity .1s ease-out, transform .1s ease-out;
+}
+.context-menu.open { opacity: 1; transform: scale(1); }
+.context-menu-head {
+  padding: var(--spacing-2) var(--spacing-3) var(--spacing-1);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+.context-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  text-align: left;
+  transition: background .1s, color .1s;
+}
+.context-menu-item > i { font-size: 16px; color: var(--text-tertiary); flex-shrink: 0; transition: color .1s; }
+.context-menu-item:hover { background: var(--surface-hover); }
+.context-menu-item:hover > i { color: var(--text-secondary); }
+.context-menu-item.cm-danger { color: var(--status-error-fg); }
+.context-menu-item.cm-danger > i { color: var(--status-error-fg); }
+.context-menu-item.cm-danger:hover { background: color-mix(in oklch, var(--red-500) 12%, transparent); }
+.context-menu-sep { height: 1px; background: var(--border-subtle); margin: var(--spacing-1); }
+/* The row whose menu is open gets a neutral wash + a brand left-edge so the
+   target stays unambiguous while the menu floats over the table. Painted as
+   an inset box-shadow (like the column hover-preview) so it layers over the
+   zebra / selected backgrounds in BOTH themes regardless of their higher
+   specificity — a plain `background` would lose to the light zebra rule. */
+tbody tr.context-target td { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 3%, transparent); }
+tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 3%, transparent), inset 2px 0 0 var(--brand-bg-default); }
+
+/* ─── Filters disclosure ("More filters") ─────────────
+   The page carries nine filters. Only the primary set (search + the two
+   key selects, Warehouse + Subproduct) stays visible; the secondary set
+   (date range, contract, vessel, tags, destination, job order) folds
+   behind this toggle so the primary row packs cleanly and the bar never
+   runs past three rows at any width. A brand count badge flags active
+   filters hiding in the collapsed section. */
+/* Wide viewports fit all nine filters in ≤3 rows, so everything stays
+   visible and the disclosure is hidden. The collapse only switches on at
+   ≤1024 (see the media query), where the secondary set would otherwise
+   spill to a fourth row. */
+.filters-more { display: none; }
+.filters-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  height: 32px;
+  padding: 0 var(--spacing-3) 0 var(--spacing-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-brand);
+  font-family: var(--font-family-sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.filters-more-btn:hover { background: var(--surface-hover); }
+.filters-more-caret { transition: transform .15s; }
+.filters.show-more .filters-more-caret { transform: rotate(180deg); }
+.filters-more-count {
+  display: none;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  align-items: center; justify-content: center;
+  background: var(--brand-bg-subtle);
+  color: var(--text-brand);
+  border-radius: 9999px;
+  font-size: 11px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.filters-more-btn.has-count .filters-more-count { display: inline-flex; }
+/* Open section: the fields speak for themselves, so drop the count badge. */
+.filters.show-more .filters-more-count { display: none !important; }
 
 /* ─── Responsive ──────────────────────────────────────
-   Scope: this is an admin tool for operations staff on a desktop
-   workstation. Phone is intentionally out of scope. The breakpoints
-   below ensure the layout survives a half-screen laptop and a
-   landscape tablet without catastrophic clipping.
+   An ops tool that lives on a desktop workstation but must survive a
+   tablet and a phone without clipping. The filter grid steps down a
+   column at a time; on a phone the fields stack one-up and tuck behind
+   a disclosure so the table keeps the screen.
    - ≤1280: filter grid 5→4 cols (Search keeps span 2).
    - ≤1024: sidebar collapses to a 56px icon rail; filter grid 3 cols;
-            body+main start scrolling instead of clipping.
-   - ≤768:  filter grid 2 cols; header right collapses notification
-            button only; sidebar overlays the page when expanded.
+            body+main start scrolling instead of clipping. (Tablet.)
+   - ≤768:  filter grid 2 cols; header right collapses to the
+            notification button only.
+   - ≤600:  filter grid 1 col, every field full width; the filter rows
+            collapse behind the toolbar "Filters" toggle, chips stay on
+            as the summary; inline toggles drop from the toolbar. (Phone.)
    Touch (hover:none): row + nav targets grow to ≥44px. */
 
 @media (max-width: 1280px) {
-  .filter-row-primary,
-  .filter-row-secondary {
+  .filter-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  /* Below the widest (5-col) layout, fold the secondary filters behind the
+     disclosure so narrowing never adds rows — that's the whole point of the
+     toggle: preserve height. Collapsed here it's a single clean row (Search
+     spans 2 + Warehouse + Subproduct fill the four columns exactly). These
+     rules cascade to every narrower breakpoint too. */
+  .filters:not(.show-more) .filter-secondary { display: none; }
+  .filters-more { display: flex; }
 }
 
 @media (max-width: 1024px) {
@@ -2025,18 +2350,31 @@ body {
   .sidebar .nav-section.is-group,
   .sidebar .nav-divider { display: none; }
   .sidebar .nav-section,
-  .sidebar .nav-item { justify-content: center; padding: var(--s3) 0; gap: 0; }
+  .sidebar .nav-item { justify-content: center; padding: var(--spacing-3) 0; gap: 0; }
+  /* The base `.nav-item:has(> i) { padding-right }` rule reserves space for
+     the label; in the icon rail that asymmetric pad shoves the subitem icons
+     (Pig Iron / Raw Materials / Sync) left of the centred .nav-section icons.
+     Higher specificity than that base rule, so it wins — every icon now
+     shares one centre axis. */
+  .sidebar .nav-item:has(> i:first-child) { padding-right: 0; }
+  /* Centre the logo mark so it shares the nav icons' centre line (both land
+     at x≈28 in the 56px rail). Without this the logo keeps its 22px left
+     pad and sits 6px off the centred icons below it. */
+  .sidebar .sidebar-logo { justify-content: center; padding-left: 0; padding-right: 0; }
 
-  .filter-row-primary,
-  .filter-row-secondary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Two columns from here down. Three would leave the collapsed set
+     (Search full-width + Warehouse + Subproduct) with an empty third
+     column beside the two selects; two columns pack it cleanly — Search
+     spans the row, Warehouse and Subproduct split the next. (The
+     disclosure itself is switched on in the ≤1280 block above.) */
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .field-wide { grid-column: span 3; }
+  .field-wide { grid-column: span 2; }
 }
 
 @media (max-width: 768px) {
-  .filter-row-primary,
-  .filter-row-secondary {
+  .filter-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .field-wide { grid-column: span 2; }
@@ -2044,12 +2382,35 @@ body {
   /* Header right: keep notifications, hide settings/logout to free
      space for the page title. The hidden controls live in the avatar
      menu in the production app. */
-  .header { padding: var(--s2) var(--s3); height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--s2); }
+  .header { padding: var(--spacing-2) 0; height: auto; min-height: 48px; flex-wrap: wrap; gap: var(--spacing-2); }
   .header-right .btn-icon:nth-child(n+2) { display: none; }
 
   /* Bulk-bar buttons shrink labels to icon-only at this width to fit. */
-  .bulk-bar .btn-secondary { padding-left: var(--s2); padding-right: var(--s2); }
+  .bulk-bar .btn-secondary { padding-left: var(--spacing-2); padding-right: var(--spacing-2); }
   .bulk-bar .btn-secondary > :not(i) { display: none; }
+
+  /* Tight: the view switch and Update collapse to icon-only to free space.
+     The active tab drops its label too — the pill + icon carry the state.
+     aria-labels keep every control's accessible name. */
+  .view-tab .view-tab-label { display: none; }
+  .view-tab { padding: 0 var(--spacing-3); }
+  .toolbar-right .btn-secondary .btn-label { display: none; }
+  .toolbar-right .btn-secondary { padding-left: var(--spacing-3); padding-right: var(--spacing-3); }
+}
+
+@media (max-width: 600px) {
+  /* Keep two columns even on a phone: dropping to one would push the
+     compact (collapsed) primary set past three rows, which is the whole
+     point of folding the secondary filters away. The 48px field height
+     keeps every control a comfortable touch target. */
+  .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .field-wide { grid-column: span 2; }
+
+  /* Toolbar: drop the inline toggles (they live in settings on a phone
+     build) and let the remaining controls wrap. */
+  .table-toolbar { flex-wrap: wrap; gap: var(--spacing-2); row-gap: var(--spacing-3); }
+  .toolbar-left { gap: var(--spacing-2); flex-wrap: wrap; }
+  .toolbar-left .toggle-label { display: none; }
 }
 
 /* Touch devices: enlarge tap targets. Pointer-precise devices keep
@@ -2065,6 +2426,8 @@ body {
 }
 
 </style>
+<!-- Shared theme controller: pre-paint + toggle wiring (must stay non-defer). -->
+<script src="theme.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 </head>
 <body>
@@ -2146,19 +2509,38 @@ body {
   <header class="header">
     <div class="header-left">
       <h1 class="page-title" id="page-title">Warehouse Movements</h1>
-      <span class="results-count" id="results-count" aria-live="polite"></span>
     </div>
     <div class="header-right">
-      <button type="button" class="btn-icon notif-btn" aria-label="Notifications (3 new)">
+      <button type="button" class="btn-icon notif-btn" data-tooltip="Notifications (3 new)" aria-label="Notifications (3 new)">
         <span class="notif-badge" aria-hidden="true"></span>
         <i class="ph ph-bell" style="font-size:20px" aria-hidden="true"></i>
       </button>
-      <button type="button" class="btn-icon" aria-label="Settings">
-        <i class="ph ph-gear" style="font-size:20px" aria-hidden="true"></i>
-      </button>
-      <button type="button" class="btn-icon" aria-label="Sign out" onclick="window.location.href='sem-001-login.html'">
-        <i class="ph ph-sign-out" style="font-size:20px" aria-hidden="true"></i>
-      </button>
+      <div class="header-menu-wrap">
+        <button type="button" class="btn-icon" id="settings-btn" data-tooltip="Account and settings" aria-label="Account and settings" aria-haspopup="menu" aria-expanded="false" onclick="toggleHeaderMenu(event)">
+          <i class="ph ph-squares-four" style="font-size:20px" aria-hidden="true"></i>
+        </button>
+        <div class="header-menu" id="header-menu" role="menu" aria-label="Account and settings">
+          <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('My profile isn\'t available in this prototype.'); closeHeaderMenu();">
+            <i class="ph ph-user-circle" aria-hidden="true"></i> My profile
+          </button>
+          <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('Change password isn\'t available in this prototype.'); closeHeaderMenu();">
+            <i class="ph ph-key" aria-hidden="true"></i> Change password
+          </button>
+          <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('User settings aren\'t available in this prototype.'); closeHeaderMenu();">
+            <i class="ph ph-gear-six" aria-hidden="true"></i> User settings
+          </button>
+          <button type="button" class="header-menu-item" id="hm-theme" role="menuitem" onclick="window.SemTheme.toggle(); syncMenuToggles();">
+            <i class="ph ph-sun" aria-hidden="true"></i> <span class="hm-label">Light theme</span>
+          </button>
+          <button type="button" class="header-menu-item" id="hm-lang" role="menuitem" onclick="toggleLang();">
+            <span class="flag fi fis fi-it" aria-hidden="true"></span> <span class="hm-label">Italiano</span>
+          </button>
+          <div class="header-menu-sep" role="separator"></div>
+          <button type="button" class="header-menu-item is-danger" role="menuitem" onclick="window.location.href='sem-001-login.html'">
+            <i class="ph ph-sign-out" aria-hidden="true"></i> Exit
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -2166,8 +2548,10 @@ body {
   <section class="toolbar">
   <div class="filters" id="filters">
 
-    <!-- Primary row: 4 always-visible filters + More disclosure -->
-    <div class="filter-row-primary">
+    <!-- One grid for all filters. The first three (Search, Warehouse,
+         Subproduct) always show; the rest carry .filter-secondary and fold
+         behind "More filters" once the viewport narrows (≤1024). -->
+    <div class="filter-grid" id="filter-grid">
       <label class="field field-wide" for="f-search" data-name="Search">
         <div class="field-row">
           <i class="ph ph-magnifying-glass" style="font-size:16px"></i>
@@ -2175,35 +2559,49 @@ body {
         </div>
       </label>
 
-      <div class="field is-select" data-name="Warehouse" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Warehouse" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Warehouse</span>
+      <div class="field is-combo" data-name="Warehouse" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="warehouse-listbox" aria-label="Warehouse"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="warehouse-label">Warehouse</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-warehouse" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="warehouse-listbox" aria-labelledby="warehouse-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Porto Marghera</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Taranto</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Gaeta</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Warehouse">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="warehouse-listbox" role="listbox" aria-label="Warehouse">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Porto Marghera</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Taranto</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Gaeta</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="field is-select" data-name="Subproduct" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Subproduct" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Subproduct</span>
+      <div class="field is-combo" data-name="Subproduct" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="subproduct-listbox" aria-label="Subproduct"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="subproduct-label">Subproduct</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-subproduct" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="subproduct-listbox" aria-labelledby="subproduct-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Standard</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">P10</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">P60</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Subproduct">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="subproduct-listbox" role="listbox" aria-label="Subproduct">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Standard</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">P10</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">P60</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="date-range" data-name="Date range" role="button" tabindex="0" aria-label="Date range — open picker" aria-haspopup="dialog" onclick="openDateRangePicker(event)">
+      <div class="date-range filter-secondary" data-name="Date range" role="button" tabindex="0" aria-label="Date range — open picker" aria-haspopup="dialog" onclick="openDateRangePicker(event)">
         <div class="field-row">
           <i class="ph ph-calendar-blank" style="font-size:16px" aria-hidden="true"></i>
           <span class="date-range-placeholder">Pick a date range</span>
@@ -2218,32 +2616,56 @@ body {
           <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
         </button>
       </div>
-
-    </div>
-
-    <div class="filter-row-secondary">
-      <label class="field" for="f-contract" data-name="Contract">
-        <span class="field-label">Contract</span>
+      <div class="field is-combo filter-secondary" data-name="Contract" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="contract-listbox" aria-label="Contract"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="contract-label">Contract</span>
         <div class="field-row">
-          <input type="text" id="f-contract" placeholder="All">
+          <input type="text" class="combo-input" id="f-contract" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="contract-listbox" aria-labelledby="contract-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-      </label>
-
-      <div class="field is-select" data-name="Vessel" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Vessel" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Vessel</span>
-        <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
-        </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Supra Monarch</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Desert Pioneer</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Amber Lagoon</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Contract">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="contract-listbox" role="listbox" aria-label="Contract">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Fonderie Cortiana</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">CAL.ME. S.P.A.</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Heidelberg Materials</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">SIPAG-BISALTA</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Acciaierie Venete</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Solvay Chimica</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">ZML Industries</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Carbofer Tecnologie</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Pontenossa S.P.A.</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Perucchini S.P.A.</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="tag-chip" id="tag-select" data-name="Tags" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Tags" onclick="toggleTagDropdown(event)">
+      <div class="field is-combo filter-secondary" data-name="Vessel" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="vessel-listbox" aria-label="Vessel"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="vessel-label">Vessel</span>
+        <div class="field-row">
+          <input type="text" class="combo-input" id="f-vessel" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="vessel-listbox" aria-labelledby="vessel-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
+        </div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Vessel">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="vessel-listbox" role="listbox" aria-label="Vessel">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Supra Monarch</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Desert Pioneer</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Amber Lagoon</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        </div>
+      </div>
+
+      <div class="tag-chip filter-secondary" id="tag-select" data-name="Tags" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Tags" onclick="toggleTagDropdown(event)">
         <span class="field-label" aria-hidden="true">Tags</span>
         <div class="field-row">
           <span class="tag-chip-text" id="tag-chip-text"><span class="tag-placeholder">All</span></span>
@@ -2259,32 +2681,56 @@ body {
         </div>
       </div>
 
-      <div class="field is-select" data-name="Destination" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Destination" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Destination</span>
+      <div class="field is-combo filter-secondary" data-name="Destination" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="destination-listbox" aria-label="Destination"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="destination-label">Destination</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-destination" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="destination-listbox" aria-labelledby="destination-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Italy</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Germany</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">France</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Destination">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="destination-listbox" role="listbox" aria-label="Destination">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Italy</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Germany</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">France</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="field is-select" data-name="Job order" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Job order" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Job order</span>
+      <div class="field is-combo filter-secondary" data-name="Job order" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="joborder-listbox" aria-label="Job order"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="joborder-label">Job order</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-joborder" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="joborder-listbox" aria-labelledby="joborder-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">JO-2026-001</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">JO-2026-002</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Job order">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="joborder-listbox" role="listbox" aria-label="Job order">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">JO-2026-001</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">JO-2026-002</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
+    </div>
+
+    <!-- More-filters disclosure: folds the secondary row away so the bar
+         never runs past three rows. -->
+    <div class="filters-more">
+      <button type="button" class="filters-more-btn" aria-expanded="false" aria-controls="filter-grid" onclick="toggleMoreFilters(this)">
+        <span class="filters-more-label">More filters</span>
+        <span class="filters-more-count" aria-hidden="true"></span>
+        <i class="ph-bold ph-caret-down filters-more-caret" style="font-size:14px" aria-hidden="true"></i>
+      </button>
     </div>
 
     <!-- Active filter chips -->
@@ -2298,13 +2744,13 @@ body {
   <div class="table-toolbar">
     <div class="toolbar-left">
       <div class="view-tabs" role="tablist" aria-label="View mode">
-        <button type="button" class="view-tab active" role="tab" aria-selected="true" onclick="selectViewTab(this)">
+        <button type="button" class="view-tab active" role="tab" aria-selected="true" aria-label="Table view" onclick="selectViewTab(this)">
           <i class="ph-bold ph-rows" style="font-size:16px" aria-hidden="true"></i>
-          Table
+          <span class="view-tab-label">Table</span>
         </button>
-        <button type="button" class="view-tab" role="tab" aria-selected="false" onclick="selectViewTab(this)">
+        <button type="button" class="view-tab" role="tab" aria-selected="false" aria-label="Cards view" onclick="selectViewTab(this)">
           <i class="ph-bold ph-squares-four" style="font-size:16px" aria-hidden="true"></i>
-          Cards
+          <span class="view-tab-label">Cards</span>
         </button>
       </div>
       <label class="toggle-label">
@@ -2317,9 +2763,9 @@ body {
       </label>
     </div>
     <div class="toolbar-right">
-      <button class="btn-secondary">
+      <button type="button" class="btn-secondary" aria-label="Update" onclick="runUpdate(this)">
         <i class="ph-bold ph-arrows-clockwise" style="font-size:16px"></i>
-        Update
+        <span class="btn-label">Update</span>
       </button>
       <button class="btn-primary">
         <i class="ph-bold ph-plus" style="font-size:16px"></i>
@@ -2341,10 +2787,10 @@ body {
     </div>
     <span class="bulk-count" id="bulk-count" aria-live="polite">0 selected</span>
     <div class="bulk-actions">
-      <button type="button" class="btn-secondary" onclick="alert('Export not wired in this prototype')">
+      <button type="button" class="btn-secondary" onclick="showToast('Export isn\'t available in this prototype.')">
         <i class="ph-bold ph-download-simple" style="font-size:16px" aria-hidden="true"></i> Export
       </button>
-      <button type="button" class="btn-secondary bulk-danger" onclick="alert('Delete not wired in this prototype')">
+      <button type="button" class="btn-secondary bulk-danger" onclick="deleteSelected()">
         <i class="ph-bold ph-trash" style="font-size:16px" aria-hidden="true"></i> Delete
       </button>
     </div>
@@ -2361,7 +2807,7 @@ body {
       <thead>
         <tr>
           <th scope="col" class="checkbox-cell" onclick="delegateToCheckbox(event, this)"><div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="Select all rows" onclick="event.stopPropagation();toggleAll(this)"><i class="ph-bold ph-check" aria-hidden="true"></i><i class="ph-bold ph-minus" aria-hidden="true"></i></div></th>
-          <th scope="col" class="sortable center" tabindex="0" aria-sort="none" onclick="sortCol(this)">Type</th>
+          <th scope="col" class="center">Type</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="descending" onclick="sortCol(this)">Warehouse</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Vessel</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Subproduct</th>
@@ -2370,7 +2816,7 @@ body {
           <th scope="col" class="sortable sort-icon-left" tabindex="0" aria-sort="none" onclick="sortCol(this)" style="text-align:right;">XAB</th>
           <th scope="col" class="sortable sort-icon-left" tabindex="0" aria-sort="none" onclick="sortCol(this)" style="text-align:right;">Quantity</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Contract</th>
-          <th scope="col" style="padding-left:var(--s4);">Actions</th>
+          <th scope="col" style="padding-left:var(--spacing-4);">Actions</th>
         </tr>
       </thead>
     </table>
@@ -2418,6 +2864,26 @@ var rows = [
    click handlers look the row up by uid. */
 rows.forEach(function(r, i) { r._uid = i; r._selected = false; });
 
+/* Prototype seed: Destination and Job order aren't in the source data
+   extract, so assign deterministic demo values by index so those filters
+   have something to act on. Tags are derived from subproduct + movement
+   type (see deriveTags) rather than stored per row. */
+var _DEST = ['Italy', 'Italy', 'Germany', 'Italy', 'France'];
+rows.forEach(function(r, i) {
+  r.dest = _DEST[i % _DEST.length];
+  r.job  = (i % 2) ? 'JO-2026-002' : 'JO-2026-001';
+});
+
+function deriveTags(r) {
+  var t = [];
+  if (r.sub === 'P10') t.push('P10');
+  if (r.sub === 'P60') t.push('P60');
+  if (typeof r.xab === 'number') t.push('XAB');
+  if (r.type === 'std') t.push('IRON');
+  if (r.type === 'edit') t.push('OEM');
+  return t;
+}
+
 function progressClass(filled, total) {
   var pct = filled / total;
   if (pct >= 1) return 'overrun';
@@ -2431,7 +2897,9 @@ function titleCase(s) {
 }
 
 function formatQty(n) {
-  return (n / 1000).toFixed(3).replace('.', ',') + ' Mt';
+  /* Absolute value — direction (in/out) is conveyed by the leading +/−
+     sign in .qty-sign. European decimal (comma) to match dd/mm/yyyy. */
+  return (Math.abs(n) / 1000).toFixed(3).replace('.', ',') + ' Mt';
 }
 
 function splitCustomer(s) {
@@ -2440,9 +2908,103 @@ function splitCustomer(s) {
   return { name: String(s), city: '' };
 }
 
+/* ─── Filtering ─────────────────────────────────────────
+   Read the committed value of every filter field and reduce the row set.
+   Fields left at "All" / empty are skipped, so an untouched filter never
+   excludes anything. (readField + _parseDate are hoisted declarations
+   defined further down.) */
+function collectFilters() {
+  var f = { tags: [] };
+  document.querySelectorAll('[data-name]').forEach(function(el) {
+    var name = el.getAttribute('data-name');
+    var items = readField(el);
+    if (el.classList.contains('tag-chip')) {
+      f.tags = items.map(function(i) { return i.value; });
+    } else if (el.classList.contains('date-range')) {
+      if (items.length) {
+        var parts = items[0].value.split(' — ');
+        f.dateStart = _parseDate(parts[0]);
+        f.dateEnd = _parseDate(parts[1]);
+      }
+    } else if (items.length) {
+      f[name] = items[0].value;
+    }
+  });
+  return f;
+}
+
+function hasActiveFilters() {
+  var f = collectFilters();
+  return !!(f.Search || f.Warehouse || f.Subproduct || f.Vessel || f.Contract
+    || f.Destination || f['Job order'] || f.dateStart || (f.tags && f.tags.length));
+}
+
+function matchesFilters(r, f) {
+  if (f.Warehouse && r.wh !== f.Warehouse) return false;
+  if (f.Subproduct && r.sub !== f.Subproduct) return false;
+  if (f.Destination && r.dest !== f.Destination) return false;
+  if (f['Job order'] && r.job !== f['Job order']) return false;
+  if (f.Vessel && titleCase((r.vessel || '').split('\n')[0]) !== f.Vessel) return false;
+  // Contract options are counterparty names; the row's customer string
+  // carries the full legal name, so match by substring.
+  if (f.Contract && r.cust.toLowerCase().indexOf(f.Contract.toLowerCase()) === -1) return false;
+  if (f.tags && f.tags.length) {
+    var rt = deriveTags(r);
+    if (!f.tags.some(function(t) { return rt.indexOf(t) !== -1; })) return false;
+  }
+  if (f.dateStart) {
+    var d = _parseDate(r.date);
+    if (d == null || d < f.dateStart) return false;
+    if (f.dateEnd && d > f.dateEnd) return false;
+  }
+  if (f.Search) {
+    var q = f.Search.toLowerCase();
+    var hay = [r.wh, r.vessel, r.sub, r.cust, r.cont, r.dest, r.job, String(r.xab)]
+      .join(' ').toLowerCase();
+    if (hay.indexOf(q) === -1) return false;
+  }
+  return true;
+}
+
+function getFilteredRows() {
+  var f = collectFilters();
+  return rows.filter(function(r) { return matchesFilters(r, f); });
+}
+
+/* Auto search toggle: when on, filters apply live; when off, the table
+   only refreshes on the Update button. */
+function isAutoSearch() {
+  var t = document.querySelector('.toggle-switch[aria-label^="Auto search"]');
+  return t ? t.classList.contains('on') : true;
+}
+
+function renderEmptyState() {
+  var active = hasActiveFilters();
+  return '<tr class="empty-row"><td colspan="11"><div class="empty-state">'
+    + '<i class="ph ph-package empty-icon" aria-hidden="true"></i>'
+    + '<p class="empty-title">' + (active
+        ? 'No movements match the current filters.'
+        : 'No movements yet.') + '</p>'
+    + (active
+        ? '<button type="button" class="btn-secondary" onclick="clearAllFilters()">'
+          + '<i class="ph-bold ph-x" style="font-size:16px" aria-hidden="true"></i>Clear all filters</button>'
+        : '')
+    + '</div></td></tr>';
+}
+
 function renderRows() {
   var tbody = document.getElementById('tbody');
-  tbody.innerHTML = rows.map(function(r) {
+  var visible = getFilteredRows();
+
+  if (!visible.length) {
+    tbody.innerHTML = renderEmptyState();
+    updateResultsCount(0);
+    updateBulkBar();
+    _queueSync();
+    return;
+  }
+
+  tbody.innerHTML = visible.map(function(r) {
     var parts = r.vessel.split('\n');
     var vName = parts[0], vNum = parts[1] || '';
     var pct = Math.min(r.filled / r.total, 1);
@@ -2454,9 +3016,13 @@ function renderRows() {
     var typeTitle = r.type === 'edit' ? 'Edit movement'
                    : r.type === 'other' ? 'Other movement'
                    : 'Standard movement';
-    var typeBadge = '<span class="move-icons" title="' + typeTitle + '">'
-      + '<i class="ph-fill ph-' + typeIconName + '"></i>'
-      + '<i class="ph-fill ph-truck"></i>'
+    // role=img + aria-label so the type is announced to screen readers /
+    // keyboard users, not just exposed via the hover title. The two glyphs
+    // themselves are decorative.
+    var typeLabel = typeTitle + ', transported by truck';
+    var typeBadge = '<span class="move-icons" role="img" aria-label="' + escAttr(typeLabel) + '">'
+      + '<i class="ph ph-' + typeIconName + '" data-tooltip="' + escAttr(typeTitle) + '" aria-hidden="true"></i>'
+      + '<i class="ph ph-truck" data-tooltip="Transported by truck" aria-hidden="true"></i>'
     + '</span>';
 
     var sel = r._selected ? ' selected' : '';
@@ -2464,51 +3030,61 @@ function renderRows() {
     var cbCheck = r._selected ? ' checked' : '';
     var cbAria = r._selected ? 'true' : 'false';
     return '<tr data-uid="' + r._uid + '" class="' + sel.trim() + '"' + ariaSel + ' onclick="toggleRow(this)">'
-      + '<td class="checkbox-cell"><div class="checkbox' + cbCheck + '" role="checkbox" tabindex="0" aria-checked="' + cbAria + '" aria-label="Select row ' + (r.xab || r.id) + '" onclick="event.stopPropagation();toggleRowCheckbox(this)"><i class="ph-bold ph-check" aria-hidden="true"></i></div></td>'
+      + '<td class="checkbox-cell"><div class="checkbox' + cbCheck + '" role="checkbox" tabindex="0" aria-checked="' + cbAria + '" aria-label="Select row ' + escAttr(r.xab || r.id) + '" onclick="event.stopPropagation();toggleRowCheckbox(this)"><i class="ph-bold ph-check" aria-hidden="true"></i></div></td>'
       + '<td class="move-cell">' + typeBadge + '</td>'
-      + '<td>' + r.wh + '</td>'
+      + '<td class="js-tip-trunc">' + escAttr(r.wh) + '</td>'
       + '<td><div class="vessel-cell">'
-        + '<span class="vessel-name">' + titleCase(vName) + '</span>'
-        + '<span class="vessel-num">' + vNum + '</span>'
+        + '<span class="vessel-name js-tip-trunc">' + escAttr(titleCase(vName)) + '</span>'
+        + '<span class="vessel-num">' + escAttr(vNum) + '</span>'
         + '</div></td>'
-      + '<td>' + r.sub + '</td>'
+      + '<td class="js-tip-trunc">' + escAttr(r.sub) + '</td>'
       + (function() {
           var c = splitCustomer(r.cust);
           return '<td><div class="cust-cell">'
-            + '<span class="cust-name">' + c.name + '</span>'
-            + (c.city ? '<span class="cust-city">' + c.city + '</span>' : '')
+            + '<span class="cust-name js-tip-trunc">' + escAttr(c.name) + '</span>'
+            + (c.city ? '<span class="cust-city">' + escAttr(c.city) + '</span>' : '')
             + '</div></td>';
         })()
-      + '<td class="num-cell">' + r.date + '</td>'
-      + '<td class="num-cell" style="text-align:right;">' + r.xab + '</td>'
-      + '<td class="qty-cell">' + (r.qty / 1000).toFixed(3) + ' Mt</td>'
+      + '<td class="num-cell">' + escAttr(r.date) + '</td>'
+      + '<td class="num-cell" style="text-align:right;">' + escAttr(r.xab) + '</td>'
+      + '<td class="qty-cell' + (r.qty < 0 ? ' qty-out' : '') + '">'
+        + '<span class="qty-sign" aria-hidden="true">' + (r.qty < 0 ? '−' : '+') + '</span>'
+        + '<span class="sr-only">' + (r.qty < 0 ? 'outbound ' : 'inbound ') + '</span>'
+        + formatQty(r.qty) + '</td>'
       + (function() {
           var C = 2 * Math.PI * 6;
           var off = C * (1 - pct);
           return '<td><div class="contract-cell">'
-            + '<span class="contract-badge"><span class="contract-prefix">№</span>' + r.cont + '</span>'
-            + '<div class="progress-wrap">'
+            + '<span class="contract-badge"><span class="contract-prefix">№</span>' + escAttr(r.cont) + '</span>'
+            + '<div class="progress-wrap ' + pClass + '">'
               + '<svg class="progress-ring" viewBox="0 0 16 16" aria-hidden="true">'
                 + '<circle class="progress-ring-track" cx="8" cy="8" r="6"/>'
                 + '<circle class="progress-ring-fill" cx="8" cy="8" r="6"'
                   + ' style="stroke-dasharray:' + C.toFixed(2) + ';stroke-dashoffset:' + off.toFixed(2) + ';"/>'
               + '</svg>'
               + '<span class="progress-label">'
-                + '<span class="progress-filled">' + r.filled.toLocaleString('en-US') + '</span>'
+                + '<span class="progress-filled">' + r.filled.toLocaleString('de-DE') + '</span>'
                 + '<span class="progress-sep">/</span>'
-                + '<span class="progress-total">' + r.total.toLocaleString('en-US') + '</span>'
+                + '<span class="progress-total">' + r.total.toLocaleString('de-DE') + '</span>'
               + '</span>'
             + '</div>'
           + '</div></td>';
         })()
-      + '<td><div class="row-actions">'
-        + '<button type="button" class="act-btn" aria-label="Open document for ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
-        + '<button type="button" class="act-btn" aria-label="View row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
-        + '<button type="button" class="act-btn" aria-label="Flag row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
-        + '<button type="button" class="act-btn" aria-label="Delete row ' + (r.xab || r.id) + '"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
-      + '</div></td>'
+      + (function() {
+          var lbl = escAttr(r.xab || r.id);
+          return '<td><div class="row-actions">'
+            + '<button type="button" class="act-btn" data-tooltip="Open document" aria-label="Open document for ' + lbl + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="View details" aria-label="View row ' + lbl + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="Flag movement" aria-label="Flag row ' + lbl + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="Delete movement" aria-label="Delete row ' + lbl + '" onclick="event.stopPropagation();deleteRow(' + r._uid + ')"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
+          + '</div></td>';
+        })()
       + '</tr>';
   }).join('');
+  // Rebuilding tbody wipes col-sorted off the body cells (the header th keeps
+  // it, so the column looked "covered by the rows"). Re-apply it to the fresh
+  // cells every render. Safe when nothing is sorted (idx null → no-op).
+  applySortedCol(sortedColIdx);
   updateResultsCount();
   updateBulkBar();
   _queueSync();
@@ -2547,6 +3123,10 @@ function syncHeadColumnWidths() {
   if (!_tHead || !_tBody) return;
   var bodyRows = _tBody.tBodies[0] && _tBody.tBodies[0].rows;
   if (!bodyRows || !bodyRows.length) return;
+  // Skip while the body shows a non-data state (empty / error use a
+  // colspan row; skeleton uses placeholder cells) — measuring those would
+  // corrupt the per-column widths. Keep the last good widths instead.
+  if (!_tBody.querySelector('tbody tr[data-uid]')) return;
 
   // Write pass 1: release pinned widths so the browser can measure
   // natural content width.
@@ -2563,7 +3143,7 @@ function syncHeadColumnWidths() {
   // Range on the text node only; body width is the cell boundingRect
   // (already includes its own 32px padding, so subtract before
   // comparing with the header text).
-  var PAD = 32;        // var(--s4) * 2
+  var PAD = 32;        // var(--spacing-4) * 2
   var ICON_SPACE = 22; // 14px sort icon + 8px gap
   var widths = new Array(_tHeadCells.length);
   var _range = document.createRange();
@@ -2662,10 +3242,11 @@ if (document.readyState === 'loading') {
   _installSyncObserver();
 }
 
-function updateResultsCount() {
+function updateResultsCount(n) {
   var el = document.getElementById('results-count');
   if (!el) return;
-  var n = document.querySelectorAll('#tbody tr').length;
+  // Count only real data rows (empty/skeleton rows carry no data-uid).
+  if (typeof n !== 'number') n = document.querySelectorAll('#tbody tr[data-uid]').length;
   el.innerHTML = '<strong>' + n + '</strong> ' + (n === 1 ? 'movement' : 'movements');
 }
 
@@ -2749,21 +3330,15 @@ function delegateToCheckbox(e, wrapper) {
 }
 
 function toggleAll(cb) {
-  var total = rows.length;
-  var checked = rows.filter(function(r) { return r._selected; }).length;
-  if (checked === total && total > 0) {
+  // Operate on the currently visible (filtered) rows only — "select all"
+  // shouldn't reach rows the active filters have hidden.
+  var vis = getFilteredRows();
+  var allSel = vis.length > 0 && vis.every(function(r) { return r._selected; });
+  if (allSel) {
     clearSelection();
   } else {
-    rows.forEach(function(r) { r._selected = true; });
-    document.querySelectorAll('#tbody .checkbox').forEach(function(c) {
-      c.classList.add('checked');
-      c.setAttribute('aria-checked', 'true');
-    });
-    document.querySelectorAll('#tbody tr').forEach(function(tr) {
-      tr.classList.add('selected');
-      tr.setAttribute('aria-selected', 'true');
-    });
-    updateBulkBar();
+    vis.forEach(function(r) { r._selected = true; });
+    renderRows();
   }
 }
 
@@ -2826,7 +3401,7 @@ function _cmp(a, b, type) {
   return a - b;
 }
 var SORT_COMPARATORS = {
-  1: { get: function(r){ return r.type; },                              type: 'string' },
+  /* Index 1 (Type) is intentionally non-sortable — no comparator. */
   2: { get: function(r){ return r.wh; },                                type: 'string' },
   3: { get: function(r){ return (r.vessel||'').split('\n')[0]; },       type: 'string' },
   4: { get: function(r){ return r.sub; },                               type: 'string' },
@@ -2879,6 +3454,20 @@ function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('collapsed');
 }
 
+/* Reveal/hide the secondary filter row behind the "More filters" toggle.
+   The primary row stays put; only the folded set and the caret + label
+   flip. Active filters hiding in the collapsed section are surfaced via
+   the button's count badge (updated in syncFilters). */
+function toggleMoreFilters(btn) {
+  var filters = document.getElementById('filters');
+  var open = filters.classList.toggle('show-more');
+  if (btn) {
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var lbl = btn.querySelector('.filters-more-label');
+    if (lbl) lbl.textContent = open ? 'Fewer filters' : 'More filters';
+  }
+}
+
 function selectNav(el) {
   document.querySelectorAll('.nav-section, .nav-item').forEach(function(n) {
     n.classList.remove('active');
@@ -2886,6 +3475,68 @@ function selectNav(el) {
   });
   el.classList.add('active');
   el.setAttribute('aria-current', 'page');
+}
+
+function toggleLegend(e) {
+  e.stopPropagation();
+  var btn = document.getElementById('legend-btn');
+  var wrap = btn.parentElement;
+  var open = wrap.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeLegend() {
+  var wrap = document.querySelector('.legend-wrap.open');
+  if (!wrap) return false;
+  wrap.classList.remove('open');
+  var btn = wrap.querySelector('#legend-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+  return true;
+}
+
+/* ─── Header account / settings menu ─────────────────── */
+function toggleHeaderMenu(e) {
+  if (e) e.stopPropagation();
+  var wrap = document.querySelector('.header-menu-wrap');
+  if (!wrap) return;
+  var open = wrap.classList.toggle('open');
+  var btn = document.getElementById('settings-btn');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeHeaderMenu() {
+  var wrap = document.querySelector('.header-menu-wrap.open');
+  if (!wrap) return false;
+  wrap.classList.remove('open');
+  var btn = wrap.querySelector('#settings-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+  return true;
+}
+var _menuLang = 'it';
+/* Keep the theme + language rows showing the CURRENT state (glyph + label);
+   clicking either one flips it. */
+function syncMenuToggles() {
+  var light = document.documentElement.getAttribute('data-theme') === 'light';
+  var themeItem = document.getElementById('hm-theme');
+  if (themeItem) {
+    var ti = themeItem.querySelector('i');
+    var tl = themeItem.querySelector('.hm-label');
+    /* Label names the ACTION (what the click does), not the current state:
+       in dark you see "Light theme" (switch to light), and vice versa. */
+    if (ti) ti.className = 'ph ' + (light ? 'ph-moon' : 'ph-sun');
+    if (tl) tl.textContent = light ? 'Dark theme' : 'Light theme';
+    themeItem.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+  }
+  var langItem = document.getElementById('hm-lang');
+  if (langItem) {
+    var lf = langItem.querySelector('.flag');
+    var ll = langItem.querySelector('.hm-label');
+    if (lf) lf.className = 'flag fi fis ' + (_menuLang === 'it' ? 'fi-it' : 'fi-gb');
+    if (ll) ll.textContent = _menuLang === 'it' ? 'Italiano' : 'English';
+  }
+}
+function toggleLang() {
+  _menuLang = _menuLang === 'it' ? 'en' : 'it';
+  syncMenuToggles();
+  showToast(_menuLang === 'it' ? 'Lingua impostata su Italiano (prototipo).' : 'Language set to English (prototype).');
 }
 
 function selectViewTab(el) {
@@ -2922,7 +3573,7 @@ function clearDateRange(e) {
 }
 
 function closeOpenDropdowns(except) {
-  document.querySelectorAll('.field.is-select.open, .tag-chip.open').forEach(function(d) {
+  document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open').forEach(function(d) {
     if (d !== except) {
       d.classList.remove('open');
       d.setAttribute('aria-expanded', 'false');
@@ -2992,6 +3643,109 @@ function selectOption(opt) {
   syncFilters();
 }
 
+/* ─── Searchable combobox (Contract) ───────────────────
+   Commit-only model: field.dataset.value + .has-value = the committed
+   selection; the input's live text is just the query. Closing without a
+   commit reverts the text to the committed value. */
+function comboField(input) { return input.closest('.field.is-combo'); }
+function comboOptions(field) {
+  return Array.prototype.slice.call(field.querySelectorAll('.custom-option'));
+}
+function comboVisibleOptions(field) {
+  return comboOptions(field).filter(function(o){ return o.style.display !== 'none'; });
+}
+function setComboActive(field, opt) {
+  comboOptions(field).forEach(function(o){ o.classList.remove('combo-active'); });
+  if (opt) {
+    opt.classList.add('combo-active');
+    opt.scrollIntoView({ block: 'nearest' });
+  }
+}
+function openCombo(input) {
+  var field = comboField(input);
+  closeOpenDropdowns(field);
+  field.classList.add('open');
+  field.setAttribute('aria-expanded', 'true');
+  // show all options fresh on open
+  comboOptions(field).forEach(function(o){ o.style.display = ''; });
+  field.querySelector('.combo-empty').style.display = 'none';
+  setComboActive(field, null);
+  input.select();
+}
+function closeCombo(input) {
+  var field = comboField(input);
+  field.classList.remove('open');
+  field.setAttribute('aria-expanded', 'false');
+  setComboActive(field, null);
+  // revert any uncommitted query back to the committed value
+  input.value = field.classList.contains('has-value') ? (field.getAttribute('data-value') || '') : '';
+}
+function filterCombo(input) {
+  var field = comboField(input);
+  var q = input.value.trim().toLowerCase();
+  var any = false;
+  comboOptions(field).forEach(function(o){
+    var match = o.textContent.toLowerCase().indexOf(q) !== -1;
+    o.style.display = match ? '' : 'none';
+    if (match) any = true;
+  });
+  field.querySelector('.combo-empty').style.display = any ? 'none' : 'block';
+  setComboActive(field, null);
+}
+function commitCombo(field, opt) {
+  var input = field.querySelector('.combo-input');
+  var value = opt.textContent.trim();
+  input.value = value;
+  field.setAttribute('data-value', value);
+  field.classList.add('has-value');
+  comboOptions(field).forEach(function(o){ o.classList.remove('is-selected'); });
+  opt.classList.add('is-selected');
+  field.classList.remove('open');
+  field.setAttribute('aria-expanded', 'false');
+  syncFilters();
+  input.blur();
+}
+function selectCombo(e, opt) {
+  // mousedown handler: preventDefault keeps focus on the input through the click
+  e.preventDefault();
+  commitCombo(comboField(opt), opt);
+}
+function resetCombo(field) {
+  var input = field.querySelector('.combo-input');
+  input.value = '';
+  field.removeAttribute('data-value');
+  field.classList.remove('has-value');
+  comboOptions(field).forEach(function(o){ o.classList.remove('is-selected'); o.style.display = ''; });
+  field.querySelector('.combo-empty').style.display = 'none';
+}
+function clearCombo(e) {
+  e.stopPropagation();
+  var field = e.target.closest('.field.is-combo');
+  resetCombo(field);
+  syncFilters();
+  field.querySelector('.combo-input').focus();
+}
+function comboKeydown(e, input) {
+  var field = comboField(input);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!field.classList.contains('open')) { openCombo(input); }
+    var vis = comboVisibleOptions(field);
+    if (!vis.length) return;
+    var cur = field.querySelector('.custom-option.combo-active');
+    var idx = vis.indexOf(cur);
+    if (e.key === 'ArrowDown') idx = idx < vis.length - 1 ? idx + 1 : 0;
+    else idx = idx > 0 ? idx - 1 : vis.length - 1;
+    setComboActive(field, vis[idx]);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    var target = field.querySelector('.custom-option.combo-active') || comboVisibleOptions(field)[0];
+    if (target) commitCombo(field, target);
+  } else if (e.key === 'Escape') {
+    if (field.classList.contains('open')) { e.preventDefault(); input.blur(); }
+  }
+}
+
 /* ─── Wave A: filter sync ──────────────────────────── */
 
 function readField(el) {
@@ -3009,6 +3763,10 @@ function readField(el) {
     return Array.from(checked).map(function(c) {
       return { name: name, value: c.value, tag: c.value };
     });
+  }
+  if (el.classList.contains('is-combo')) {
+    if (!el.classList.contains('has-value')) return [];
+    return [{ name: name, value: el.getAttribute('data-value') || '' }];
   }
   if (el.classList.contains('is-select')) {
     if (!el.classList.contains('has-value')) return [];
@@ -3031,6 +3789,7 @@ function clearField(name) {
       updateTagChip();
       return;
     }
+    if (el.classList.contains('is-combo')) { resetCombo(el); return; }
     if (el.classList.contains('is-select')) {
       el.querySelector('.custom-select-value').textContent = '';
       el.classList.remove('has-value');
@@ -3054,6 +3813,19 @@ function escAttr(s) {
     return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
   });
 }
+
+/* Debounce: collapse a burst of calls into one trailing call. Used for
+   the live text inputs so a fast typist doesn't re-filter + re-render on
+   every keystroke (matters once the dataset grows past a few rows). */
+function debounce(fn, wait) {
+  var t = null;
+  return function() {
+    var ctx = this, args = arguments;
+    clearTimeout(t);
+    t = setTimeout(function() { fn.apply(ctx, args); }, wait);
+  };
+}
+var debouncedSync = debounce(syncFilters, 200);
 
 function syncFilters() {
   var actives = [];
@@ -3082,6 +3854,21 @@ function syncFilters() {
     filters.classList.remove('has-chips');
     chipsContainer.innerHTML = '';
   }
+
+  // Badge the "More filters" toggle with how many active filters are hiding
+  // in the collapsed secondary section, so a folded-away filter still shows.
+  var SECONDARY_FILTERS = ['Date range', 'Contract', 'Vessel', 'Tags', 'Destination', 'Job order'];
+  var hiddenActive = actives.filter(function(a) { return SECONDARY_FILTERS.indexOf(a.name) !== -1; }).length;
+  var moreBtn = document.querySelector('.filters-more-btn');
+  if (moreBtn) {
+    var moreCount = moreBtn.querySelector('.filters-more-count');
+    if (moreCount) moreCount.textContent = hiddenActive ? hiddenActive : '';
+    moreBtn.classList.toggle('has-count', hiddenActive > 0);
+  }
+
+  // Apply the filters to the table live when Auto search is on; otherwise
+  // the chips update but the table waits for the Update button.
+  if (isAutoSearch()) renderRows();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -3120,11 +3907,12 @@ document.addEventListener('DOMContentLoaded', function() {
     cb.addEventListener('change', updateTagChip);
   });
 
-  // Sync filter chips bar + More count on any input change
+  // Sync filter chips bar + table on any text input (debounced).
   document.querySelectorAll('.field input[type=text]').forEach(function(input) {
-    input.addEventListener('input', syncFilters);
+    input.addEventListener('input', debouncedSync);
   });
   syncFilters();
+  syncMenuToggles();
 
   // Close any open dropdown when clicking outside
   document.addEventListener('click', function(e) {
@@ -3133,12 +3921,16 @@ document.addEventListener('DOMContentLoaded', function() {
       chip.classList.remove('open');
       chip.setAttribute('aria-expanded', 'false');
     }
-    document.querySelectorAll('.field.is-select.open').forEach(function(f) {
+    document.querySelectorAll('.field.is-select.open, .field.is-combo.open').forEach(function(f) {
       if (!f.contains(e.target)) {
         f.classList.remove('open');
         f.setAttribute('aria-expanded', 'false');
       }
     });
+    var lw = document.querySelector('.legend-wrap.open');
+    if (lw && !lw.contains(e.target)) closeLegend();
+    var hm = document.querySelector('.header-menu-wrap.open');
+    if (hm && !hm.contains(e.target)) closeHeaderMenu();
   });
 });
 
@@ -3152,7 +3944,9 @@ document.addEventListener('keydown', function(e) {
 
   // Escape closes any open dropdown (and the date picker if open).
   if (e.key === 'Escape') {
-    var open = document.querySelectorAll('.field.is-select.open, .tag-chip.open');
+    if (closeHeaderMenu()) { e.preventDefault(); return; }
+    if (closeLegend()) { e.preventDefault(); return; }
+    var open = document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open');
     if (open.length) {
       open.forEach(function(d) {
         d.classList.remove('open');
@@ -3179,6 +3973,115 @@ document.addEventListener('keydown', function(e) {
     t.click();
   }
 });
+
+/* ─── Update (skeleton refresh) ────────────────────────
+   The Update button simulates a refetch: paint skeleton rows, then
+   re-render once "data" settles. While in flight the button is disabled
+   (aria-busy + spinner) so a refresh can't be double-fired.
+
+   Failure path: set `window._simulateError = true` and click Update to
+   exercise the failed-load state + Retry (there's no real backend to
+   fail on its own). Retry calls runUpdate() again. */
+var _loadTimer = null;
+function _setUpdateBusy(btn, busy) {
+  if (!btn) return;
+  btn.disabled = busy;
+  btn.setAttribute('aria-busy', busy ? 'true' : 'false');
+  var ic = btn.querySelector('i');
+  if (ic) ic.classList.toggle('spin', busy);
+}
+function renderErrorState() {
+  return '<tr class="error-row"><td colspan="11"><div class="empty-state">'
+    + '<i class="ph ph-warning-circle empty-icon" style="color:var(--status-error-fg)" aria-hidden="true"></i>'
+    + '<p class="empty-title">Couldn\'t load movements.</p>'
+    + '<p class="empty-sub">Check your connection, then try again.</p>'
+    + '<button type="button" class="btn-secondary" onclick="runUpdate()">'
+      + '<i class="ph-bold ph-arrows-clockwise" style="font-size:16px" aria-hidden="true"></i>Retry</button>'
+    + '</div></td></tr>';
+}
+function runUpdate(btn) {
+  var tbody = document.getElementById('tbody');
+  _setUpdateBusy(btn, true);
+  tbody.innerHTML = Array.from({ length: 8 }).map(function() {
+    return '<tr class="skeleton-row">' + Array.from({ length: 11 }).map(function(_, i) {
+      var w = i === 0 ? '16px' : (35 + ((i * 17) % 55)) + '%';
+      return '<td><span class="skel" style="width:' + w + '"></span></td>';
+    }).join('') + '</tr>';
+  }).join('');
+  clearTimeout(_loadTimer);
+  _loadTimer = setTimeout(function() {
+    if (window._simulateError) {
+      tbody.innerHTML = renderErrorState();
+      updateResultsCount(0);
+      updateBulkBar();
+      _queueSync();
+    } else {
+      renderRows();
+    }
+    _setUpdateBusy(btn, false);
+  }, 700);
+}
+
+/* ─── Delete with undo ─────────────────────────────────
+   Destructive actions remove rows from the data immediately, then offer
+   a 6s undo toast — cheaper for the user than a blocking confirm dialog,
+   and fully reversible. */
+var _undoTimer = null;
+function deleteRow(uid) {
+  var idx = rows.findIndex(function(r) { return r._uid === uid; });
+  if (idx < 0) return;
+  var removed = [{ row: rows[idx], idx: idx }];
+  rows.splice(idx, 1);
+  renderRows();
+  showUndoToast(removed, '1 movement deleted');
+}
+function deleteSelected() {
+  var removed = [];
+  rows.forEach(function(r, i) { if (r._selected) removed.push({ row: r, idx: i }); });
+  if (!removed.length) return;
+  rows = rows.filter(function(r) { return !r._selected; });
+  renderRows();
+  showUndoToast(removed, removed.length + ' movement' + (removed.length === 1 ? '' : 's') + ' deleted');
+}
+/* Generic toast. `action` is optional: { label, onClick }. One toast at a
+   time; auto-dismisses after `timeout` ms. The single feedback channel for
+   the whole page, so the alert() native dialogs don't reappear. */
+function showToast(msg, action, timeout) {
+  var stack = document.getElementById('toast-stack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.id = 'toast-stack';
+    stack.className = 'toast-stack';
+    document.body.appendChild(stack);
+  }
+  stack.innerHTML = '';
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.innerHTML = '<span class="toast-msg">' + escAttr(msg) + '</span>'
+    + (action ? '<button type="button" class="toast-undo">' + escAttr(action.label) + '</button>' : '');
+  if (action) {
+    toast.querySelector('.toast-undo').addEventListener('click', function() {
+      clearTimeout(_undoTimer);
+      stack.innerHTML = '';
+      action.onClick();
+    });
+  }
+  stack.appendChild(toast);
+  clearTimeout(_undoTimer);
+  _undoTimer = setTimeout(function() { stack.innerHTML = ''; }, timeout || 6000);
+}
+
+function showUndoToast(removed, msg) {
+  showToast(msg, { label: 'Undo', onClick: function() {
+    // Reinsert at original indices (ascending) so positions are restored.
+    removed.sort(function(a, b) { return a.idx - b.idx; }).forEach(function(item) {
+      item.row._selected = false;
+      rows.splice(Math.min(item.idx, rows.length), 0, item.row);
+    });
+    renderRows();
+  } });
+}
 
 renderRows();
 
@@ -3276,6 +4179,241 @@ document.addEventListener('mousedown', function() {
   new ResizeObserver(updateThumb).observe(wrap);
   if (head) new ResizeObserver(updateThumb).observe(head);
   updateThumb();
+})();
+
+/* Give every sidebar nav item (and the collapse button) a tooltip built
+   from its own label, so the collapsed/rail sidebar can name each icon on
+   hover. The tooltip controller only surfaces these while the label itself
+   is hidden, so an expanded sidebar shows none. */
+(function() {
+  document.querySelectorAll('.sidebar .nav-item, .sidebar .nav-section:not(.is-group)').forEach(function(el) {
+    var label = el.querySelector('.nav-label');
+    if (label && !el.hasAttribute('data-tooltip')) el.setAttribute('data-tooltip', label.textContent.trim());
+  });
+  var collapseBtn = document.querySelector('.collapse-btn');
+  if (collapseBtn && !collapseBtn.hasAttribute('data-tooltip')) collapseBtn.setAttribute('data-tooltip', 'Collapse sidebar');
+})();
+
+/* ─── Tooltip controller ───────────────────────────────
+   One shared chip, delegated over the whole document. Two trigger kinds:
+   - [data-tooltip]: always show the attribute text (icon buttons, type
+     badge) — on hover (delayed) and immediately on keyboard focus.
+   - .js-tip-trunc: show the element's own text only when it's actually
+     clipped (scrollWidth > clientWidth), so full-width cells stay quiet.
+   Dismisses on leave, scroll, resize, Escape, and any mousedown. */
+(function() {
+  var tip = document.createElement('div');
+  tip.className = 'tooltip';
+  tip.id = 'app-tooltip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+
+  var showTimer = null, current = null;
+  var DELAY = 350;
+
+  function resolve(el) {
+    return el && el.closest ? el.closest('[data-tooltip], .js-tip-trunc') : null;
+  }
+  function textFor(t) {
+    var explicit = t.getAttribute('data-tooltip');
+    if (explicit) {
+      // Sidebar nav: the label IS the tooltip, so only show it when the
+      // label is hidden (collapsed rail). If the label is on screen, skip.
+      if (t.closest('.sidebar')) {
+        var label = t.querySelector('.nav-label');
+        if (label && label.offsetParent !== null) return null;
+      }
+      return explicit;
+    }
+    if (t.classList.contains('js-tip-trunc') && t.scrollWidth > t.clientWidth + 1) {
+      return t.textContent.trim();
+    }
+    return null;
+  }
+  function place(t) {
+    var r = t.getBoundingClientRect();
+    var w = tip.offsetWidth, h = tip.offsetHeight, m = 8, gap = 8;
+    var left = r.left + r.width / 2 - w / 2;
+    left = Math.max(m, Math.min(left, window.innerWidth - w - m));
+    var top = r.top - h - gap;            // prefer above
+    if (top < m) top = r.bottom + gap;    // flip below when no room
+    tip.style.left = Math.round(left) + 'px';
+    tip.style.top = Math.round(top) + 'px';
+  }
+  function show(t) {
+    var txt = textFor(t);
+    if (!txt) return;
+    current = t;
+    tip.textContent = txt;
+    place(t);
+    requestAnimationFrame(function() { tip.classList.add('visible'); });
+  }
+  function hide() {
+    current = null;
+    tip.classList.remove('visible');
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    var t = resolve(e.target);
+    if (!t || t === current) return;
+    clearTimeout(showTimer);
+    showTimer = setTimeout(function() { show(t); }, DELAY);
+  });
+  document.addEventListener('mouseout', function(e) {
+    var t = resolve(e.target);
+    if (!t) return;
+    if (e.relatedTarget && t.contains(e.relatedTarget)) return; // moved within
+    clearTimeout(showTimer);
+    hide();
+  });
+  // Keyboard focus: show at once (only for explicit-text triggers).
+  document.addEventListener('focusin', function(e) {
+    var t = e.target.closest && e.target.closest('[data-tooltip]');
+    if (!t) return;
+    clearTimeout(showTimer);
+    show(t);
+  });
+  document.addEventListener('focusout', function() { clearTimeout(showTimer); hide(); });
+  window.addEventListener('scroll', hide, true);
+  window.addEventListener('resize', hide);
+  document.addEventListener('mousedown', hide);
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') hide(); });
+})();
+
+/* ─── Row context menu (right-click) ───────────────────
+   Right-clicking a table row opens an in-design menu at the pointer
+   instead of the browser's native one. Single-row menu by default; if
+   the row is part of a multi-row selection, a selection-scoped menu
+   (export / clear / delete N) is shown instead. Arrow-key navigable,
+   closes on Escape / outside click / scroll / resize. */
+(function() {
+  var tbody = document.getElementById('tbody');
+  if (!tbody) return;
+
+  var menu = document.createElement('div');
+  menu.className = 'context-menu';
+  menu.id = 'row-context-menu';
+  menu.setAttribute('role', 'menu');
+  menu.style.display = 'none';
+  document.body.appendChild(menu);
+
+  var targetTr = null;
+
+  function head(t) { return '<div class="context-menu-head">' + escAttr(t) + '</div>'; }
+  function sep() { return '<div class="context-menu-sep" role="separator"></div>'; }
+  function item(action, icon, label, cls) {
+    return '<button type="button" role="menuitem" class="context-menu-item ' + (cls || '') + '" data-action="' + action + '">'
+      + '<i class="ph-bold ' + icon + '" aria-hidden="true"></i><span>' + escAttr(label) + '</span></button>';
+  }
+
+  function buildMenu(uid) {
+    var row = rows.find(function(r) { return r._uid === uid; });
+    if (!row) return '';
+    var selected = rows.filter(function(r) { return r._selected; });
+    if (row._selected && selected.length > 1) {
+      var n = selected.length;
+      return head(n + ' movements selected')
+        + item('export', 'ph-download-simple', 'Export selection')
+        + sep()
+        + item('clearsel', 'ph-x-circle', 'Clear selection')
+        + sep()
+        + item('deletesel', 'ph-trash', 'Delete ' + n + ' movements', 'cm-danger');
+    }
+    return head('XAB ' + (row.xab || row.id))
+      + item('open', 'ph-file-text', 'Open document')
+      + item('view', 'ph-eye', 'View details')
+      + sep()
+      + item('copyxab', 'ph-copy', 'Copy XAB')
+      + item('copycont', 'ph-copy', 'Copy contract №')
+      + sep()
+      + (row._selected
+          ? item('deselect', 'ph-check-square', 'Deselect row')
+          : item('select', 'ph-square', 'Select row'))
+      + item('flag', 'ph-flag', 'Flag movement')
+      + sep()
+      + item('delete', 'ph-trash', 'Delete movement', 'cm-danger');
+  }
+
+  function openAt(x, y, uid, tr) {
+    menu.innerHTML = buildMenu(uid);
+    menu.dataset.uid = uid;
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    menu.classList.remove('open');
+    // Clamp inside the viewport (flip up / left when near an edge).
+    var mw = menu.offsetWidth, mh = menu.offsetHeight, m = 8;
+    var left = Math.max(m, Math.min(x, window.innerWidth - mw - m));
+    var top = Math.max(m, Math.min(y, window.innerHeight - mh - m));
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.style.visibility = '';
+    requestAnimationFrame(function() { menu.classList.add('open'); });
+    if (targetTr) targetTr.classList.remove('context-target');
+    targetTr = tr;
+    if (tr) tr.classList.add('context-target');
+    var first = menu.querySelector('.context-menu-item');
+    if (first) first.focus();
+  }
+  function close() {
+    if (menu.style.display === 'none') return;
+    menu.classList.remove('open');
+    menu.style.display = 'none';
+    if (targetTr) { targetTr.classList.remove('context-target'); targetTr = null; }
+  }
+
+  function copy(text, label) {
+    var done = function() { showToast('Copied ' + label + '.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else { done(); }
+  }
+  function run(action, uid) {
+    var row = rows.find(function(r) { return r._uid === uid; });
+    switch (action) {
+      case 'open': showToast('Document view isn\'t available in this prototype.'); break;
+      case 'view': showToast('Detail view isn\'t available in this prototype.'); break;
+      case 'copyxab': if (row) copy(String(row.xab), 'XAB ' + row.xab); break;
+      case 'copycont': if (row) copy(String(row.cont), 'contract № ' + row.cont); break;
+      case 'select': if (row) { row._selected = true; renderRows(); } break;
+      case 'deselect': if (row) { row._selected = false; renderRows(); } break;
+      case 'flag': showToast('Movement flagged.'); break;
+      case 'delete': deleteRow(uid); break;
+      case 'deletesel': deleteSelected(); break;
+      case 'export': showToast('Export isn\'t available in this prototype.'); break;
+      case 'clearsel': clearSelection(); break;
+    }
+  }
+
+  tbody.addEventListener('contextmenu', function(e) {
+    var tr = e.target.closest('tr[data-uid]');
+    if (!tr) return;
+    e.preventDefault();
+    openAt(e.clientX, e.clientY, +tr.dataset.uid, tr);
+  });
+  menu.addEventListener('click', function(e) {
+    var it = e.target.closest('.context-menu-item');
+    if (!it) return;
+    var action = it.dataset.action;
+    var uid = +menu.dataset.uid;
+    close();
+    run(action, uid);
+  });
+  menu.addEventListener('keydown', function(e) {
+    var items = Array.prototype.slice.call(menu.querySelectorAll('.context-menu-item'));
+    if (!items.length) return;
+    var idx = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); (items[idx + 1] || items[0]).focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (items[idx - 1] || items[items.length - 1]).focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  });
+
+  document.addEventListener('mousedown', function(e) { if (!menu.contains(e.target)) close(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+  window.addEventListener('resize', close);
+  var wrap = document.querySelector('.table-wrap');
+  if (wrap) wrap.addEventListener('scroll', close, { passive: true });
 })();
 </script>
 </body>
