@@ -309,7 +309,7 @@ body.keyboard-nav th.sortable:focus-visible {
      light, lighter in dark — always more contrast than the bg — and clearly
      blue. text-brand (blue-700 light / blue-300 dark) stays readable on it;
      the ::before accent bar reinforces the brand cue. */
-  color: var(--text-brand);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 16%, var(--bg-page));
   font-weight: 600;
 }
@@ -371,7 +371,7 @@ body.keyboard-nav th.sortable:focus-visible {
    and the active item visually reverts to white-on-dim. */
 .nav-section.active:hover,
 .nav-item.active:hover {
-  color: var(--text-brand);
+  color: var(--blue-450);
   background: color-mix(in oklch, var(--brand-bg-default) 22%, var(--bg-page));
 }
 
@@ -1204,7 +1204,7 @@ label.field:has(input[type=text]) { cursor: text; }
    the tab's 15%. Stays clearly subordinate to the solid-blue Add CTA. */
 .toolbar-right .btn-secondary {
   background: color-mix(in oklch, color-mix(in oklch, var(--brand-bg-default) 65%, var(--neutral-400)) 16%, transparent);
-  color: var(--text-brand);
+  color: var(--blue-450);
 }
 .toolbar-right .btn-secondary:hover {
   background: color-mix(in oklch, color-mix(in oklch, var(--brand-bg-default) 65%, var(--neutral-400)) 24%, transparent);
@@ -2076,8 +2076,20 @@ body {
 .legend-sep { height: 1px; background: var(--border-subtle); margin: var(--spacing-1) 0; }
 
 /* ─── Empty state ────────────────────────────────────── */
-.empty-row td { height: auto; border: none; }
-.empty-row:hover td { background: transparent; }
+.empty-row td, .error-row td { height: auto; border: none; }
+/* Empty / error state fills the whole scroll area so the message centers
+   vertically (td is vertical-align:middle) instead of pinning to the top. */
+.table-wrap:has(.empty-row) > table,
+.table-wrap:has(.error-row) > table { height: 100%; }
+/* No row-hover wash over the placeholder (keep its resting surface). */
+.empty-row:hover td, .error-row:hover td { background: transparent; box-shadow: none; }
+/* The empty / error state is the only body row, so it falls on nth-child(odd)
+   and would otherwise pick up the light-theme blue zebra wash and read as a
+   tinted band. Keep it flush on the table surface (transparent) so the message
+   stays quiet. Specificity here (.empty-row + :not(.selected) + data-theme)
+   beats the nth-child(odd) zebra rule. */
+[data-theme="light"] tbody tr.empty-row:not(.selected) td,
+[data-theme="light"] tbody tr.error-row:not(.selected) td { background: var(--bg-elevated); }
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -2090,6 +2102,9 @@ body {
 .empty-icon { font-size: 40px; color: var(--text-disabled); }
 .empty-title { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
 .empty-sub { font-size: 13px; font-weight: 500; color: var(--text-tertiary); margin-top: -6px; }
+/* Clear-all-filters action uses the active-tab text colour (blue-450), like
+   the active sidebar item and the Update button — keeps its neutral surface. */
+.empty-state .btn-secondary { color: var(--blue-450); }
 
 /* Disabled / busy buttons (e.g. Update mid-refresh). */
 .btn-primary:disabled,
