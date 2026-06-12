@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
 
 
 <link rel="stylesheet" href="tokens.css">
@@ -87,6 +88,8 @@
 [data-theme="light"] .tag-dropdown,
 [data-theme="light"] .custom-select-dropdown,
 [data-theme="light"] .legend-pop,
+[data-theme="light"] .context-menu,
+[data-theme="light"] .header-menu,
 [data-theme="light"] .toast {
   box-shadow: 0 16px 40px rgba(17, 24, 39, .14), 0 4px 12px rgba(17, 24, 39, .08);
 }
@@ -99,12 +102,17 @@
 [data-theme="light"] .tag-dropdown,
 [data-theme="light"] .custom-select-dropdown,
 [data-theme="light"] .legend-pop,
+[data-theme="light"] .context-menu,
+[data-theme="light"] .header-menu,
 [data-theme="light"] .toast {
   border: none;
 }
 [data-theme="light"] .flatpickr-calendar {
   border: none !important;
 }
+/* Toast on the white elevated surface in light theme (matches the menus /
+   popovers), not the grey neutral-200 overlay. */
+[data-theme="light"] .toast { background: var(--bg-elevated); }
 
 /* ─── Icons ──────────────────────────────────────────── */
 .ph { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; line-height: 1; }
@@ -302,7 +310,7 @@ body.keyboard-nav th.sortable:focus-visible {
      blue. text-brand (blue-700 light / blue-300 dark) stays readable on it;
      the ::before accent bar reinforces the brand cue. */
   color: var(--text-brand);
-  background: color-mix(in oklch, var(--brand-bg-default) 24%, var(--bg-page));
+  background: color-mix(in oklch, var(--brand-bg-default) 16%, var(--bg-page));
   font-weight: 600;
 }
 .nav-section.active::before,
@@ -364,7 +372,7 @@ body.keyboard-nav th.sortable:focus-visible {
 .nav-section.active:hover,
 .nav-item.active:hover {
   color: var(--text-brand);
-  background: color-mix(in oklch, var(--brand-bg-default) 32%, var(--bg-page));
+  background: color-mix(in oklch, var(--brand-bg-default) 22%, var(--bg-page));
 }
 
 .nav-subitem { /* same padding as nav-section */ }
@@ -380,6 +388,10 @@ body.keyboard-nav th.sortable:focus-visible {
   margin: var(--spacing-2) 0;
 }
 [data-theme="light"] .nav-divider { background: var(--border-strong); }
+/* The logo's bottom border is the separator above the first group
+   (Contracts). border-default (neutral-200) is near-invisible on the light
+   sidebar, so lift it to border-strong to match the nav dividers. */
+[data-theme="light"] .sidebar-logo { border-bottom-color: var(--border-strong); }
 
 .sidebar-collapse {
   flex-shrink: 0;
@@ -417,6 +429,14 @@ body.keyboard-nav th.sortable:focus-visible {
 /* ─── Main ───────────────────────────────────────────── */
 .main {
   flex: 1;
+  /* Flex children default to min-width:auto (= content size), which lets the
+     wide data table push .main past the viewport — the filter grid then
+     inherits that over-wide width and its right columns spill off-screen.
+     Pin min-width:0 so .main always shrinks to the available row space and
+     the grid's minmax(0,1fr) columns can do their job. On desktop the
+     overflow:hidden below already implied this; the ≤1024 override flips it
+     to overflow:visible, so the explicit min-width:0 is what holds there. */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -474,8 +494,11 @@ body.keyboard-nav th.sortable:focus-visible {
   gap: var(--spacing-2);
   flex-shrink: 0;
 }
-.filter-row-primary,
-.filter-row-secondary {
+/* All filters live in ONE grid so the nine fields flow continuously and
+   pack without holes (Search spans 2 → 10 column-units → exactly two rows
+   of 5 on the widest layout). The secondary fields carry .filter-secondary
+   so the narrow-screen disclosure can fold just them away. */
+.filter-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--spacing-2);
@@ -654,9 +677,15 @@ label.field:has(input[type=text]) { cursor: text; }
 }
 .field.is-select.open .custom-select-dropdown { display: block; }
 .field.is-select .field-caret,
+.field.is-combo .field-caret,
 .tag-chip .field-caret { transition: transform .15s; }
 .field.is-select.open .field-caret,
+.field.is-combo.open .field-caret,
 .tag-chip.open .field-caret { transform: translateY(-50%) rotate(180deg); }
+/* Combo carries both a chevron (dropdown affordance) and a clear button.
+   Show the chevron at rest; once a contract is chosen the clear X takes
+   its place (same right slot), so they never overlap. */
+.field.is-combo.has-value .field-caret { display: none; }
 .custom-option {
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-sm);
@@ -690,6 +719,11 @@ label.field:has(input[type=text]) { cursor: text; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Committed tag values read at full input-fg, matching the Contract / Vessel
+   value text. (.tag-chip rests at the dimmer placeholder colour, which made
+   the chosen tags look lighter/thinner than the other fields.) The "All"
+   placeholder keeps its muted colour. */
+.tag-chip.has-value .tag-chip-text { color: var(--input-fg); }
 .tag-counter {
   position: absolute;
   right: calc(var(--spacing-3) + 22px + 6px);
@@ -1239,7 +1273,7 @@ th {
   background: var(--table-header-bg);
   color: var(--table-header-fg);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 0 var(--spacing-4);
@@ -1298,8 +1332,8 @@ th.sortable:hover .sort-preview { opacity: 0.7; }
 .table-zone:has(.table-head-wrap th:nth-child(10):hover) .table-wrap td:nth-child(10) {
   /* Hover preview of the whole column before clicking to sort. Neutral wash
      (text-primary auto-adapts per theme) so it reads as "hover", distinct from
-     the sorted column's faint blue. The old white-2% was invisible in light. */
-  box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 2%, transparent);
+     the sorted column's cool-grey tint. Kept light at 1%. */
+  box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 1%, transparent);
 }
 th.center { text-align: center; }
 
@@ -1316,7 +1350,13 @@ td {
 }
 
 tbody tr:nth-child(even) td { background: var(--table-row-zebra); }
-tbody tr:hover td { background: var(--table-row-bg-hover); }
+/* Row hover: a neutral ink/white wash laid as an inset box-shadow so it
+   LAYERS over the row's resting background (white OR the blue zebra) instead
+   of replacing it. A translucent `background` reset the cell to the card
+   colour, so on the darker zebra rows the hover landed ~equal to the resting
+   tint and vanished. As a shadow the delta is consistent on every row.
+   text-primary adapts per theme: darkens in light, lightens in dark. */
+tbody tr:hover td { box-shadow: inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 35%, var(--text-primary)) 5%, transparent); }
 /* On hover, promote every text tier one step up so the row reads as
    the foreground focus: tertiary → secondary, secondary → primary.
    Brand colour (progress-filled) is left alone — it's already the
@@ -1347,10 +1387,11 @@ tbody tr.selected:nth-child(even) td { background: var(--surface-selected-strong
    neutral (neutral-500) shifted 20% toward blue-500, then laid at 11% →
    ~0.96: an off-white grey that sits clearly between the darkened canvas
    (~0.91) and the white rows (1.0), with only a hint of blue.
-   :not(:hover):not(.selected) lets hover/selection rules keep winning; the
-   selected "strong" tint follows onto the tinted odd rows. */
-[data-theme="light"] tbody tr:nth-child(odd):not(:hover):not(.selected) td  { background: color-mix(in oklch, color-mix(in oklch, var(--blue-500) 20%, var(--neutral-500)) 11%, transparent); }
-[data-theme="light"] tbody tr:nth-child(even):not(:hover):not(.selected) td { background: transparent; }
+   Only :not(.selected) now — the zebra background STAYS on hover so the
+   hover box-shadow can layer over it (otherwise the wash lands on white and
+   vanishes against the zebra). Selection still overrides it. */
+[data-theme="light"] tbody tr:nth-child(odd):not(.selected) td  { background: color-mix(in oklch, color-mix(in oklch, var(--blue-500) 20%, var(--neutral-500)) 11%, transparent); }
+[data-theme="light"] tbody tr:nth-child(even):not(.selected) td { background: transparent; }
 [data-theme="light"] tbody tr.selected:nth-child(odd) td  { background: var(--surface-selected-strong); }
 [data-theme="light"] tbody tr.selected:nth-child(even) td { background: var(--table-row-bg-selected); }
 /* Selected row: everything inside (text + icons + action buttons)
@@ -1374,21 +1415,35 @@ tbody tr.selected .progress-filled     { color: var(--text-primary); }
 /* Active-sort column: semi-transparent tint layered ON TOP of zebra /
    hover / selected via inset box-shadow (background untouched, so the
    stripes underneath still read). Plus primary text in body. */
-/* A faint, clean cool-blue wash down the sorted column — enough hue that it
-   doesn't read as muddy grey, but far lighter than the active selection (~24%)
-   so it doesn't look "selected". */
-tbody td.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--blue-500) 3%, transparent); }
-thead th.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--blue-500) 4.5%, transparent); }
+/* A faint cool-GREY wash down the sorted column. The tint is blue-500 mixed
+   ~35% into neutral-400 (same lightness, ~half the chroma) so it reads as a
+   cool grey with only a whisper of blue — not a blue stripe — while the
+   active sort arrow + primary text still mark the column. Grey reads weaker
+   than the old blue at the same opacity, so it's lifted to 7%/9% to stay
+   visible. !important so it wins over the column hover-preview (which has a
+   very high :has() specificity and would otherwise mask the sorted tint the
+   moment the cursor sits on the header — i.e. right after a sort click). */
+tbody td.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 25%, var(--neutral-400)) 5%, transparent) !important; }
+thead th.col-sorted { box-shadow: inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 25%, var(--neutral-400)) 7%, transparent) !important; }
+/* Hovered row's sorted cell: stack the row-hover wash ON TOP of the sort tint
+   (two box-shadow layers) so the hover reads THROUGH the column instead of the
+   column looking like a solid block the hover skips over. */
+tbody tr:hover:not(.selected) td.col-sorted {
+  box-shadow:
+    inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 35%, var(--text-primary)) 5%, transparent),
+    inset 0 0 0 1000px color-mix(in oklch, color-mix(in oklch, var(--blue-500) 25%, var(--neutral-400)) 5%, transparent) !important;
+}
 /* On a selected row the brand tint is already the dominant signal —
    stacking the sort-column highlight on top of it just muddies the
    colour without adding info. Strip it for selected rows. */
-tbody tr.selected td.col-sorted { box-shadow: none; }
+tbody tr.selected td.col-sorted { box-shadow: none !important; }
 /* Once a row is checked, focus shifts from "sorting" to "acting on
    the selection". Drop the column-sort tint everywhere — head + body —
-   so the table reads as one consistent surface under bulk-mode. */
+   so the table reads as one consistent surface under bulk-mode.
+   !important to override the now-!important col-sorted tint above. */
 .table-zone:has(tr.selected) thead th.col-sorted,
 .table-zone:has(tr.selected) tbody td.col-sorted {
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 /* (Previously: 5px box-shadow extensions painted into the scrollbar
@@ -1466,6 +1521,11 @@ thead .checkbox {
      they read lighter / less contrasty than the row text. */
   color: var(--text-tertiary);
 }
+.move-icons > i { transition: color .12s; }
+/* Each glyph highlights independently: hovering the type icon or the
+   transport icon lifts just that one to the brand hue (each carries its
+   own tooltip too). */
+.move-icons > i:hover { color: var(--brand-bg-default); }
 
 /* ─── Vessel cell ────────────────────────────────────── */
 .vessel-cell {
@@ -1732,8 +1792,75 @@ svg { flex-shrink: 0; }
      was too muted/light to pop against the bell. */
   background: var(--status-notification);
   border-radius: 50%;
-  border: 1.5px solid var(--bg-elevated);
 }
+
+/* ─── Header account / settings menu ─────────────────── */
+.header-menu-wrap { position: relative; display: inline-flex; }
+/* Pressed (menu open): solid brand fill. */
+.header-menu-wrap.open > .btn-icon { background: var(--brand-bg-default); color: var(--brand-fg); }
+.header-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 224px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  padding: var(--spacing-2);
+  z-index: 80;
+  /* Column with a small gap between rows so the items breathe. */
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+.header-menu-wrap.open .header-menu { display: flex; }
+.header-menu-sep { height: 1px; background: var(--border-subtle); margin: 0; }
+.header-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  /* Taller rows (12px vertical) for a roomier menu. */
+  padding: var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-family: var(--font-family-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+/* Leading glyph slot — icon or a flag emoji — kept the same width so the
+   labels line up. */
+.header-menu-item > i,
+.header-menu-item > .flag {
+  width: 18px;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: color .12s;
+}
+/* Round flag chip (flag-icons square flag, circle-cropped). */
+.header-menu-item .flag {
+  height: 18px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+}
+.header-menu-item:hover { background: color-mix(in oklch, var(--brand-bg-default) 10%, transparent); }
+.header-menu-item:hover > i { color: var(--brand-bg-default); }
+/* Destructive last item (Exit): neutral at rest, reveals the error hue on
+   hover — same treatment as the table's delete row action. */
+.header-menu-item.is-danger:hover { background: color-mix(in oklch, var(--red-500) 12%, transparent); color: var(--status-error-fg); }
+.header-menu-item.is-danger:hover > i { color: var(--status-error-fg); }
 
 /* ─── Zones (islands layout) ─────────────────────────── */
 body {
@@ -2039,23 +2166,174 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
 }
 .toast-undo:hover { background: var(--surface-hover); }
 
+/* ─── Tooltip ─────────────────────────────────────────
+   One shared floating chip, JS-positioned. A dark chip with WHITE text in
+   both themes: dark uses the lifted bg-overlay, light uses a dark slate
+   (neutral-800) so it reads as the classic dark tooltip on the white card.
+   Shown on hover (delayed) and on focus; a truncated cell only gets a
+   tooltip when its text is actually clipped. */
+.tooltip {
+  position: fixed;
+  z-index: 300;
+  max-width: 320px;
+  padding: 6px var(--spacing-2);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 20px rgba(0,0,0,.38);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity .12s ease-out, transform .12s ease-out;
+}
+.tooltip.visible { opacity: 1; transform: translateY(0); }
+/* Light: white elevated chip (from --bg-elevated) with the soft navy popover
+   shadow, so the tooltip lifts off the white card without a hard border. */
+[data-theme="light"] .tooltip {
+  box-shadow: 0 10px 28px rgba(17,24,39,.16), 0 3px 10px rgba(17,24,39,.09);
+}
+
+/* ─── Row context menu (right-click) ──────────────────
+   Same elevated-menu family as the filter dropdowns. Opens at the
+   pointer, clamped to the viewport, arrow-key navigable. Destructive
+   items take the error hue on hover, matching the row action buttons. */
+.context-menu {
+  position: fixed;
+  z-index: 250;
+  min-width: 212px;
+  max-width: 280px;
+  padding: var(--spacing-1);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  opacity: 0;
+  transform: scale(.97);
+  transform-origin: top left;
+  transition: opacity .1s ease-out, transform .1s ease-out;
+}
+.context-menu.open { opacity: 1; transform: scale(1); }
+.context-menu-head {
+  padding: var(--spacing-2) var(--spacing-3) var(--spacing-1);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+.context-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  text-align: left;
+  transition: background .1s, color .1s;
+}
+.context-menu-item > i { font-size: 16px; color: var(--text-tertiary); flex-shrink: 0; transition: color .1s; }
+.context-menu-item:hover { background: var(--surface-hover); }
+.context-menu-item:hover > i { color: var(--text-secondary); }
+.context-menu-item.cm-danger { color: var(--status-error-fg); }
+.context-menu-item.cm-danger > i { color: var(--status-error-fg); }
+.context-menu-item.cm-danger:hover { background: color-mix(in oklch, var(--red-500) 12%, transparent); }
+.context-menu-sep { height: 1px; background: var(--border-subtle); margin: var(--spacing-1); }
+/* The row whose menu is open gets a neutral wash + a brand left-edge so the
+   target stays unambiguous while the menu floats over the table. Painted as
+   an inset box-shadow (like the column hover-preview) so it layers over the
+   zebra / selected backgrounds in BOTH themes regardless of their higher
+   specificity — a plain `background` would lose to the light zebra rule. */
+tbody tr.context-target td { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 3%, transparent); }
+tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mix(in oklch, var(--text-primary) 3%, transparent), inset 2px 0 0 var(--brand-bg-default); }
+
+/* ─── Filters disclosure ("More filters") ─────────────
+   The page carries nine filters. Only the primary set (search + the two
+   key selects, Warehouse + Subproduct) stays visible; the secondary set
+   (date range, contract, vessel, tags, destination, job order) folds
+   behind this toggle so the primary row packs cleanly and the bar never
+   runs past three rows at any width. A brand count badge flags active
+   filters hiding in the collapsed section. */
+/* Wide viewports fit all nine filters in ≤3 rows, so everything stays
+   visible and the disclosure is hidden. The collapse only switches on at
+   ≤1024 (see the media query), where the secondary set would otherwise
+   spill to a fourth row. */
+.filters-more { display: none; }
+.filters-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  height: 32px;
+  padding: 0 var(--spacing-3) 0 var(--spacing-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-brand);
+  font-family: var(--font-family-sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.filters-more-btn:hover { background: var(--surface-hover); }
+.filters-more-caret { transition: transform .15s; }
+.filters.show-more .filters-more-caret { transform: rotate(180deg); }
+.filters-more-count {
+  display: none;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  align-items: center; justify-content: center;
+  background: var(--brand-bg-subtle);
+  color: var(--text-brand);
+  border-radius: 9999px;
+  font-size: 11px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.filters-more-btn.has-count .filters-more-count { display: inline-flex; }
+/* Open section: the fields speak for themselves, so drop the count badge. */
+.filters.show-more .filters-more-count { display: none !important; }
+
 /* ─── Responsive ──────────────────────────────────────
-   Scope: this is an admin tool for operations staff on a desktop
-   workstation. Phone is intentionally out of scope. The breakpoints
-   below ensure the layout survives a half-screen laptop and a
-   landscape tablet without catastrophic clipping.
+   An ops tool that lives on a desktop workstation but must survive a
+   tablet and a phone without clipping. The filter grid steps down a
+   column at a time; on a phone the fields stack one-up and tuck behind
+   a disclosure so the table keeps the screen.
    - ≤1280: filter grid 5→4 cols (Search keeps span 2).
    - ≤1024: sidebar collapses to a 56px icon rail; filter grid 3 cols;
-            body+main start scrolling instead of clipping.
-   - ≤768:  filter grid 2 cols; header right collapses notification
-            button only; sidebar overlays the page when expanded.
+            body+main start scrolling instead of clipping. (Tablet.)
+   - ≤768:  filter grid 2 cols; header right collapses to the
+            notification button only.
+   - ≤600:  filter grid 1 col, every field full width; the filter rows
+            collapse behind the toolbar "Filters" toggle, chips stay on
+            as the summary; inline toggles drop from the toolbar. (Phone.)
    Touch (hover:none): row + nav targets grow to ≥44px. */
 
 @media (max-width: 1280px) {
-  .filter-row-primary,
-  .filter-row-secondary {
+  .filter-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  /* Below the widest (5-col) layout, fold the secondary filters behind the
+     disclosure so narrowing never adds rows — that's the whole point of the
+     toggle: preserve height. Collapsed here it's a single clean row (Search
+     spans 2 + Warehouse + Subproduct fill the four columns exactly). These
+     rules cascade to every narrower breakpoint too. */
+  .filters:not(.show-more) .filter-secondary { display: none; }
+  .filters-more { display: flex; }
 }
 
 @media (max-width: 1024px) {
@@ -2073,17 +2351,30 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   .sidebar .nav-divider { display: none; }
   .sidebar .nav-section,
   .sidebar .nav-item { justify-content: center; padding: var(--spacing-3) 0; gap: 0; }
+  /* The base `.nav-item:has(> i) { padding-right }` rule reserves space for
+     the label; in the icon rail that asymmetric pad shoves the subitem icons
+     (Pig Iron / Raw Materials / Sync) left of the centred .nav-section icons.
+     Higher specificity than that base rule, so it wins — every icon now
+     shares one centre axis. */
+  .sidebar .nav-item:has(> i:first-child) { padding-right: 0; }
+  /* Centre the logo mark so it shares the nav icons' centre line (both land
+     at x≈28 in the 56px rail). Without this the logo keeps its 22px left
+     pad and sits 6px off the centred icons below it. */
+  .sidebar .sidebar-logo { justify-content: center; padding-left: 0; padding-right: 0; }
 
-  .filter-row-primary,
-  .filter-row-secondary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Two columns from here down. Three would leave the collapsed set
+     (Search full-width + Warehouse + Subproduct) with an empty third
+     column beside the two selects; two columns pack it cleanly — Search
+     spans the row, Warehouse and Subproduct split the next. (The
+     disclosure itself is switched on in the ≤1280 block above.) */
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .field-wide { grid-column: span 3; }
+  .field-wide { grid-column: span 2; }
 }
 
 @media (max-width: 768px) {
-  .filter-row-primary,
-  .filter-row-secondary {
+  .filter-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .field-wide { grid-column: span 2; }
@@ -2097,6 +2388,29 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   /* Bulk-bar buttons shrink labels to icon-only at this width to fit. */
   .bulk-bar .btn-secondary { padding-left: var(--spacing-2); padding-right: var(--spacing-2); }
   .bulk-bar .btn-secondary > :not(i) { display: none; }
+
+  /* Tight: the view switch and Update collapse to icon-only to free space.
+     The active tab drops its label too — the pill + icon carry the state.
+     aria-labels keep every control's accessible name. */
+  .view-tab .view-tab-label { display: none; }
+  .view-tab { padding: 0 var(--spacing-3); }
+  .toolbar-right .btn-secondary .btn-label { display: none; }
+  .toolbar-right .btn-secondary { padding-left: var(--spacing-3); padding-right: var(--spacing-3); }
+}
+
+@media (max-width: 600px) {
+  /* Keep two columns even on a phone: dropping to one would push the
+     compact (collapsed) primary set past three rows, which is the whole
+     point of folding the secondary filters away. The 48px field height
+     keeps every control a comfortable touch target. */
+  .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .field-wide { grid-column: span 2; }
+
+  /* Toolbar: drop the inline toggles (they live in settings on a phone
+     build) and let the remaining controls wrap. */
+  .table-toolbar { flex-wrap: wrap; gap: var(--spacing-2); row-gap: var(--spacing-3); }
+  .toolbar-left { gap: var(--spacing-2); flex-wrap: wrap; }
+  .toolbar-left .toggle-label { display: none; }
 }
 
 /* Touch devices: enlarge tap targets. Pointer-precise devices keep
@@ -2139,7 +2453,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
       <i class="ph ph-package" style="font-size:20px" aria-hidden="true"></i>
       <span class="nav-label">Raw Materials</span>
     </button>
-    <div class="nav-divider" role="presentation" style="background:transparent"></div>
+    <div class="nav-divider" role="presentation"></div>
 
     <div class="nav-section is-group" role="presentation">
       <span class="nav-label">Operations</span>
@@ -2195,22 +2509,38 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   <header class="header">
     <div class="header-left">
       <h1 class="page-title" id="page-title">Warehouse Movements</h1>
-      <span class="results-count" id="results-count" aria-live="polite"></span>
     </div>
     <div class="header-right">
-      <button type="button" class="btn-icon notif-btn" aria-label="Notifications (3 new)">
+      <button type="button" class="btn-icon notif-btn" data-tooltip="Notifications (3 new)" aria-label="Notifications (3 new)">
         <span class="notif-badge" aria-hidden="true"></span>
         <i class="ph ph-bell" style="font-size:20px" aria-hidden="true"></i>
       </button>
-      <button type="button" class="btn-icon" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">
-        <i class="ph ph-sun" style="font-size:20px" aria-hidden="true"></i>
-      </button>
-      <button type="button" class="btn-icon" aria-label="Settings">
-        <i class="ph ph-gear" style="font-size:20px" aria-hidden="true"></i>
-      </button>
-      <button type="button" class="btn-icon" aria-label="Sign out" onclick="window.location.href='sem-001-login.html'">
-        <i class="ph ph-sign-out" style="font-size:20px" aria-hidden="true"></i>
-      </button>
+      <div class="header-menu-wrap">
+        <button type="button" class="btn-icon" id="settings-btn" data-tooltip="Account and settings" aria-label="Account and settings" aria-haspopup="menu" aria-expanded="false" onclick="toggleHeaderMenu(event)">
+          <i class="ph ph-squares-four" style="font-size:20px" aria-hidden="true"></i>
+        </button>
+        <div class="header-menu" id="header-menu" role="menu" aria-label="Account and settings">
+          <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('My profile isn\'t available in this prototype.'); closeHeaderMenu();">
+            <i class="ph ph-user-circle" aria-hidden="true"></i> My profile
+          </button>
+          <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('Change password isn\'t available in this prototype.'); closeHeaderMenu();">
+            <i class="ph ph-key" aria-hidden="true"></i> Change password
+          </button>
+          <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('User settings aren\'t available in this prototype.'); closeHeaderMenu();">
+            <i class="ph ph-gear-six" aria-hidden="true"></i> User settings
+          </button>
+          <button type="button" class="header-menu-item" id="hm-theme" role="menuitem" onclick="window.SemTheme.toggle(); syncMenuToggles();">
+            <i class="ph ph-sun" aria-hidden="true"></i> <span class="hm-label">Light theme</span>
+          </button>
+          <button type="button" class="header-menu-item" id="hm-lang" role="menuitem" onclick="toggleLang();">
+            <span class="flag fi fis fi-it" aria-hidden="true"></span> <span class="hm-label">Italiano</span>
+          </button>
+          <div class="header-menu-sep" role="separator"></div>
+          <button type="button" class="header-menu-item is-danger" role="menuitem" onclick="window.location.href='sem-001-login.html'">
+            <i class="ph ph-sign-out" aria-hidden="true"></i> Exit
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -2218,8 +2548,10 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   <section class="toolbar">
   <div class="filters" id="filters">
 
-    <!-- Primary row: 4 always-visible filters + More disclosure -->
-    <div class="filter-row-primary">
+    <!-- One grid for all filters. The first three (Search, Warehouse,
+         Subproduct) always show; the rest carry .filter-secondary and fold
+         behind "More filters" once the viewport narrows (≤1024). -->
+    <div class="filter-grid" id="filter-grid">
       <label class="field field-wide" for="f-search" data-name="Search">
         <div class="field-row">
           <i class="ph ph-magnifying-glass" style="font-size:16px"></i>
@@ -2227,35 +2559,49 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
         </div>
       </label>
 
-      <div class="field is-select" data-name="Warehouse" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Warehouse" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Warehouse</span>
+      <div class="field is-combo" data-name="Warehouse" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="warehouse-listbox" aria-label="Warehouse"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="warehouse-label">Warehouse</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-warehouse" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="warehouse-listbox" aria-labelledby="warehouse-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Porto Marghera</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Taranto</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Gaeta</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Warehouse">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="warehouse-listbox" role="listbox" aria-label="Warehouse">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Porto Marghera</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Taranto</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Gaeta</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="field is-select" data-name="Subproduct" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Subproduct" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Subproduct</span>
+      <div class="field is-combo" data-name="Subproduct" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="subproduct-listbox" aria-label="Subproduct"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="subproduct-label">Subproduct</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-subproduct" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="subproduct-listbox" aria-labelledby="subproduct-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Standard</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">P10</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">P60</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Subproduct">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="subproduct-listbox" role="listbox" aria-label="Subproduct">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Standard</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">P10</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">P60</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="date-range" data-name="Date range" role="button" tabindex="0" aria-label="Date range — open picker" aria-haspopup="dialog" onclick="openDateRangePicker(event)">
+      <div class="date-range filter-secondary" data-name="Date range" role="button" tabindex="0" aria-label="Date range — open picker" aria-haspopup="dialog" onclick="openDateRangePicker(event)">
         <div class="field-row">
           <i class="ph ph-calendar-blank" style="font-size:16px" aria-hidden="true"></i>
           <span class="date-range-placeholder">Pick a date range</span>
@@ -2270,19 +2616,15 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
           <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
         </button>
       </div>
-
-    </div>
-
-    <div class="filter-row-secondary">
-      <div class="field is-combo" data-name="Contract" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="contract-listbox" aria-label="Contract"
+      <div class="field is-combo filter-secondary" data-name="Contract" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="contract-listbox" aria-label="Contract"
            onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
         <span class="field-label" id="contract-label">Contract</span>
         <div class="field-row">
-          <i class="ph ph-magnifying-glass" style="font-size:16px" aria-hidden="true"></i>
           <input type="text" class="combo-input" id="f-contract" placeholder="All"
                  autocomplete="off" spellcheck="false" role="searchbox"
                  aria-autocomplete="list" aria-controls="contract-listbox" aria-labelledby="contract-label"
                  onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
         <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Contract">
           <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
@@ -2302,21 +2644,28 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
         </div>
       </div>
 
-      <div class="field is-select" data-name="Vessel" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Vessel" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Vessel</span>
+      <div class="field is-combo filter-secondary" data-name="Vessel" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="vessel-listbox" aria-label="Vessel"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="vessel-label">Vessel</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-vessel" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="vessel-listbox" aria-labelledby="vessel-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Supra Monarch</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Desert Pioneer</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Amber Lagoon</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Vessel">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="vessel-listbox" role="listbox" aria-label="Vessel">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Supra Monarch</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Desert Pioneer</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Amber Lagoon</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="tag-chip" id="tag-select" data-name="Tags" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Tags" onclick="toggleTagDropdown(event)">
+      <div class="tag-chip filter-secondary" id="tag-select" data-name="Tags" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Tags" onclick="toggleTagDropdown(event)">
         <span class="field-label" aria-hidden="true">Tags</span>
         <div class="field-row">
           <span class="tag-chip-text" id="tag-chip-text"><span class="tag-placeholder">All</span></span>
@@ -2332,32 +2681,56 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
         </div>
       </div>
 
-      <div class="field is-select" data-name="Destination" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Destination" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Destination</span>
+      <div class="field is-combo filter-secondary" data-name="Destination" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="destination-listbox" aria-label="Destination"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="destination-label">Destination</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-destination" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="destination-listbox" aria-labelledby="destination-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Italy</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">Germany</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">France</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Destination">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="destination-listbox" role="listbox" aria-label="Destination">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Italy</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Germany</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">France</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
 
-      <div class="field is-select" data-name="Job order" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Job order" onclick="toggleSelect(event, this)">
-        <span class="field-label" aria-hidden="true">Job order</span>
+      <div class="field is-combo filter-secondary" data-name="Job order" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="joborder-listbox" aria-label="Job order"
+           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
+        <span class="field-label" id="joborder-label">Job order</span>
         <div class="field-row">
-          <span class="custom-select-value" data-placeholder="All"></span>
-          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px"></i>
+          <input type="text" class="combo-input" id="f-joborder" placeholder="All"
+                 autocomplete="off" spellcheck="false" role="searchbox"
+                 aria-autocomplete="list" aria-controls="joborder-listbox" aria-labelledby="joborder-label"
+                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <div class="custom-select-dropdown" role="listbox" onclick="event.stopPropagation()">
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">All</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">JO-2026-001</div>
-          <div class="custom-option" role="option" tabindex="-1" onclick="selectOption(this)">JO-2026-002</div>
+        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Job order">
+          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
+        </button>
+        <div class="custom-select-dropdown" id="joborder-listbox" role="listbox" aria-label="Job order">
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">JO-2026-001</div>
+          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">JO-2026-002</div>
+          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
         </div>
       </div>
+    </div>
+
+    <!-- More-filters disclosure: folds the secondary row away so the bar
+         never runs past three rows. -->
+    <div class="filters-more">
+      <button type="button" class="filters-more-btn" aria-expanded="false" aria-controls="filter-grid" onclick="toggleMoreFilters(this)">
+        <span class="filters-more-label">More filters</span>
+        <span class="filters-more-count" aria-hidden="true"></span>
+        <i class="ph-bold ph-caret-down filters-more-caret" style="font-size:14px" aria-hidden="true"></i>
+      </button>
     </div>
 
     <!-- Active filter chips -->
@@ -2371,13 +2744,13 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
   <div class="table-toolbar">
     <div class="toolbar-left">
       <div class="view-tabs" role="tablist" aria-label="View mode">
-        <button type="button" class="view-tab active" role="tab" aria-selected="true" onclick="selectViewTab(this)">
+        <button type="button" class="view-tab active" role="tab" aria-selected="true" aria-label="Table view" onclick="selectViewTab(this)">
           <i class="ph-bold ph-rows" style="font-size:16px" aria-hidden="true"></i>
-          Table
+          <span class="view-tab-label">Table</span>
         </button>
-        <button type="button" class="view-tab" role="tab" aria-selected="false" onclick="selectViewTab(this)">
+        <button type="button" class="view-tab" role="tab" aria-selected="false" aria-label="Cards view" onclick="selectViewTab(this)">
           <i class="ph-bold ph-squares-four" style="font-size:16px" aria-hidden="true"></i>
-          Cards
+          <span class="view-tab-label">Cards</span>
         </button>
       </div>
       <label class="toggle-label">
@@ -2390,22 +2763,9 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
       </label>
     </div>
     <div class="toolbar-right">
-      <div class="legend-wrap">
-        <button type="button" class="btn-icon" id="legend-btn" aria-label="Movement type legend" aria-haspopup="dialog" aria-expanded="false" onclick="toggleLegend(event)">
-          <i class="ph ph-info" style="font-size:18px" aria-hidden="true"></i>
-        </button>
-        <div class="legend-pop" id="legend-pop" role="dialog" aria-label="Movement type legend">
-          <div class="legend-title">Movement types</div>
-          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-stack" aria-hidden="true"></i></span> Standard</div>
-          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-trolley-suitcase" aria-hidden="true"></i></span> Edit</div>
-          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-sketch-logo" aria-hidden="true"></i></span> Other</div>
-          <div class="legend-sep" role="presentation"></div>
-          <div class="legend-item"><span class="legend-icons"><i class="ph-fill ph-truck" aria-hidden="true"></i></span> Transported by truck</div>
-        </div>
-      </div>
-      <button type="button" class="btn-secondary" onclick="runUpdate(this)">
+      <button type="button" class="btn-secondary" aria-label="Update" onclick="runUpdate(this)">
         <i class="ph-bold ph-arrows-clockwise" style="font-size:16px"></i>
-        Update
+        <span class="btn-label">Update</span>
       </button>
       <button class="btn-primary">
         <i class="ph-bold ph-plus" style="font-size:16px"></i>
@@ -2447,7 +2807,7 @@ tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--s
       <thead>
         <tr>
           <th scope="col" class="checkbox-cell" onclick="delegateToCheckbox(event, this)"><div class="checkbox" role="checkbox" tabindex="0" aria-checked="false" aria-label="Select all rows" onclick="event.stopPropagation();toggleAll(this)"><i class="ph-bold ph-check" aria-hidden="true"></i><i class="ph-bold ph-minus" aria-hidden="true"></i></div></th>
-          <th scope="col" class="sortable center" tabindex="0" aria-sort="none" onclick="sortCol(this)">Type</th>
+          <th scope="col" class="center">Type</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="descending" onclick="sortCol(this)">Warehouse</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Vessel</th>
           <th scope="col" class="sortable" tabindex="0" aria-sort="none" onclick="sortCol(this)">Subproduct</th>
@@ -2660,9 +3020,9 @@ function renderRows() {
     // keyboard users, not just exposed via the hover title. The two glyphs
     // themselves are decorative.
     var typeLabel = typeTitle + ', transported by truck';
-    var typeBadge = '<span class="move-icons" role="img" title="' + escAttr(typeTitle) + '" aria-label="' + escAttr(typeLabel) + '">'
-      + '<i class="ph-fill ph-' + typeIconName + '" aria-hidden="true"></i>'
-      + '<i class="ph-fill ph-truck" aria-hidden="true"></i>'
+    var typeBadge = '<span class="move-icons" role="img" aria-label="' + escAttr(typeLabel) + '">'
+      + '<i class="ph ph-' + typeIconName + '" data-tooltip="' + escAttr(typeTitle) + '" aria-hidden="true"></i>'
+      + '<i class="ph ph-truck" data-tooltip="Transported by truck" aria-hidden="true"></i>'
     + '</span>';
 
     var sel = r._selected ? ' selected' : '';
@@ -2672,16 +3032,16 @@ function renderRows() {
     return '<tr data-uid="' + r._uid + '" class="' + sel.trim() + '"' + ariaSel + ' onclick="toggleRow(this)">'
       + '<td class="checkbox-cell"><div class="checkbox' + cbCheck + '" role="checkbox" tabindex="0" aria-checked="' + cbAria + '" aria-label="Select row ' + escAttr(r.xab || r.id) + '" onclick="event.stopPropagation();toggleRowCheckbox(this)"><i class="ph-bold ph-check" aria-hidden="true"></i></div></td>'
       + '<td class="move-cell">' + typeBadge + '</td>'
-      + '<td>' + escAttr(r.wh) + '</td>'
+      + '<td class="js-tip-trunc">' + escAttr(r.wh) + '</td>'
       + '<td><div class="vessel-cell">'
-        + '<span class="vessel-name">' + escAttr(titleCase(vName)) + '</span>'
+        + '<span class="vessel-name js-tip-trunc">' + escAttr(titleCase(vName)) + '</span>'
         + '<span class="vessel-num">' + escAttr(vNum) + '</span>'
         + '</div></td>'
-      + '<td>' + escAttr(r.sub) + '</td>'
+      + '<td class="js-tip-trunc">' + escAttr(r.sub) + '</td>'
       + (function() {
           var c = splitCustomer(r.cust);
           return '<td><div class="cust-cell">'
-            + '<span class="cust-name">' + escAttr(c.name) + '</span>'
+            + '<span class="cust-name js-tip-trunc">' + escAttr(c.name) + '</span>'
             + (c.city ? '<span class="cust-city">' + escAttr(c.city) + '</span>' : '')
             + '</div></td>';
         })()
@@ -2713,10 +3073,10 @@ function renderRows() {
       + (function() {
           var lbl = escAttr(r.xab || r.id);
           return '<td><div class="row-actions">'
-            + '<button type="button" class="act-btn" aria-label="Open document for ' + lbl + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
-            + '<button type="button" class="act-btn" aria-label="View row ' + lbl + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
-            + '<button type="button" class="act-btn" aria-label="Flag row ' + lbl + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
-            + '<button type="button" class="act-btn" aria-label="Delete row ' + lbl + '" onclick="event.stopPropagation();deleteRow(' + r._uid + ')"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="Open document" aria-label="Open document for ' + lbl + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="View details" aria-label="View row ' + lbl + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="Flag movement" aria-label="Flag row ' + lbl + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="Delete movement" aria-label="Delete row ' + lbl + '" onclick="event.stopPropagation();deleteRow(' + r._uid + ')"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
           + '</div></td>';
         })()
       + '</tr>';
@@ -3041,7 +3401,7 @@ function _cmp(a, b, type) {
   return a - b;
 }
 var SORT_COMPARATORS = {
-  1: { get: function(r){ return r.type; },                              type: 'string' },
+  /* Index 1 (Type) is intentionally non-sortable — no comparator. */
   2: { get: function(r){ return r.wh; },                                type: 'string' },
   3: { get: function(r){ return (r.vessel||'').split('\n')[0]; },       type: 'string' },
   4: { get: function(r){ return r.sub; },                               type: 'string' },
@@ -3094,6 +3454,20 @@ function toggleSidebar() {
   document.querySelector('.sidebar').classList.toggle('collapsed');
 }
 
+/* Reveal/hide the secondary filter row behind the "More filters" toggle.
+   The primary row stays put; only the folded set and the caret + label
+   flip. Active filters hiding in the collapsed section are surfaced via
+   the button's count badge (updated in syncFilters). */
+function toggleMoreFilters(btn) {
+  var filters = document.getElementById('filters');
+  var open = filters.classList.toggle('show-more');
+  if (btn) {
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var lbl = btn.querySelector('.filters-more-label');
+    if (lbl) lbl.textContent = open ? 'Fewer filters' : 'More filters';
+  }
+}
+
 function selectNav(el) {
   document.querySelectorAll('.nav-section, .nav-item').forEach(function(n) {
     n.classList.remove('active');
@@ -3117,6 +3491,52 @@ function closeLegend() {
   var btn = wrap.querySelector('#legend-btn');
   if (btn) btn.setAttribute('aria-expanded', 'false');
   return true;
+}
+
+/* ─── Header account / settings menu ─────────────────── */
+function toggleHeaderMenu(e) {
+  if (e) e.stopPropagation();
+  var wrap = document.querySelector('.header-menu-wrap');
+  if (!wrap) return;
+  var open = wrap.classList.toggle('open');
+  var btn = document.getElementById('settings-btn');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeHeaderMenu() {
+  var wrap = document.querySelector('.header-menu-wrap.open');
+  if (!wrap) return false;
+  wrap.classList.remove('open');
+  var btn = wrap.querySelector('#settings-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+  return true;
+}
+var _menuLang = 'it';
+/* Keep the theme + language rows showing the CURRENT state (glyph + label);
+   clicking either one flips it. */
+function syncMenuToggles() {
+  var light = document.documentElement.getAttribute('data-theme') === 'light';
+  var themeItem = document.getElementById('hm-theme');
+  if (themeItem) {
+    var ti = themeItem.querySelector('i');
+    var tl = themeItem.querySelector('.hm-label');
+    /* Label names the ACTION (what the click does), not the current state:
+       in dark you see "Light theme" (switch to light), and vice versa. */
+    if (ti) ti.className = 'ph ' + (light ? 'ph-moon' : 'ph-sun');
+    if (tl) tl.textContent = light ? 'Dark theme' : 'Light theme';
+    themeItem.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+  }
+  var langItem = document.getElementById('hm-lang');
+  if (langItem) {
+    var lf = langItem.querySelector('.flag');
+    var ll = langItem.querySelector('.hm-label');
+    if (lf) lf.className = 'flag fi fis ' + (_menuLang === 'it' ? 'fi-it' : 'fi-gb');
+    if (ll) ll.textContent = _menuLang === 'it' ? 'Italiano' : 'English';
+  }
+}
+function toggleLang() {
+  _menuLang = _menuLang === 'it' ? 'en' : 'it';
+  syncMenuToggles();
+  showToast(_menuLang === 'it' ? 'Lingua impostata su Italiano (prototipo).' : 'Language set to English (prototype).');
 }
 
 function selectViewTab(el) {
@@ -3435,6 +3855,17 @@ function syncFilters() {
     chipsContainer.innerHTML = '';
   }
 
+  // Badge the "More filters" toggle with how many active filters are hiding
+  // in the collapsed secondary section, so a folded-away filter still shows.
+  var SECONDARY_FILTERS = ['Date range', 'Contract', 'Vessel', 'Tags', 'Destination', 'Job order'];
+  var hiddenActive = actives.filter(function(a) { return SECONDARY_FILTERS.indexOf(a.name) !== -1; }).length;
+  var moreBtn = document.querySelector('.filters-more-btn');
+  if (moreBtn) {
+    var moreCount = moreBtn.querySelector('.filters-more-count');
+    if (moreCount) moreCount.textContent = hiddenActive ? hiddenActive : '';
+    moreBtn.classList.toggle('has-count', hiddenActive > 0);
+  }
+
   // Apply the filters to the table live when Auto search is on; otherwise
   // the chips update but the table waits for the Update button.
   if (isAutoSearch()) renderRows();
@@ -3481,6 +3912,7 @@ document.addEventListener('DOMContentLoaded', function() {
     input.addEventListener('input', debouncedSync);
   });
   syncFilters();
+  syncMenuToggles();
 
   // Close any open dropdown when clicking outside
   document.addEventListener('click', function(e) {
@@ -3497,6 +3929,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     var lw = document.querySelector('.legend-wrap.open');
     if (lw && !lw.contains(e.target)) closeLegend();
+    var hm = document.querySelector('.header-menu-wrap.open');
+    if (hm && !hm.contains(e.target)) closeHeaderMenu();
   });
 });
 
@@ -3510,6 +3944,7 @@ document.addEventListener('keydown', function(e) {
 
   // Escape closes any open dropdown (and the date picker if open).
   if (e.key === 'Escape') {
+    if (closeHeaderMenu()) { e.preventDefault(); return; }
     if (closeLegend()) { e.preventDefault(); return; }
     var open = document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open');
     if (open.length) {
@@ -3744,6 +4179,241 @@ document.addEventListener('mousedown', function() {
   new ResizeObserver(updateThumb).observe(wrap);
   if (head) new ResizeObserver(updateThumb).observe(head);
   updateThumb();
+})();
+
+/* Give every sidebar nav item (and the collapse button) a tooltip built
+   from its own label, so the collapsed/rail sidebar can name each icon on
+   hover. The tooltip controller only surfaces these while the label itself
+   is hidden, so an expanded sidebar shows none. */
+(function() {
+  document.querySelectorAll('.sidebar .nav-item, .sidebar .nav-section:not(.is-group)').forEach(function(el) {
+    var label = el.querySelector('.nav-label');
+    if (label && !el.hasAttribute('data-tooltip')) el.setAttribute('data-tooltip', label.textContent.trim());
+  });
+  var collapseBtn = document.querySelector('.collapse-btn');
+  if (collapseBtn && !collapseBtn.hasAttribute('data-tooltip')) collapseBtn.setAttribute('data-tooltip', 'Collapse sidebar');
+})();
+
+/* ─── Tooltip controller ───────────────────────────────
+   One shared chip, delegated over the whole document. Two trigger kinds:
+   - [data-tooltip]: always show the attribute text (icon buttons, type
+     badge) — on hover (delayed) and immediately on keyboard focus.
+   - .js-tip-trunc: show the element's own text only when it's actually
+     clipped (scrollWidth > clientWidth), so full-width cells stay quiet.
+   Dismisses on leave, scroll, resize, Escape, and any mousedown. */
+(function() {
+  var tip = document.createElement('div');
+  tip.className = 'tooltip';
+  tip.id = 'app-tooltip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.appendChild(tip);
+
+  var showTimer = null, current = null;
+  var DELAY = 350;
+
+  function resolve(el) {
+    return el && el.closest ? el.closest('[data-tooltip], .js-tip-trunc') : null;
+  }
+  function textFor(t) {
+    var explicit = t.getAttribute('data-tooltip');
+    if (explicit) {
+      // Sidebar nav: the label IS the tooltip, so only show it when the
+      // label is hidden (collapsed rail). If the label is on screen, skip.
+      if (t.closest('.sidebar')) {
+        var label = t.querySelector('.nav-label');
+        if (label && label.offsetParent !== null) return null;
+      }
+      return explicit;
+    }
+    if (t.classList.contains('js-tip-trunc') && t.scrollWidth > t.clientWidth + 1) {
+      return t.textContent.trim();
+    }
+    return null;
+  }
+  function place(t) {
+    var r = t.getBoundingClientRect();
+    var w = tip.offsetWidth, h = tip.offsetHeight, m = 8, gap = 8;
+    var left = r.left + r.width / 2 - w / 2;
+    left = Math.max(m, Math.min(left, window.innerWidth - w - m));
+    var top = r.top - h - gap;            // prefer above
+    if (top < m) top = r.bottom + gap;    // flip below when no room
+    tip.style.left = Math.round(left) + 'px';
+    tip.style.top = Math.round(top) + 'px';
+  }
+  function show(t) {
+    var txt = textFor(t);
+    if (!txt) return;
+    current = t;
+    tip.textContent = txt;
+    place(t);
+    requestAnimationFrame(function() { tip.classList.add('visible'); });
+  }
+  function hide() {
+    current = null;
+    tip.classList.remove('visible');
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    var t = resolve(e.target);
+    if (!t || t === current) return;
+    clearTimeout(showTimer);
+    showTimer = setTimeout(function() { show(t); }, DELAY);
+  });
+  document.addEventListener('mouseout', function(e) {
+    var t = resolve(e.target);
+    if (!t) return;
+    if (e.relatedTarget && t.contains(e.relatedTarget)) return; // moved within
+    clearTimeout(showTimer);
+    hide();
+  });
+  // Keyboard focus: show at once (only for explicit-text triggers).
+  document.addEventListener('focusin', function(e) {
+    var t = e.target.closest && e.target.closest('[data-tooltip]');
+    if (!t) return;
+    clearTimeout(showTimer);
+    show(t);
+  });
+  document.addEventListener('focusout', function() { clearTimeout(showTimer); hide(); });
+  window.addEventListener('scroll', hide, true);
+  window.addEventListener('resize', hide);
+  document.addEventListener('mousedown', hide);
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') hide(); });
+})();
+
+/* ─── Row context menu (right-click) ───────────────────
+   Right-clicking a table row opens an in-design menu at the pointer
+   instead of the browser's native one. Single-row menu by default; if
+   the row is part of a multi-row selection, a selection-scoped menu
+   (export / clear / delete N) is shown instead. Arrow-key navigable,
+   closes on Escape / outside click / scroll / resize. */
+(function() {
+  var tbody = document.getElementById('tbody');
+  if (!tbody) return;
+
+  var menu = document.createElement('div');
+  menu.className = 'context-menu';
+  menu.id = 'row-context-menu';
+  menu.setAttribute('role', 'menu');
+  menu.style.display = 'none';
+  document.body.appendChild(menu);
+
+  var targetTr = null;
+
+  function head(t) { return '<div class="context-menu-head">' + escAttr(t) + '</div>'; }
+  function sep() { return '<div class="context-menu-sep" role="separator"></div>'; }
+  function item(action, icon, label, cls) {
+    return '<button type="button" role="menuitem" class="context-menu-item ' + (cls || '') + '" data-action="' + action + '">'
+      + '<i class="ph-bold ' + icon + '" aria-hidden="true"></i><span>' + escAttr(label) + '</span></button>';
+  }
+
+  function buildMenu(uid) {
+    var row = rows.find(function(r) { return r._uid === uid; });
+    if (!row) return '';
+    var selected = rows.filter(function(r) { return r._selected; });
+    if (row._selected && selected.length > 1) {
+      var n = selected.length;
+      return head(n + ' movements selected')
+        + item('export', 'ph-download-simple', 'Export selection')
+        + sep()
+        + item('clearsel', 'ph-x-circle', 'Clear selection')
+        + sep()
+        + item('deletesel', 'ph-trash', 'Delete ' + n + ' movements', 'cm-danger');
+    }
+    return head('XAB ' + (row.xab || row.id))
+      + item('open', 'ph-file-text', 'Open document')
+      + item('view', 'ph-eye', 'View details')
+      + sep()
+      + item('copyxab', 'ph-copy', 'Copy XAB')
+      + item('copycont', 'ph-copy', 'Copy contract №')
+      + sep()
+      + (row._selected
+          ? item('deselect', 'ph-check-square', 'Deselect row')
+          : item('select', 'ph-square', 'Select row'))
+      + item('flag', 'ph-flag', 'Flag movement')
+      + sep()
+      + item('delete', 'ph-trash', 'Delete movement', 'cm-danger');
+  }
+
+  function openAt(x, y, uid, tr) {
+    menu.innerHTML = buildMenu(uid);
+    menu.dataset.uid = uid;
+    menu.style.display = 'block';
+    menu.style.visibility = 'hidden';
+    menu.classList.remove('open');
+    // Clamp inside the viewport (flip up / left when near an edge).
+    var mw = menu.offsetWidth, mh = menu.offsetHeight, m = 8;
+    var left = Math.max(m, Math.min(x, window.innerWidth - mw - m));
+    var top = Math.max(m, Math.min(y, window.innerHeight - mh - m));
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.style.visibility = '';
+    requestAnimationFrame(function() { menu.classList.add('open'); });
+    if (targetTr) targetTr.classList.remove('context-target');
+    targetTr = tr;
+    if (tr) tr.classList.add('context-target');
+    var first = menu.querySelector('.context-menu-item');
+    if (first) first.focus();
+  }
+  function close() {
+    if (menu.style.display === 'none') return;
+    menu.classList.remove('open');
+    menu.style.display = 'none';
+    if (targetTr) { targetTr.classList.remove('context-target'); targetTr = null; }
+  }
+
+  function copy(text, label) {
+    var done = function() { showToast('Copied ' + label + '.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else { done(); }
+  }
+  function run(action, uid) {
+    var row = rows.find(function(r) { return r._uid === uid; });
+    switch (action) {
+      case 'open': showToast('Document view isn\'t available in this prototype.'); break;
+      case 'view': showToast('Detail view isn\'t available in this prototype.'); break;
+      case 'copyxab': if (row) copy(String(row.xab), 'XAB ' + row.xab); break;
+      case 'copycont': if (row) copy(String(row.cont), 'contract № ' + row.cont); break;
+      case 'select': if (row) { row._selected = true; renderRows(); } break;
+      case 'deselect': if (row) { row._selected = false; renderRows(); } break;
+      case 'flag': showToast('Movement flagged.'); break;
+      case 'delete': deleteRow(uid); break;
+      case 'deletesel': deleteSelected(); break;
+      case 'export': showToast('Export isn\'t available in this prototype.'); break;
+      case 'clearsel': clearSelection(); break;
+    }
+  }
+
+  tbody.addEventListener('contextmenu', function(e) {
+    var tr = e.target.closest('tr[data-uid]');
+    if (!tr) return;
+    e.preventDefault();
+    openAt(e.clientX, e.clientY, +tr.dataset.uid, tr);
+  });
+  menu.addEventListener('click', function(e) {
+    var it = e.target.closest('.context-menu-item');
+    if (!it) return;
+    var action = it.dataset.action;
+    var uid = +menu.dataset.uid;
+    close();
+    run(action, uid);
+  });
+  menu.addEventListener('keydown', function(e) {
+    var items = Array.prototype.slice.call(menu.querySelectorAll('.context-menu-item'));
+    if (!items.length) return;
+    var idx = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); (items[idx + 1] || items[0]).focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (items[idx - 1] || items[items.length - 1]).focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  });
+
+  document.addEventListener('mousedown', function(e) { if (!menu.contains(e.target)) close(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close(); });
+  window.addEventListener('resize', close);
+  var wrap = document.querySelector('.table-wrap');
+  if (wrap) wrap.addEventListener('scroll', close, { passive: true });
 })();
 </script>
 </body>
