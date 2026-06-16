@@ -149,7 +149,7 @@
 
 [data-theme="light"] {
   --bg-page: oklch(0.910 0.012 240);
-  --bg-surface: var(--neutral-100);
+  --bg-surface: var(--base-white);   /* both surface & elevated white in light (matches Figma) */
   --bg-elevated: var(--base-white);
   --bg-overlay: var(--neutral-200);
   --text-primary: var(--neutral-900);
