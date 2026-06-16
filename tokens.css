@@ -158,9 +158,9 @@
   --text-disabled: var(--neutral-400);
   --text-inverse: var(--neutral-50);
   --text-brand: var(--blue-700);
-  --border-default: var(--neutral-200);
-  --border-subtle: var(--neutral-100);
-  --border-strong: var(--neutral-300);
+  --border-default: var(--neutral-300);  /* light borders one step heavier — visible on white surfaces (matches Figma) */
+  --border-subtle: var(--neutral-200);
+  --border-strong: var(--neutral-400);
   --border-focus: var(--blue-500);
   --brand-bg-default: var(--blue-500);
   --brand-bg-hover: var(--blue-600);
