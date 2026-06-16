@@ -23,6 +23,8 @@
   --blue-950: oklch(0.150 0.060 233.41);
   --neutral-50: oklch(0.985 0.008 240);
   --neutral-100: oklch(0.960 0.010 240);
+  --neutral-150: oklch(0.945 0.005 240);
+  --neutral-175: oklch(0.925 0.005 240);
   --neutral-200: oklch(0.910 0.012 240);
   --neutral-300: oklch(0.830 0.014 240);
   --neutral-350: oklch(0.780 0.014 240);
@@ -100,7 +102,8 @@
   --button-ghost-fg: var(--text-secondary);
   --button-destructive-bg: var(--status-error-solid);
   --button-destructive-fg: var(--base-white);
-  --input-bg: var(--bg-elevated);
+  --input-bg: var(--neutral-750);          /* solid field surface (was bg-elevated) */
+  --input-bg-hover: var(--neutral-700);
   --input-fg: var(--text-primary);
   --input-placeholder: var(--text-secondary);
   --input-border-default: var(--border-default);
@@ -152,6 +155,8 @@
   --bg-surface: var(--base-white);   /* both surface & elevated white in light (matches Figma) */
   --bg-elevated: var(--base-white);
   --bg-overlay: var(--neutral-200);
+  --input-bg: var(--neutral-150);
+  --input-bg-hover: var(--neutral-175);
   --text-primary: var(--neutral-900);
   --text-secondary: oklch(0.360 0.014 240);
   --text-tertiary: oklch(0.520 0.014 240);
