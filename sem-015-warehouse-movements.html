@@ -1419,10 +1419,10 @@ tbody tr.selected {
   --text-tertiary:  var(--text-primary);
 }
 tbody tr.selected .act-btn { color: var(--text-primary); }
-tbody tr.selected .hist-bar.filled { background: var(--text-primary); }
-tbody tr.selected .hist-bar { background: color-mix(in oklch, var(--text-primary) 30%, transparent); }
+tbody tr.selected .hist-track { background: color-mix(in oklch, var(--text-primary) 25%, transparent); }
+tbody tr.selected .hist-fill  { background: var(--text-primary); }
 tbody tr.selected .hist-label .hist-filled { color: var(--text-primary); }
-tbody tr.selected .hist-sep { opacity: 1; }
+tbody tr.selected .hist-sep   { opacity: 1; }
 /* Active-sort column: semi-transparent tint layered ON TOP of zebra /
    hover / selected via inset box-shadow (background untouched, so the
    stripes underneath still read). Plus primary text in body. */
@@ -1616,20 +1616,20 @@ thead .checkbox {
   font-variant-numeric: tabular-nums;
 }
 .hist-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.hist-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 14px;
-}
-.hist-bar {
-  width: 8px;
-  border-radius: var(--radius-sm);
+.hist-track {
+  height: 8px;
+  border-radius: var(--radius-md);
   background: var(--border-default);
+  overflow: hidden;
 }
-.hist-bar.filled { background: var(--brand-bg-default); }
-.hist-wrap.warn .hist-bar.filled { background: var(--status-warning-solid); }
-.hist-wrap.overrun .hist-bar { background: var(--status-error-solid); }
+.hist-fill {
+  height: 100%;
+  border-radius: var(--radius-md);
+  background: var(--brand-bg-default);
+  min-width: 0;
+}
+.hist-wrap.warn  .hist-fill { background: var(--status-warning-solid); }
+.hist-wrap.overrun .hist-fill { background: var(--status-error-solid); width: 100% !important; }
 .hist-label {
   font-size: 12px;
   color: var(--text-tertiary);
@@ -2944,8 +2944,8 @@ var rows = [
   { type:'std',  id:5184,  wh:'Porto Marghera', vessel:'TORRENT\n25072',           sub:'Standard', cust:'Solvay Chimica Italia S.p.A. (Massa)',            date:'23/02/2026', xab:5184,   qty:-29440, cont:'25/0173',  filled:3192, total:4500 },
   { type:'edit', id:71130, wh:'Porto Marghera', vessel:'IZUMO HERMES\n25073',      sub:'P10',      cust:'ZML Industries S.p.A. Socio Unico (Maniago)',     date:'23/02/2026', xab:71130,  qty:-31800, cont:'26/G0010', filled:144,  total:540 },
   { type:'std',  id:5175,  wh:'Porto Marghera', vessel:'DESERT PIONEER\n25061',    sub:'Standard', cust:'Carbofer Tecnologie S.p.A. (Brescia)',            date:'23/02/2026', xab:5175,   qty:-32680, cont:'26/0002',  filled:762,  total:2000 },
-  { type:'std',  id:5190,  wh:'Porto Marghera', vessel:'DESERT PIONEER\n25061',    sub:'Standard', cust:'Drycarbo S.r.l. (Bagnolo Mella)',                 date:'23/02/2026', xab:5190,   qty:-30880, cont:'26/0014',  filled:701,  total:1000 },
-  { type:'edit', id:71132, wh:'Porto Marghera', vessel:'SAGA ENTERPRISE\n25065',   sub:'P60',      cust:'Perucchini S.p.A. (Omegna)',                      date:'23/02/2026', xab:71132,  qty:-31200, cont:'25/G0724', filled:1,    total:300 },
+  { type:'std',  id:5190,  wh:'Porto Marghera', vessel:'DESERT PIONEER\n25061',    sub:'Standard', cust:'Drycarbo S.r.l. (Bagnolo Mella)',                 date:'23/02/2026', xab:5190,   qty:-30880, cont:'26/0014',  filled:1180, total:1000 },
+  { type:'edit', id:71132, wh:'Porto Marghera', vessel:'SAGA ENTERPRISE\n25065',   sub:'P60',      cust:'Perucchini S.p.A. (Omegna)',                      date:'23/02/2026', xab:71132,  qty:-31200, cont:'25/G0724', filled:-85,  total:300 },
   { type:'std',  id:5177,  wh:'Porto Marghera', vessel:'AMBER LAGOON\n25036',      sub:'Standard', cust:'Pontenossa S.p.A. (Ponte Nossa)',                 date:'23/02/2026', xab:5177,   qty:-28420, cont:'25/0165',  filled:2615, total:10000 },
   { type:'std',  id:5178,  wh:'Porto Marghera', vessel:'AMBER LAGOON\n25036',      sub:'Standard', cust:'Pontenossa S.p.A. (Ponte Nossa)',                 date:'23/02/2026', xab:5178,   qty:-28280, cont:'25/0165',  filled:2615, total:10000 },
 ];
@@ -2977,22 +2977,9 @@ function deriveTags(r) {
 }
 
 function progressClass(filled, total) {
-  var pct = filled / total;
-  if (pct >= 1) return 'overrun';
-  if (pct >= 0.75) return 'warn';
+  if (filled < 0 || filled >= total) return 'overrun';
+  if (filled / total >= 0.75) return 'warn';
   return 'ok';
-}
-
-function histBars(pct) {
-  var NUM = 5, bars = '';
-  for (var i = 0; i < NUM; i++) {
-    var segStart = i / NUM, segEnd = (i + 1) / NUM;
-    var isFull = pct >= segEnd;
-    var isPartial = !isFull && pct > segStart;
-    var h = isFull ? 14 : isPartial ? Math.max(4, Math.round(14 * (pct - segStart) * NUM)) : 3;
-    bars += '<div class="hist-bar' + (isFull || isPartial ? ' filled' : '') + '" style="height:' + h + 'px"></div>';
-  }
-  return bars;
 }
 
 function titleCase(s) {
@@ -3110,7 +3097,6 @@ function renderRows() {
   tbody.innerHTML = visible.map(function(r) {
     var parts = r.vessel.split('\n');
     var vName = parts[0], vNum = parts[1] || '';
-    var pct = Math.min(r.filled / r.total, 1);
     var pClass = progressClass(r.filled, r.total);
 
     var typeIconName = r.type === 'edit' ? 'trolley-suitcase'
@@ -3155,10 +3141,11 @@ function renderRows() {
         + '<span class="sr-only">' + (r.qty < 0 ? 'outbound ' : 'inbound ') + '</span>'
         + formatQty(r.qty) + '</td>'
       + (function() {
+          var barW = (Math.max(0, Math.min(1, r.filled / r.total)) * 100).toFixed(1);
           return '<td><div class="contract-cell">'
             + '<span class="contract-badge">' + escAttr(r.cont) + '</span>'
             + '<div class="hist-wrap ' + pClass + '">'
-              + '<div class="hist-bars">' + histBars(pct) + '</div>'
+              + '<div class="hist-track"><div class="hist-fill" style="width:' + barW + '%"></div></div>'
               + '<span class="hist-label">'
                 + '<span class="hist-filled">' + r.filled.toLocaleString('de-DE') + '</span>'
                 + '<span class="hist-sep">/</span>'
