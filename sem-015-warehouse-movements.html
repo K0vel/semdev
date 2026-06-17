@@ -2653,24 +2653,18 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
         </div>
       </div>
 
-      <div class="field is-combo" data-name="Subproduct" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="subproduct-listbox" aria-label="Subproduct"
-           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
-        <span class="field-label" id="subproduct-label">Subproduct</span>
+      <div class="field tag-chip" id="sub-select" data-name="Subproduct" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Subproduct" onclick="toggleChipDropdown(event, this)">
+        <span class="field-label" aria-hidden="true">Subproduct</span>
         <div class="field-row">
-          <input type="text" class="combo-input" id="f-subproduct" placeholder="All"
-                 autocomplete="off" spellcheck="false" role="searchbox"
-                 aria-autocomplete="list" aria-controls="subproduct-listbox" aria-labelledby="subproduct-label"
-                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <span class="tag-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" aria-label="Clear subproduct filter" onclick="event.stopPropagation();clearField('Subproduct');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Subproduct">
-          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
-        </button>
-        <div class="custom-select-dropdown" id="subproduct-listbox" role="listbox" aria-label="Subproduct">
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Standard</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">P10</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">P60</div>
-          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        <div class="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search"><input type="text" class="tag-search-input" placeholder="Search…" aria-label="Search subproducts" oninput="filterChipOptions(this)" onkeydown="event.stopPropagation()"></div>
+          <label class="tag-option"><input type="checkbox" value="Standard"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Standard</label>
+          <label class="tag-option"><input type="checkbox" value="P10"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> P10</label>
+          <label class="tag-option"><input type="checkbox" value="P60"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> P60</label>
         </div>
       </div>
 
@@ -2689,52 +2683,40 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
           <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
         </button>
       </div>
-      <div class="field is-combo filter-secondary" data-name="Contract" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="contract-listbox" aria-label="Contract"
-           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
-        <span class="field-label" id="contract-label">Contract</span>
+      <div class="field tag-chip filter-secondary" id="contract-select" data-name="Contract" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Contract" onclick="toggleChipDropdown(event, this)">
+        <span class="field-label" aria-hidden="true">Contract</span>
         <div class="field-row">
-          <input type="text" class="combo-input" id="f-contract" placeholder="All"
-                 autocomplete="off" spellcheck="false" role="searchbox"
-                 aria-autocomplete="list" aria-controls="contract-listbox" aria-labelledby="contract-label"
-                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <span class="tag-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" aria-label="Clear contract filter" onclick="event.stopPropagation();clearField('Contract');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Contract">
-          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
-        </button>
-        <div class="custom-select-dropdown" id="contract-listbox" role="listbox" aria-label="Contract">
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Fonderie Cortiana</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">CAL.ME. S.P.A.</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Heidelberg Materials</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">SIPAG-BISALTA</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Acciaierie Venete</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Solvay Chimica</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">ZML Industries</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Carbofer Tecnologie</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Pontenossa S.P.A.</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Perucchini S.P.A.</div>
-          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        <div class="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search"><input type="text" class="tag-search-input" placeholder="Search contracts…" aria-label="Search contracts" oninput="filterChipOptions(this)" onkeydown="event.stopPropagation()"></div>
+          <label class="tag-option"><input type="checkbox" value="Fonderie Cortiana"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Fonderie Cortiana</label>
+          <label class="tag-option"><input type="checkbox" value="CAL.ME. S.P.A."><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> CAL.ME. S.P.A.</label>
+          <label class="tag-option"><input type="checkbox" value="Heidelberg Materials"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Heidelberg Materials</label>
+          <label class="tag-option"><input type="checkbox" value="SIPAG-BISALTA"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> SIPAG-BISALTA</label>
+          <label class="tag-option"><input type="checkbox" value="Acciaierie Venete"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Acciaierie Venete</label>
+          <label class="tag-option"><input type="checkbox" value="Solvay Chimica"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Solvay Chimica</label>
+          <label class="tag-option"><input type="checkbox" value="ZML Industries"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> ZML Industries</label>
+          <label class="tag-option"><input type="checkbox" value="Carbofer Tecnologie"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Carbofer Tecnologie</label>
+          <label class="tag-option"><input type="checkbox" value="Pontenossa S.P.A."><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Pontenossa S.P.A.</label>
+          <label class="tag-option"><input type="checkbox" value="Perucchini S.P.A."><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Perucchini S.P.A.</label>
         </div>
       </div>
 
-      <div class="field is-combo filter-secondary" data-name="Vessel" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="vessel-listbox" aria-label="Vessel"
-           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
-        <span class="field-label" id="vessel-label">Vessel</span>
+      <div class="field tag-chip filter-secondary" id="vessel-select" data-name="Vessel" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Vessel" onclick="toggleChipDropdown(event, this)">
+        <span class="field-label" aria-hidden="true">Vessel</span>
         <div class="field-row">
-          <input type="text" class="combo-input" id="f-vessel" placeholder="All"
-                 autocomplete="off" spellcheck="false" role="searchbox"
-                 aria-autocomplete="list" aria-controls="vessel-listbox" aria-labelledby="vessel-label"
-                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <span class="tag-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" aria-label="Clear vessel filter" onclick="event.stopPropagation();clearField('Vessel');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Vessel">
-          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
-        </button>
-        <div class="custom-select-dropdown" id="vessel-listbox" role="listbox" aria-label="Vessel">
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Supra Monarch</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Desert Pioneer</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Amber Lagoon</div>
-          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        <div class="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search"><input type="text" class="tag-search-input" placeholder="Search vessels…" aria-label="Search vessels" oninput="filterChipOptions(this)" onkeydown="event.stopPropagation()"></div>
+          <label class="tag-option"><input type="checkbox" value="Supra Monarch"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Supra Monarch</label>
+          <label class="tag-option"><input type="checkbox" value="Desert Pioneer"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Desert Pioneer</label>
+          <label class="tag-option"><input type="checkbox" value="Amber Lagoon"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Amber Lagoon</label>
         </div>
       </div>
 
@@ -2757,44 +2739,32 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
         </div>
       </div>
 
-      <div class="field is-combo filter-secondary" data-name="Destination" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="destination-listbox" aria-label="Destination"
-           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
-        <span class="field-label" id="destination-label">Destination</span>
+      <div class="field tag-chip filter-secondary" id="destination-select" data-name="Destination" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Destination" onclick="toggleChipDropdown(event, this)">
+        <span class="field-label" aria-hidden="true">Destination</span>
         <div class="field-row">
-          <input type="text" class="combo-input" id="f-destination" placeholder="All"
-                 autocomplete="off" spellcheck="false" role="searchbox"
-                 aria-autocomplete="list" aria-controls="destination-listbox" aria-labelledby="destination-label"
-                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <span class="tag-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" aria-label="Clear destination filter" onclick="event.stopPropagation();clearField('Destination');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Destination">
-          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
-        </button>
-        <div class="custom-select-dropdown" id="destination-listbox" role="listbox" aria-label="Destination">
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Italy</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Germany</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">France</div>
-          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        <div class="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search"><input type="text" class="tag-search-input" placeholder="Search destinations…" aria-label="Search destinations" oninput="filterChipOptions(this)" onkeydown="event.stopPropagation()"></div>
+          <label class="tag-option"><input type="checkbox" value="Italy"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Italy</label>
+          <label class="tag-option"><input type="checkbox" value="Germany"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Germany</label>
+          <label class="tag-option"><input type="checkbox" value="France"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> France</label>
         </div>
       </div>
 
-      <div class="field is-combo filter-secondary" data-name="Job order" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="joborder-listbox" aria-label="Job order"
-           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
-        <span class="field-label" id="joborder-label">Job order</span>
+      <div class="field tag-chip filter-secondary" id="joborder-select" data-name="Job order" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Job order" onclick="toggleChipDropdown(event, this)">
+        <span class="field-label" aria-hidden="true">Job order</span>
         <div class="field-row">
-          <input type="text" class="combo-input" id="f-joborder" placeholder="All"
-                 autocomplete="off" spellcheck="false" role="searchbox"
-                 aria-autocomplete="list" aria-controls="joborder-listbox" aria-labelledby="joborder-label"
-                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <span class="tag-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" aria-label="Clear job order filter" onclick="event.stopPropagation();clearField('Job order');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Job order">
-          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
-        </button>
-        <div class="custom-select-dropdown" id="joborder-listbox" role="listbox" aria-label="Job order">
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">JO-2026-001</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">JO-2026-002</div>
-          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        <div class="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search"><input type="text" class="tag-search-input" placeholder="Search job orders…" aria-label="Search job orders" oninput="filterChipOptions(this)" onkeydown="event.stopPropagation()"></div>
+          <label class="tag-option"><input type="checkbox" value="JO-2026-001"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> JO-2026-001</label>
+          <label class="tag-option"><input type="checkbox" value="JO-2026-002"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> JO-2026-002</label>
         </div>
       </div>
     </div>
@@ -3023,19 +2993,24 @@ function collectFilters() {
 
 function hasActiveFilters() {
   var f = collectFilters();
-  return !!(f.Search || (f.Warehouse && f.Warehouse.length) || f.Subproduct || f.Vessel || f.Contract
-    || f.Destination || f['Job order'] || f.dateStart || (f.tags && f.tags.length));
+  return !!(f.Search
+    || (f.Warehouse && f.Warehouse.length)
+    || (f.Subproduct && f.Subproduct.length)
+    || (f.Contract && f.Contract.length)
+    || (f.Vessel && f.Vessel.length)
+    || (f.Destination && f.Destination.length)
+    || (f['Job order'] && f['Job order'].length)
+    || f.dateStart
+    || (f.tags && f.tags.length));
 }
 
 function matchesFilters(r, f) {
   if (f.Warehouse && f.Warehouse.length && f.Warehouse.indexOf(r.wh) === -1) return false;
-  if (f.Subproduct && r.sub !== f.Subproduct) return false;
-  if (f.Destination && r.dest !== f.Destination) return false;
-  if (f['Job order'] && r.job !== f['Job order']) return false;
-  if (f.Vessel && titleCase((r.vessel || '').split('\n')[0]) !== f.Vessel) return false;
-  // Contract options are counterparty names; the row's customer string
-  // carries the full legal name, so match by substring.
-  if (f.Contract && r.cust.toLowerCase().indexOf(f.Contract.toLowerCase()) === -1) return false;
+  if (f.Subproduct && f.Subproduct.length && f.Subproduct.indexOf(r.sub) === -1) return false;
+  if (f.Destination && f.Destination.length && f.Destination.indexOf(r.dest) === -1) return false;
+  if (f['Job order'] && f['Job order'].length && f['Job order'].indexOf(r.job) === -1) return false;
+  if (f.Vessel && f.Vessel.length && f.Vessel.indexOf(titleCase((r.vessel || '').split('\n')[0])) === -1) return false;
+  if (f.Contract && f.Contract.length && !f.Contract.some(function(c) { return r.cust.toLowerCase().indexOf(c.toLowerCase()) !== -1; })) return false;
   if (f.tags && f.tags.length) {
     var rt = deriveTags(r);
     if (!f.tags.some(function(t) { return rt.indexOf(t) !== -1; })) return false;
