@@ -63,7 +63,7 @@
   --text-tertiary: oklch(0.600 0.014 240);
   --text-disabled: var(--neutral-600);
   --text-inverse: var(--neutral-900);
-  --text-brand: var(--blue-300);
+  --text-brand: var(--blue-400);
   --border-default: var(--neutral-700);
   --border-subtle: var(--neutral-750);
   --border-strong: var(--neutral-600);
@@ -160,9 +160,10 @@
   --text-primary: var(--neutral-900);
   --text-secondary: oklch(0.360 0.014 240);
   --text-tertiary: oklch(0.520 0.014 240);
-  --text-disabled: var(--neutral-400);
+  --text-disabled: var(--neutral-300);
   --text-inverse: var(--neutral-50);
-  --text-brand: var(--blue-700);
+  --text-brand: var(--blue-600);
+  --button-secondary-fg: var(--blue-600);   /* secondary button text is brand-blue in light (matches Figma) */
   --border-default: var(--neutral-300);  /* light borders one step heavier — visible on white surfaces (matches Figma) */
   --border-subtle: var(--neutral-200);
   --border-strong: var(--neutral-400);
