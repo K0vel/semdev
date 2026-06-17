@@ -613,6 +613,19 @@ label.field:has(input[type=text]) { cursor: text; }
   cursor: default;
 }
 .tag-chip.open .tag-dropdown { display: block; }
+.tag-search { padding: 6px 8px 2px; }
+.tag-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font: 13px/1.4 var(--font-family-sans);
+  padding: 5px 8px;
+  outline: none;
+}
+.tag-search-input:focus { border-color: var(--input-border-focus); }
 .tag-option {
   display: flex;
   align-items: center;
@@ -1406,12 +1419,10 @@ tbody tr.selected {
   --text-tertiary:  var(--text-primary);
 }
 tbody tr.selected .act-btn { color: var(--text-primary); }
-/* Progress ring + slash: SVG strokes and opacity'd glyphs don't
-   inherit from the text-tier vars, so override explicitly. */
-tbody tr.selected .progress-ring-fill  { stroke: var(--text-primary); }
-tbody tr.selected .progress-ring-track { stroke: color-mix(in oklch, var(--text-primary) 30%, transparent); }
-tbody tr.selected .progress-sep        { opacity: 1; }
-tbody tr.selected .progress-filled     { color: var(--text-primary); }
+tbody tr.selected .hist-bar.filled { background: var(--text-primary); }
+tbody tr.selected .hist-bar { background: color-mix(in oklch, var(--text-primary) 30%, transparent); }
+tbody tr.selected .hist-label .hist-filled { color: var(--text-primary); }
+tbody tr.selected .hist-sep { opacity: 1; }
 /* Active-sort column: semi-transparent tint layered ON TOP of zebra /
    hover / selected via inset box-shadow (background untouched, so the
    stripes underneath still read). Plus primary text in body. */
@@ -1604,51 +1615,32 @@ thead .checkbox {
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
-.contract-prefix { margin-right: 4px; }
-.progress-wrap {
+.hist-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hist-bars {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--spacing-1);
-  min-width: 0;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
 }
-.progress-ring {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  /* Negative vertical margin shrinks the ring's effective layout
-     height (16 → 14) so the progress-wrap matches vessel-num /
-     cust-city's 14.4px line-box; the ring still renders at 16px
-     visually because margin doesn't clip the SVG. */
-  margin: -1px 0;
-  transform: rotate(-90deg);
+.hist-bar {
+  width: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--border-default);
 }
-.progress-ring-track {
-  stroke: var(--border-default);
-  stroke-width: 2;
-  fill: none;
-}
-.progress-ring-fill {
-  stroke: var(--brand-bg-default);
-  stroke-width: 2;
-  fill: none;
-  stroke-linecap: round;
-  transition: stroke-dashoffset .3s;
-}
-
-.progress-label {
+.hist-bar.filled { background: var(--brand-bg-default); }
+.hist-wrap.warn .hist-bar.filled { background: var(--status-warning-solid); }
+.hist-wrap.overrun .hist-bar { background: var(--status-error-solid); }
+.hist-label {
   font-size: 12px;
   color: var(--text-tertiary);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
   white-space: nowrap;
-  flex-shrink: 0;
-  text-align: left;
 }
-.progress-label .progress-total { color: inherit; font-weight: inherit; }
-.progress-label .progress-filled { color: var(--brand-bg-default); font-weight: 600; }
-.progress-label .progress-sep { margin: 0 2px; opacity: 0.6; }
+.hist-label .hist-filled { color: var(--brand-bg-default); font-weight: 600; }
+.hist-wrap.warn .hist-label .hist-filled { color: var(--status-warning-fg); }
+.hist-wrap.overrun .hist-label .hist-filled { color: var(--status-error-fg); }
+.hist-label .hist-sep { margin: 0 2px; opacity: 0.6; }
 
 /* ─── Row actions ────────────────────────────────────── */
 .row-actions {
@@ -1882,7 +1874,7 @@ body {
 }
 .header-zone,
 .table-zone {
-  background: var(--bg-elevated);
+  background: var(--bg-surface);
   border: none;
   border-radius: var(--radius-md);
 }
@@ -2129,14 +2121,83 @@ body {
 /* ─── Quantity direction sign (+ inbound / − outbound) ─── */
 .qty-cell .qty-sign { margin-right: 1px; color: var(--text-tertiary); font-weight: 600; }
 
-/* ─── Contract progress thresholds ───────────────────────
-   Ring + filled count shift hue as the contract nears (≥75%) or
-   exceeds (≥100%) its total. Skipped on selected rows, where the brand
-   tint already owns the row's colour. */
-tbody tr:not(.selected) .progress-wrap.warn .progress-ring-fill { stroke: var(--status-warning-solid); }
-tbody tr:not(.selected) .progress-wrap.warn .progress-filled { color: var(--status-warning-fg); }
-tbody tr:not(.selected) .progress-wrap.overrun .progress-ring-fill { stroke: var(--status-error-solid); }
-tbody tr:not(.selected) .progress-wrap.overrun .progress-filled { color: var(--status-error-fg); }
+/* ─── Contract histogram thresholds (warn ≥75%, overrun ≥100%) ─── */
+
+/* ─── Confirmation modal ────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+}
+.modal-overlay[hidden] { display: none; }
+.modal-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-8);
+  max-width: 400px;
+  width: calc(100% - 48px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  box-shadow: 0 8px 32px rgba(0,0,0,.45);
+}
+.modal-icon {
+  width: 48px; height: 48px;
+  background: var(--status-error-bg);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--status-error-fg);
+  font-size: 24px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0;
+}
+.modal-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+  width: 100%;
+}
+.modal-btn {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-family-sans);
+  cursor: pointer;
+  border: none;
+  transition: background .15s;
+}
+.modal-btn-cancel {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-fg);
+  border: 1px solid var(--button-secondary-border);
+}
+.modal-btn-cancel:hover { background: var(--button-secondary-bg-hover); }
+.modal-btn-delete {
+  background: var(--button-destructive-bg);
+  color: var(--button-destructive-fg);
+}
+.modal-btn-delete:hover { filter: brightness(1.1); }
 
 /* ─── Undo toast ─────────────────────────────────────── */
 .toast-stack {
@@ -2530,6 +2591,12 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
         <span class="notif-badge" aria-hidden="true"></span>
         <i class="ph ph-bell" style="font-size:20px" aria-hidden="true"></i>
       </button>
+      <button type="button" class="btn-icon" id="btn-lang" data-tooltip="Switch language" aria-label="Switch language" onclick="toggleLang()">
+        <span class="flag fi fis fi-it" aria-hidden="true" style="font-size:20px"></span>
+      </button>
+      <button type="button" class="btn-icon" id="btn-theme" data-tooltip="Switch theme" aria-label="Switch theme" onclick="window.SemTheme.toggle(); syncMenuToggles();">
+        <i class="ph ph-sun" style="font-size:20px" aria-hidden="true"></i>
+      </button>
       <div class="header-menu-wrap">
         <button type="button" class="btn-icon" id="settings-btn" data-tooltip="Account and settings" aria-label="Account and settings" aria-haspopup="menu" aria-expanded="false" onclick="toggleHeaderMenu(event)">
           <i class="ph ph-squares-four" style="font-size:20px" aria-hidden="true"></i>
@@ -2543,12 +2610,6 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
           </button>
           <button type="button" class="header-menu-item" role="menuitem" onclick="showToast('User settings aren\'t available in this prototype.'); closeHeaderMenu();">
             <i class="ph ph-gear-six" aria-hidden="true"></i> User settings
-          </button>
-          <button type="button" class="header-menu-item" id="hm-theme" role="menuitem" onclick="window.SemTheme.toggle(); syncMenuToggles();">
-            <i class="ph ph-sun" aria-hidden="true"></i> <span class="hm-label">Light theme</span>
-          </button>
-          <button type="button" class="header-menu-item" id="hm-lang" role="menuitem" onclick="toggleLang();">
-            <span class="flag fi fis fi-it" aria-hidden="true"></span> <span class="hm-label">Italiano</span>
           </button>
           <div class="header-menu-sep" role="separator"></div>
           <button type="button" class="header-menu-item is-danger" role="menuitem" onclick="window.location.href='sem-001-login.html'">
@@ -2688,6 +2749,9 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
         <div class="tag-dropdown" id="tag-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search">
+            <input type="text" class="tag-search-input" placeholder="Search tags…" aria-label="Search tags" oninput="filterTagOptions(this)" onkeydown="event.stopPropagation()">
+          </div>
           <label class="tag-option"><input type="checkbox" value="XAB"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> XAB</label>
           <label class="tag-option"><input type="checkbox" value="IRON"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> IRON</label>
           <label class="tag-option"><input type="checkbox" value="P10"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> P10</label>
@@ -2852,6 +2916,19 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
 
 </main>
 
+<!-- Confirmation modal (delete) -->
+<div class="modal-overlay" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" hidden>
+  <div class="modal-card">
+    <div class="modal-icon"><i class="ph-fill ph-warning" aria-hidden="true"></i></div>
+    <h2 class="modal-title" id="confirm-title">Delete this movement?</h2>
+    <p class="modal-desc">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn modal-btn-cancel" id="confirm-cancel">Cancel</button>
+      <button type="button" class="modal-btn modal-btn-delete" id="confirm-ok">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Sample data ──────────────────────────────────────
 var rows = [
@@ -2903,8 +2980,19 @@ function progressClass(filled, total) {
   var pct = filled / total;
   if (pct >= 1) return 'overrun';
   if (pct >= 0.75) return 'warn';
-  if (pct >= 0.25) return 'ok';
   return 'ok';
+}
+
+function histBars(pct) {
+  var NUM = 5, bars = '';
+  for (var i = 0; i < NUM; i++) {
+    var segStart = i / NUM, segEnd = (i + 1) / NUM;
+    var isFull = pct >= segEnd;
+    var isPartial = !isFull && pct > segStart;
+    var h = isFull ? 14 : isPartial ? Math.max(4, Math.round(14 * (pct - segStart) * NUM)) : 3;
+    bars += '<div class="hist-bar' + (isFull || isPartial ? ' filled' : '') + '" style="height:' + h + 'px"></div>';
+  }
+  return bars;
 }
 
 function titleCase(s) {
@@ -3067,20 +3155,14 @@ function renderRows() {
         + '<span class="sr-only">' + (r.qty < 0 ? 'outbound ' : 'inbound ') + '</span>'
         + formatQty(r.qty) + '</td>'
       + (function() {
-          var C = 2 * Math.PI * 6;
-          var off = C * (1 - pct);
           return '<td><div class="contract-cell">'
-            + '<span class="contract-badge"><span class="contract-prefix">№</span>' + escAttr(r.cont) + '</span>'
-            + '<div class="progress-wrap ' + pClass + '">'
-              + '<svg class="progress-ring" viewBox="0 0 16 16" aria-hidden="true">'
-                + '<circle class="progress-ring-track" cx="8" cy="8" r="6"/>'
-                + '<circle class="progress-ring-fill" cx="8" cy="8" r="6"'
-                  + ' style="stroke-dasharray:' + C.toFixed(2) + ';stroke-dashoffset:' + off.toFixed(2) + ';"/>'
-              + '</svg>'
-              + '<span class="progress-label">'
-                + '<span class="progress-filled">' + r.filled.toLocaleString('de-DE') + '</span>'
-                + '<span class="progress-sep">/</span>'
-                + '<span class="progress-total">' + r.total.toLocaleString('de-DE') + '</span>'
+            + '<span class="contract-badge">' + escAttr(r.cont) + '</span>'
+            + '<div class="hist-wrap ' + pClass + '">'
+              + '<div class="hist-bars">' + histBars(pct) + '</div>'
+              + '<span class="hist-label">'
+                + '<span class="hist-filled">' + r.filled.toLocaleString('de-DE') + '</span>'
+                + '<span class="hist-sep">/</span>'
+                + '<span class="hist-total">' + r.total.toLocaleString('de-DE') + '</span>'
               + '</span>'
             + '</div>'
           + '</div></td>';
@@ -3091,7 +3173,7 @@ function renderRows() {
             + '<button type="button" class="act-btn" data-tooltip="Open document" aria-label="Open document for ' + lbl + '"><i class=\"ph-fill ph-file-text\" aria-hidden=\"true\"></i></button>'
             + '<button type="button" class="act-btn" data-tooltip="View details" aria-label="View row ' + lbl + '"><i class=\"ph-fill ph-eye\" aria-hidden=\"true\"></i></button>'
             + '<button type="button" class="act-btn" data-tooltip="Flag movement" aria-label="Flag row ' + lbl + '"><i class=\"ph-fill ph-warning\" aria-hidden=\"true\"></i></button>'
-            + '<button type="button" class="act-btn" data-tooltip="Delete movement" aria-label="Delete row ' + lbl + '" onclick="event.stopPropagation();deleteRow(' + r._uid + ')"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
+            + '<button type="button" class="act-btn" data-tooltip="Delete movement" aria-label="Delete row ' + lbl + '" onclick="event.stopPropagation();openConfirmModal(' + r._uid + ')"><i class=\"ph-fill ph-trash\" aria-hidden=\"true\"></i></button>'
           + '</div></td>';
         })()
       + '</tr>';
@@ -3530,22 +3612,19 @@ var _menuLang = 'it';
    clicking either one flips it. */
 function syncMenuToggles() {
   var light = document.documentElement.getAttribute('data-theme') === 'light';
-  var themeItem = document.getElementById('hm-theme');
-  if (themeItem) {
-    var ti = themeItem.querySelector('i');
-    var tl = themeItem.querySelector('.hm-label');
-    /* Label names the ACTION (what the click does), not the current state:
-       in dark you see "Light theme" (switch to light), and vice versa. */
-    if (ti) ti.className = 'ph ' + (light ? 'ph-moon' : 'ph-sun');
-    if (tl) tl.textContent = light ? 'Dark theme' : 'Light theme';
-    themeItem.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+  var themeBtn = document.getElementById('btn-theme');
+  if (themeBtn) {
+    var ti = themeBtn.querySelector('i');
+    if (ti) { ti.className = 'ph ' + (light ? 'ph-moon' : 'ph-sun'); ti.style.fontSize = '20px'; }
+    themeBtn.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+    themeBtn.setAttribute('data-tooltip', light ? 'Switch to dark theme' : 'Switch to light theme');
   }
-  var langItem = document.getElementById('hm-lang');
-  if (langItem) {
-    var lf = langItem.querySelector('.flag');
-    var ll = langItem.querySelector('.hm-label');
+  var langBtn = document.getElementById('btn-lang');
+  if (langBtn) {
+    var lf = langBtn.querySelector('.flag');
     if (lf) lf.className = 'flag fi fis ' + (_menuLang === 'it' ? 'fi-it' : 'fi-gb');
-    if (ll) ll.textContent = _menuLang === 'it' ? 'Italiano' : 'English';
+    langBtn.setAttribute('aria-label', _menuLang === 'it' ? 'Switch to English' : 'Passa a Italiano');
+    langBtn.setAttribute('data-tooltip', _menuLang === 'it' ? 'Switch to English' : 'Passa a Italiano');
   }
 }
 function toggleLang() {
@@ -3596,12 +3675,24 @@ function closeOpenDropdowns(except) {
   });
 }
 
+function filterTagOptions(input) {
+  var q = input.value.toLowerCase();
+  document.querySelectorAll('#tag-dropdown .tag-option').forEach(function(opt) {
+    var val = opt.querySelector('input').value.toLowerCase();
+    opt.style.display = val.includes(q) ? '' : 'none';
+  });
+}
+
 function toggleTagDropdown(e) {
   e.stopPropagation();
   var chip = document.getElementById('tag-select');
   closeOpenDropdowns(chip);
   chip.classList.toggle('open');
   chip.setAttribute('aria-expanded', chip.classList.contains('open') ? 'true' : 'false');
+  if (chip.classList.contains('open')) {
+    var si = chip.querySelector('.tag-search-input');
+    if (si) { si.value = ''; filterTagOptions(si); si.focus(); }
+  }
 }
 
 function updateTagChip() {
@@ -3959,6 +4050,8 @@ document.addEventListener('keydown', function(e) {
 
   // Escape closes any open dropdown (and the date picker if open).
   if (e.key === 'Escape') {
+    var modal = document.getElementById('confirm-modal');
+    if (modal && !modal.hasAttribute('hidden')) { closeConfirmModal(); e.preventDefault(); return; }
     if (closeHeaderMenu()) { e.preventDefault(); return; }
     if (closeLegend()) { e.preventDefault(); return; }
     var open = document.querySelectorAll('.field.is-select.open, .field.is-combo.open, .tag-chip.open');
@@ -4042,6 +4135,24 @@ function runUpdate(btn) {
    a 6s undo toast — cheaper for the user than a blocking confirm dialog,
    and fully reversible. */
 var _undoTimer = null;
+var _confirmUid = null;
+function openConfirmModal(uid) {
+  _confirmUid = uid;
+  var m = document.getElementById('confirm-modal');
+  m.removeAttribute('hidden');
+  document.getElementById('confirm-ok').focus();
+}
+function closeConfirmModal() {
+  _confirmUid = null;
+  document.getElementById('confirm-modal').setAttribute('hidden', '');
+}
+document.getElementById('confirm-ok').addEventListener('click', function() {
+  if (_confirmUid !== null) { var uid = _confirmUid; closeConfirmModal(); deleteRow(uid); }
+});
+document.getElementById('confirm-cancel').addEventListener('click', closeConfirmModal);
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirmModal();
+});
 function deleteRow(uid) {
   var idx = rows.findIndex(function(r) { return r._uid === uid; });
   if (idx < 0) return;
@@ -4392,7 +4503,7 @@ document.addEventListener('mousedown', function() {
       case 'select': if (row) { row._selected = true; renderRows(); } break;
       case 'deselect': if (row) { row._selected = false; renderRows(); } break;
       case 'flag': showToast('Movement flagged.'); break;
-      case 'delete': deleteRow(uid); break;
+      case 'delete': openConfirmModal(uid); break;
       case 'deletesel': deleteSelected(); break;
       case 'export': showToast('Export isn\'t available in this prototype.'); break;
       case 'clearsel': clearSelection(); break;

@@ -31,10 +31,10 @@
   --neutral-400: oklch(0.700 0.014 240);
   --neutral-500: oklch(0.580 0.014 240);
   --neutral-600: oklch(0.460 0.014 240);
-  --neutral-700: oklch(0.330 0.020 240);
-  --neutral-750: oklch(0.270 0.022 240);
-  --neutral-800: oklch(0.220 0.025 240);
-  --neutral-850: oklch(0.190 0.025 240);
+  --neutral-700: oklch(0.327 0.018 239);
+  --neutral-750: oklch(0.271 0.017 237);
+  --neutral-800: oklch(0.242 0.015 236);   /* dark neutrals retuned to match Figma sRGB scale (were too black) */
+  --neutral-850: oklch(0.213 0.014 239);
   --neutral-900: oklch(0.160 0.025 240);
   --neutral-950: oklch(0.110 0.020 240);
   --green-100: oklch(0.930 0.060 145);
