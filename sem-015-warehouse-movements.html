@@ -2635,24 +2635,20 @@ tbody tr.context-target td:first-child { box-shadow: inset 0 0 0 1000px color-mi
         </div>
       </label>
 
-      <div class="field is-combo" data-name="Warehouse" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="warehouse-listbox" aria-label="Warehouse"
-           onclick="if(!event.target.closest('.custom-select-dropdown,.field-clear')) this.querySelector('.combo-input').focus()">
-        <span class="field-label" id="warehouse-label">Warehouse</span>
+      <div class="field tag-chip" id="wh-select" data-name="Warehouse" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="Warehouse" onclick="toggleChipDropdown(event, this)">
+        <span class="field-label" aria-hidden="true">Warehouse</span>
         <div class="field-row">
-          <input type="text" class="combo-input" id="f-warehouse" placeholder="All"
-                 autocomplete="off" spellcheck="false" role="searchbox"
-                 aria-autocomplete="list" aria-controls="warehouse-listbox" aria-labelledby="warehouse-label"
-                 onfocus="openCombo(this)" oninput="filterCombo(this)" onblur="closeCombo(this)" onkeydown="comboKeydown(event, this)">
+          <span class="tag-chip-text" id="wh-chip-text"><span class="tag-placeholder">All</span></span>
+          <button type="button" class="tag-counter" id="wh-counter" aria-label="Clear warehouse filter" onclick="event.stopPropagation();clearField('Warehouse');"><span class="tag-counter-num" aria-hidden="true"></span><i class="ph-bold ph-x tag-counter-x" aria-hidden="true"></i></button>
           <i class="ph-bold ph-caret-down field-caret" style="font-size:14px" aria-hidden="true"></i>
         </div>
-        <button type="button" class="field-clear" onmousedown="event.preventDefault()" onclick="clearCombo(event)" aria-label="Clear Warehouse">
-          <i class="ph-bold ph-x" style="font-size:14px" aria-hidden="true"></i>
-        </button>
-        <div class="custom-select-dropdown" id="warehouse-listbox" role="listbox" aria-label="Warehouse">
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Porto Marghera</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Taranto</div>
-          <div class="custom-option" role="option" tabindex="-1" onmousedown="selectCombo(event, this)">Gaeta</div>
-          <div class="combo-empty" aria-hidden="true" style="display:none">No matches</div>
+        <div class="tag-dropdown" id="wh-dropdown" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">
+          <div class="tag-search">
+            <input type="text" class="tag-search-input" placeholder="Search warehouses…" aria-label="Search warehouses" oninput="filterChipOptions(this)" onkeydown="event.stopPropagation()">
+          </div>
+          <label class="tag-option"><input type="checkbox" value="Porto Marghera"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Porto Marghera</label>
+          <label class="tag-option"><input type="checkbox" value="Taranto"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Taranto</label>
+          <label class="tag-option"><input type="checkbox" value="Gaeta"><span class="checkbox" aria-hidden="true"><i class="ph-bold ph-check"></i></span> Gaeta</label>
         </div>
       </div>
 
@@ -3009,7 +3005,8 @@ function collectFilters() {
     var name = el.getAttribute('data-name');
     var items = readField(el);
     if (el.classList.contains('tag-chip')) {
-      f.tags = items.map(function(i) { return i.value; });
+      var arr = items.map(function(i) { return i.value; });
+      if (name === 'Tags') { f.tags = arr; } else { f[name] = arr; }
     } else if (el.classList.contains('date-range')) {
       if (items.length) {
         var parts = items[0].value.split(' — ');
@@ -3025,12 +3022,12 @@ function collectFilters() {
 
 function hasActiveFilters() {
   var f = collectFilters();
-  return !!(f.Search || f.Warehouse || f.Subproduct || f.Vessel || f.Contract
+  return !!(f.Search || (f.Warehouse && f.Warehouse.length) || f.Subproduct || f.Vessel || f.Contract
     || f.Destination || f['Job order'] || f.dateStart || (f.tags && f.tags.length));
 }
 
 function matchesFilters(r, f) {
-  if (f.Warehouse && r.wh !== f.Warehouse) return false;
+  if (f.Warehouse && f.Warehouse.length && f.Warehouse.indexOf(r.wh) === -1) return false;
   if (f.Subproduct && r.sub !== f.Subproduct) return false;
   if (f.Destination && r.dest !== f.Destination) return false;
   if (f['Job order'] && r.job !== f['Job order']) return false;
@@ -3662,48 +3659,50 @@ function closeOpenDropdowns(except) {
   });
 }
 
-function filterTagOptions(input) {
+function filterChipOptions(input) {
   var q = input.value.toLowerCase();
-  document.querySelectorAll('#tag-dropdown .tag-option').forEach(function(opt) {
+  var dropdown = input.closest('.tag-dropdown');
+  if (!dropdown) return;
+  dropdown.querySelectorAll('.tag-option').forEach(function(opt) {
     var val = opt.querySelector('input').value.toLowerCase();
     opt.style.display = val.includes(q) ? '' : 'none';
   });
 }
+function filterTagOptions(input) { filterChipOptions(input); }
 
-function toggleTagDropdown(e) {
+function toggleChipDropdown(e, chipEl) {
   e.stopPropagation();
-  var chip = document.getElementById('tag-select');
-  closeOpenDropdowns(chip);
-  chip.classList.toggle('open');
-  chip.setAttribute('aria-expanded', chip.classList.contains('open') ? 'true' : 'false');
-  if (chip.classList.contains('open')) {
-    var si = chip.querySelector('.tag-search-input');
-    if (si) { si.value = ''; filterTagOptions(si); si.focus(); }
+  closeOpenDropdowns(chipEl);
+  chipEl.classList.toggle('open');
+  chipEl.setAttribute('aria-expanded', chipEl.classList.contains('open') ? 'true' : 'false');
+  if (chipEl.classList.contains('open')) {
+    var si = chipEl.querySelector('.tag-search-input');
+    if (si) { si.value = ''; filterChipOptions(si); si.focus(); }
   }
 }
+function toggleTagDropdown(e) { toggleChipDropdown(e, document.getElementById('tag-select')); }
 
-function updateTagChip() {
-  var checked = document.querySelectorAll('#tag-dropdown input:checked');
-  var chip = document.getElementById('tag-select');
-  var text = document.getElementById('tag-chip-text');
-  var counter = document.getElementById('tag-counter');
-  var counterNum = counter.querySelector('.tag-counter-num');
+function updateChip(chipEl) {
+  var checked = chipEl.querySelectorAll('input[type=checkbox]:checked');
+  var text = chipEl.querySelector('.tag-chip-text');
+  var counterNum = chipEl.querySelector('.tag-counter-num');
   if (checked.length === 0) {
-    text.innerHTML = '<span class="tag-placeholder">All</span>';
-    counterNum.textContent = '';
-    chip.classList.remove('has-value');
+    if (text) text.innerHTML = '<span class="tag-placeholder">All</span>';
+    if (counterNum) counterNum.textContent = '';
+    chipEl.classList.remove('has-value');
   } else {
-    text.textContent = Array.from(checked).map(function(c) { return c.value; }).join('; ');
-    counterNum.textContent = checked.length;
-    chip.classList.add('has-value');
+    if (text) text.textContent = Array.from(checked).map(function(c) { return c.value; }).join('; ');
+    if (counterNum) counterNum.textContent = checked.length;
+    chipEl.classList.add('has-value');
   }
   syncFilters();
 }
+function updateTagChip() { updateChip(document.getElementById('tag-select')); }
 
 function removeTag(e, value) {
   e.stopPropagation();
   var cb = document.querySelector('#tag-dropdown input[value="' + value + '"]');
-  if (cb) { cb.checked = false; updateTagChip(); }
+  if (cb) { cb.checked = false; updateChip(document.getElementById('tag-select')); }
 }
 
 function toggleSelect(e, el) {
@@ -3879,7 +3878,7 @@ function clearField(name) {
     }
     if (el.classList.contains('tag-chip')) {
       el.querySelectorAll('input:checked').forEach(function(cb){ cb.checked = false; });
-      updateTagChip();
+      updateChip(el);
       return;
     }
     if (el.classList.contains('is-combo')) { resetCombo(el); return; }
@@ -3995,9 +3994,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Tag multiselect: track checkbox state
-  document.querySelectorAll('#tag-dropdown input').forEach(function(cb) {
-    cb.addEventListener('change', updateTagChip);
+  // Multiselect chips: track checkbox state for all tag-chip dropdowns
+  document.querySelectorAll('.tag-chip input[type=checkbox]').forEach(function(cb) {
+    cb.addEventListener('change', function() { updateChip(this.closest('.tag-chip')); });
   });
 
   // Sync filter chips bar + table on any text input (debounced).
