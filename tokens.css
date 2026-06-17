@@ -55,8 +55,8 @@
   --base-white: oklch(1 0 0);
   --base-black: oklch(0 0 0);
   --bg-page: var(--neutral-950);
-  --bg-surface: var(--neutral-900);
-  --bg-elevated: var(--neutral-800);
+  --bg-surface: var(--neutral-850);   /* lighter/softer dark surfaces, clearer layering (matches Figma) */
+  --bg-elevated: var(--neutral-700);
   --bg-overlay: var(--neutral-700);
   --text-primary: var(--neutral-50);
   --text-secondary: var(--neutral-350);
@@ -121,7 +121,7 @@
   --table-row-bg-selected: var(--surface-selected);
   --table-row-border: var(--border-subtle);
   --table-row-zebra: color-mix(in oklch, color-mix(in oklch, var(--blue-400) 30%, var(--neutral-400)) 5%, transparent);
-  --sidebar-bg: var(--bg-elevated);
+  --sidebar-bg: var(--bg-page);
   --sidebar-border: transparent;
   --sidebar-item-fg: var(--text-secondary);
   --sidebar-item-fg-active: var(--text-primary);
