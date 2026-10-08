@@ -54,10 +54,27 @@
   --orange-900: oklch(0.250 0.050 60);
   --base-white: oklch(1 0 0);
   --base-black: oklch(0 0 0);
-  --bg-page: var(--neutral-950);
-  --bg-surface: var(--neutral-850);   /* lighter/softer dark surfaces, clearer layering (matches Figma) */
-  --bg-elevated: var(--neutral-700);
-  --bg-overlay: var(--neutral-700);
+
+  /* ── Elevation ladder ───────────────────────────────────────
+     Ordered surface roles, each rung one step further from the
+     page background = more "presence" (CLAUDE.md rules 1-2). A
+     control RESTS above its card and LIFTS further on hover, so a
+     control surface can never resolve to its host card's colour
+     (the field/backing merge bug). Dark climbs lighter per rung;
+     the light theme (below) inverts the DIRECTION — cards go
+     bright-white, controls step DARKER — but the ROLE ORDER
+     canvas < card < control < control-hover is preserved. Author
+     component surfaces from these rungs, not from raw neutral-*. */
+  --surface-canvas:        var(--neutral-950); /* the page itself */
+  --surface-card:          var(--neutral-850); /* toolbar, table, panels on the canvas */
+  --surface-control:       var(--neutral-750); /* field/input at rest, above its card */
+  --surface-control-hover: var(--neutral-700); /* control hover/active — one rung higher */
+  --surface-overlay:       var(--neutral-700); /* floating menus, dropdowns, toasts */
+
+  --bg-page: var(--surface-canvas);
+  --bg-surface: var(--surface-card);
+  --bg-elevated: var(--surface-overlay);
+  --bg-overlay: var(--neutral-700);   /* a hover overlay, not a floating surface — kept off the ladder */
   --text-primary: var(--neutral-50);
   --text-secondary: var(--neutral-350);
   --text-tertiary: oklch(0.600 0.014 240);
@@ -68,6 +85,10 @@
   --border-subtle: var(--neutral-750);
   --border-strong: var(--neutral-600);
   --border-focus: var(--neutral-400);
+  /* Dividers on the bare page canvas (e.g. the flat sidebar). Kept SEPARATE
+     from --border-* (which mean "a line on a card") so retuning a card border
+     never silently changes the sidebar's divider, and vice versa. */
+  --divider-on-canvas: var(--neutral-700);
   --brand-bg-default: var(--blue-400);
   --brand-bg-hover: var(--blue-500);
   --brand-bg-subtle: var(--blue-900);
@@ -102,8 +123,8 @@
   --button-ghost-fg: var(--text-secondary);
   --button-destructive-bg: var(--status-error-solid);
   --button-destructive-fg: var(--base-white);
-  --input-bg: var(--neutral-750);          /* solid field surface (was bg-elevated) */
-  --input-bg-hover: var(--neutral-700);
+  --input-bg: var(--surface-control);        /* control rest rung of the elevation ladder */
+  --input-bg-hover: var(--surface-control-hover);  /* control hover rung — always one above rest */
   --input-fg: var(--text-primary);
   --input-placeholder: var(--text-secondary);
   --input-border-default: var(--border-default);
@@ -151,12 +172,24 @@
 }
 
 [data-theme="light"] {
-  --bg-page: oklch(0.910 0.012 240);
-  --bg-surface: var(--base-white);   /* both surface & elevated white in light (matches Figma) */
-  --bg-elevated: var(--base-white);
+  /* Elevation ladder, light theme. DIRECTION inverts vs dark: the grey desk
+     (canvas) is the darkest surface, cards pop up to bright white, and controls
+     step DARKER than their white card to show presence (can't lighten past
+     white). Role order canvas < card < control < control-hover is preserved,
+     so the same component tokens stay correct without per-page patching. */
+  --surface-canvas:        var(--neutral-200); /* the grey desk */
+  --surface-card:          var(--base-white);  /* cards pop white off the desk */
+  --surface-control:       var(--neutral-150); /* field rest — a hair darker than the white card */
+  --surface-control-hover: var(--neutral-175); /* field hover — one gentle step darker again */
+  --surface-overlay:       var(--base-white);  /* floating menus ride bright, lifted by shadow */
+
+  --bg-page: var(--surface-canvas);
+  --bg-surface: var(--surface-card);
+  --bg-elevated: var(--surface-overlay);
   --bg-overlay: var(--neutral-200);
-  --input-bg: var(--neutral-150);
-  --input-bg-hover: var(--neutral-175);
+  --input-bg: var(--surface-control);
+  --input-bg-hover: var(--surface-control-hover);
+  --divider-on-canvas: var(--neutral-300);   /* gentle ~ΔL 0.08 line on the light sidebar */
   --text-primary: var(--neutral-900);
   --text-secondary: oklch(0.360 0.014 240);
   --text-tertiary: oklch(0.520 0.014 240);

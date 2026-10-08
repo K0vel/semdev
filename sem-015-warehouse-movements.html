@@ -265,7 +265,8 @@ body.keyboard-nav th.sortable:focus-visible {
   padding: var(--spacing-1) 22px;
   min-height: 56px;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--border-default);
+  /* Separator above the first nav group — same canvas-divider role as .nav-divider. */
+  border-bottom: 1px solid var(--divider-on-canvas);
 }
 .sidebar-logo-mark {
   width: 24px;
@@ -379,10 +380,10 @@ body.keyboard-nav th.sortable:focus-visible {
 
 .nav-divider {
   height: 1px;
-  /* A soft divider. Both themes use border-default: on the light sidebar
-     (canvas ≈ neutral-200) border-default (neutral-300) reads as a gentle
-     ΔL ~0.08 line — border-strong (neutral-400) was far too dark. */
-  background: var(--border-default);
+  /* The sidebar is flat on the page canvas, so its dividers use the
+     canvas-divider role — decoupled from --border-* (card lines). Gentle in
+     both themes (dark neutral-700; light neutral-300, ΔL ~0.08 on the desk). */
+  background: var(--divider-on-canvas);
   /* Span the content width (aligned with the nav-item boxes), not edge-to-
      edge: drop the negative side margin so the ends line up with the items. */
   margin: var(--spacing-2) 0;
@@ -1897,13 +1898,11 @@ body {
   border-bottom: none; /* gap separates header from the toolbar card now */
 }
 .header-zone .toolbar {
-  /* Toolbar card sits on the darker bg-surface (dark: neutral-850) so the
-     fields — input-bg neutral-750 — rest ABOVE their podkladka. With the old
-     bg-elevated (neutral-700) backing the field rested darker than its card
-     and hover (input-bg-hover = neutral-700) landed exactly on the backing,
-     merging into it. In light theme bg-surface = bg-elevated = white, so the
-     light look is unchanged. */
-  background: var(--bg-surface);
+  /* Toolbar is a CARD rung of the elevation ladder, so the fields on it
+     (control rung) rest one step above and lift again on hover — they can
+     never resolve to the toolbar's own colour. (The old bg-elevated backing
+     shared the control-hover rung, which is what made fields merge on hover.) */
+  background: var(--surface-card);
   border-radius: var(--radius-md);
 }
 .toolbar { overflow: visible; }
